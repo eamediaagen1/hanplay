@@ -1,0 +1,224 @@
+Continue from the current project state and do not break existing routes, auth, or product logic.
+
+I want you to fully redesign and upgrade the landing page so it looks much more attractive, complete, modern, and trustworthy.
+
+GOAL
+Create a polished SaaS landing page that clearly explains the product, shows benefits, improves trust, and encourages users to join / waitlist / get early access.
+
+The landing page should feel premium, clean, and conversion-focused.
+
+IMPORTANT CONTEXT ABOUT THE PRODUCT
+This app helps users learn Chinese through a structured HSK system with:
+- flashcards by category
+- phrases
+- quizzes and exams
+- progress tracking
+- level progression (HSK1 → HSK6)
+- premium access for full content
+- demo experience for free users
+
+The landing page should explain the product simply and clearly for beginners and HSK learners.
+
+================================
+PART 1 — FULL LANDING PAGE REDESIGN
+================================
+
+Please redesign the landing page with a much better structure and stronger visual hierarchy.
+
+It should include these sections:
+
+1. Hero section
+- strong headline
+- short clear subheadline
+- primary CTA
+- secondary CTA if useful
+- product preview / mockup / visual area
+- polished layout, not plain text only
+
+2. Problem section
+Show the pain points:
+- learning Chinese feels overwhelming
+- no clear structure
+- inconsistent study methods
+- hard to track progress
+- hard to stay motivated
+
+3. Solution section
+Explain how the app solves this:
+- structured HSK path
+- flashcards + phrases + quizzes
+- exam-based progression
+- clear next step
+- all in one place
+
+4. Features section
+Include visually clear feature cards for:
+- Flashcards by category
+- Phrases practice
+- Quizzes and exams
+- Progress tracking
+- Level progression
+- Premium full access
+
+5. Benefits section
+Focus on outcomes:
+- learn faster
+- stay consistent
+- always know what to study next
+- prepare for HSK exams
+- track real improvement
+
+6. How it works
+Simple 3–4 step explanation:
+- choose level
+- study flashcards and phrases
+- take quiz/exam
+- unlock next level
+
+7. Testimonials section
+Add a polished testimonials block with realistic-looking testimonials.
+Create 3–6 believable testimonials from:
+- beginner learner
+- self-learner
+- exam-focused student
+- busy learner
+
+Each testimonial should include:
+- full name
+- short role or context
+- short quote
+- benefit they experienced
+
+Keep them realistic, not exaggerated.
+
+8. Demo / Coming soon / Early access section
+Since the product is still being improved, add a section like:
+- “Coming Soon”
+- “Get Early Access”
+- “Try the Demo”
+Explain why users should join early.
+
+9. Final CTA section
+Strong final call to action:
+- Join waitlist
+- Get early access
+- Try demo
+
+10. Footer
+Simple, clean footer with:
+- product name
+- copyright
+- optional links placeholder
+
+================================
+PART 2 — MAKE IT VISUALLY ATTRACTIVE
+================================
+
+Improve the design significantly.
+
+Requirements:
+- modern SaaS look
+- cleaner spacing
+- better typography hierarchy
+- stronger section separation
+- better button styling
+- card-based layout where useful
+- responsive design
+- more premium feel
+- not too crowded
+
+If the codebase uses Tailwind or an existing design system, use it consistently.
+
+If there are existing styles/components, reuse them where possible.
+
+================================
+PART 3 — TRUST + CONVERSION
+================================
+
+Make the landing page more persuasive.
+
+Add trust-building elements like:
+- testimonials
+- clear product explanation
+- “coming soon” positioning
+- stronger CTA copy
+- more polished feature presentation
+
+Possible CTA copy examples:
+- Join the Waitlist
+- Get Early Access
+- Try the Demo
+- Start Learning Smarter
+
+================================
+PART 4 — COPY IMPROVEMENT
+================================
+
+Please improve the text so it sounds clear, modern, and user-friendly.
+
+Avoid:
+- generic filler text
+- robotic marketing language
+- vague descriptions
+
+Prefer:
+- short, readable copy
+- benefit-focused wording
+- beginner-friendly explanation
+- confident but realistic tone
+
+================================
+PART 5 — PRODUCT POSITIONING
+================================
+
+The landing page should clearly communicate:
+- what the app is
+- who it is for
+- why it is useful
+- what makes it different
+- what users can do inside it
+
+The visitor should understand within a few seconds that this is:
+a structured HSK learning platform with flashcards, phrases, quizzes, and level progression.
+
+================================
+PART 6 — OPTIONAL VISUAL IMPROVEMENTS
+================================
+
+If helpful and easy:
+- add simple icons
+- add mock feature cards
+- add a product preview area
+- add gradient or premium-style accents
+- add section background contrast
+- add subtle UI polish
+
+But keep it clean, not flashy.
+
+================================
+PART 7 — RESPONSIVENESS
+================================
+
+Make sure the landing page works well on:
+- desktop
+- tablet
+- mobile
+
+The hierarchy should remain clear on small screens.
+
+================================
+PART 8 — DELIVERABLES
+================================
+
+At the end, provide:
+1. what was changed
+2. sections added/updated
+3. files changed
+4. CTA strategy used
+5. testimonial content added
+6. any placeholder content I should customize later
+
+Important:
+Do not give me only copy suggestions.
+Implement the improved landing page directly in the project.
+Keep it polished, structured, attractive, and conversion-focused.
