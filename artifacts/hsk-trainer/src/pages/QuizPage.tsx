@@ -278,7 +278,7 @@ export default function QuizPage() {
       <div className="min-h-full flex items-center justify-center">
         <div className="text-center p-8">
           <h2 className="text-2xl font-bold mb-4 text-foreground">Not enough words for a quiz</h2>
-          <button onClick={() => setLocation("/levels")} className="text-primary hover:underline">
+          <button onClick={() => setLocation("/dashboard")} className="text-primary hover:underline">
             Choose a level
           </button>
         </div>
@@ -301,7 +301,7 @@ export default function QuizPage() {
       {/* ── Sticky header ─────────────────────────────────────── */}
       <header className="sticky top-[52px] md:top-0 z-40 bg-background/90 backdrop-blur-xl border-b border-border/50 h-[52px] flex items-center justify-between px-4 shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
         <button
-          onClick={() => setLocation("/levels")}
+          onClick={() => setLocation("/dashboard")}
           className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors rounded-lg py-1.5 px-2 -ml-2 hover:bg-muted"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -537,7 +537,7 @@ export default function QuizPage() {
                         </motion.button>
                       ) : (
                         <button
-                          onClick={() => setLocation("/levels")}
+                          onClick={() => setLocation("/dashboard")}
                           className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:-translate-y-0.5 transition-all"
                         >
                           All levels complete!
@@ -551,7 +551,7 @@ export default function QuizPage() {
                           Study Flashcards
                         </button>
                         <button
-                          onClick={() => setLocation("/levels")}
+                          onClick={() => setLocation("/dashboard")}
                           className="flex-1 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors border border-border/60"
                         >
                           Level Select
@@ -583,7 +583,7 @@ export default function QuizPage() {
                           Dashboard
                         </button>
                         <button
-                          onClick={() => setLocation("/levels")}
+                          onClick={() => setLocation("/dashboard")}
                           className="flex-1 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors border border-border/60"
                         >
                           Level Select

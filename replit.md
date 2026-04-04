@@ -42,7 +42,8 @@ workspace/
 - **HSK 2–6**: Premium, words served exclusively from `GET /api/lessons?level=N` (requires valid Supabase JWT + `is_premium = true` in DB)
 
 ### Frontend (`artifacts/hsk-trainer`)
-- **Pages**: MarketingPage, PricingPage (`/pricing`), ChineseThemesPage (`/chinese-themes`), LandingPage (magic link), AuthCallback, DashboardPage (`/dashboard`), LevelSelection (`/levels`), FlashcardPage, ReviewPage, QuizPage, ProgressPage, SettingsPage, AdminPage / AdminLoginPage
+- **Pages**: MarketingPage, PricingPage (`/pricing`), LandingPage (magic link+password auth with optional name on signup), AuthCallback, DashboardPage (`/dashboard` — unified learning hub), FlashcardPage, ReviewPage, QuizPage, PhrasesPage, StrokesPage, SettingsPage, ChineseThemesPage (auth+premium-gated at `/chinese-themes`), AdminPage / AdminLoginPage
+- **Removed/redirected**: ProgressPage (redirects to `/dashboard`), LevelSelection (`/levels` redirects to `/dashboard`)
 - **Auth context**: `src/contexts/auth-context.tsx` — `AuthProvider` + `useAuth` hook
 - **Data hooks**: `use-profile.ts`, `use-saved-words.ts`, `use-study-prefs.ts`, `use-streak.ts`, `use-flashcard-position.ts`, `use-referral.ts`
   - `useStudyPrefs()` → `{ prefs: { showPinyin, autoPlay, lastLevel }, set }` — persisted to `hsk_study_prefs` in localStorage
@@ -170,10 +171,11 @@ src/pages/
 8. Run `migrations/008_streaks.sql` in Supabase SQL editor (daily streak table)
 9. Run `migrations/009_referrals.sql` in Supabase SQL editor (adds `referral_code` to profiles)
 10. Run `migrations/010_referrals_v2.sql` in Supabase SQL editor (purchase-attributed referrals table)
-11. Set all secrets listed above in Replit Secrets
-12. After first sign-in, promote yourself to admin: `UPDATE profiles SET role = 'admin' WHERE email = 'YOUR_EMAIL';`
-13. Configure Gumroad webhook URL: `https://<APP_URL>/api/gumroad/webhook?secret=<GUMROAD_WEBHOOK_SECRET>`
-14. Access admin panel at `<APP_URL>/admin` — verify at `/admin/login` to enable write actions
+11. Run `migrations/011_profile_name.sql` in Supabase SQL editor (adds `name` column to profiles)
+12. Set all secrets listed above in Replit Secrets
+13. After first sign-in, promote yourself to admin: `UPDATE profiles SET role = 'admin' WHERE email = 'YOUR_EMAIL';`
+14. Configure Gumroad webhook URL: `https://<APP_URL>/api/gumroad/webhook?secret=<GUMROAD_WEBHOOK_SECRET>`
+15. Access admin panel at `<APP_URL>/admin` — verify at `/admin/login` to enable write actions
 
 ## TypeScript & Composite Projects
 

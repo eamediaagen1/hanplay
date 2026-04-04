@@ -13,13 +13,11 @@ import LandingPage      from "@/pages/LandingPage";
 import AuthCallback     from "@/pages/AuthCallback";
 import DemoPage         from "@/pages/DemoPage";
 import DashboardPage    from "@/pages/DashboardPage";
-import LevelSelection   from "@/pages/LevelSelection";
 import FlashcardPage    from "@/pages/FlashcardPage";
 import ReviewPage       from "@/pages/ReviewPage";
 import QuizPage         from "@/pages/QuizPage";
 import PhrasesPage      from "@/pages/PhrasesPage";
 import StrokesPage      from "@/pages/StrokesPage";
-import ProgressPage     from "@/pages/ProgressPage";
 import SettingsPage     from "@/pages/SettingsPage";
 import AdminPage        from "@/pages/AdminPage";
 import AdminLoginPage   from "@/pages/AdminLoginPage";
@@ -80,13 +78,12 @@ function Router() {
   }
 
   // ── 2. True public pages — no auth needed, always render instantly ─────────
-  if (location === "/" || location === "/demo" || location === "/pricing" || location === "/chinese-themes") {
+  if (location === "/" || location === "/demo" || location === "/pricing") {
     return (
       <Switch>
         <Route path="/"                component={MarketingPage} />
         <Route path="/demo"            component={DemoPage} />
         <Route path="/pricing"         component={PricingPage} />
-        <Route path="/chinese-themes"  component={ChineseThemesPage} />
       </Switch>
     );
   }
@@ -112,13 +109,14 @@ function Router() {
     <AppShell>
       <Switch>
         <Route path="/dashboard"         component={DashboardPage} />
-        <Route path="/levels"            component={LevelSelection} />
+        <Route path="/levels"            component={() => <Redirect to="/dashboard" />} />
+        <Route path="/progress"          component={() => <Redirect to="/dashboard" />} />
         <Route path="/flashcards/:level" component={FlashcardPage} />
         <Route path="/quiz/:level"       component={QuizPage} />
         <Route path="/review"            component={ReviewPage} />
         <Route path="/phrases"           component={PhrasesPage} />
         <Route path="/strokes"           component={StrokesPage} />
-        <Route path="/progress"          component={ProgressPage} />
+        <Route path="/chinese-themes"    component={ChineseThemesPage} />
         <Route path="/settings"          component={SettingsPage} />
         <Route component={NotFound} />
       </Switch>

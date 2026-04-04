@@ -1,0 +1,229 @@
+Continue from the current project state and do not break auth, premium logic, levels, progress persistence, referral logic, or admin features.
+
+I want to restructure the app UX and navigation around a cleaner dashboard-first experience.
+
+GOAL
+- Rename “Levels” to “Dashboard”
+- Make Dashboard the main structured learning hub
+- Remove unnecessary pages
+- Add useful metrics in a clean way
+- Move review into the dashboard instead of a separate review mode/page
+- Keep Chinese Themes visible in sidebar for premium users only
+- Remove Chinese Themes from public navigation
+- Add name field on signup and show greeting like: “Hi, Name”
+
+==================================================
+PART 1 — RENAME LEVELS TO DASHBOARD
+==================================================
+
+I want the current “Levels” concept/page to become the new main Dashboard experience.
+
+Requirements:
+- rename menu/sidebar label from “Levels” to “Dashboard”
+- use Dashboard as the main organized place for learning progress and level navigation
+- preserve existing level logic, progression, and locking
+- make the dashboard cleaner and more structured than the current implementation
+
+This new Dashboard should include:
+1. current level
+2. progress bar
+3. next action
+4. level cards/status overview
+5. review section
+6. small useful metrics
+
+==================================================
+PART 2 — DELETE PROGRESS PAGE
+==================================================
+
+Remove the standalone Progress page if it exists.
+
+Requirements:
+- remove it from routes/navigation
+- move any useful content from Progress page into Dashboard if needed
+- do not leave dead links
+
+==================================================
+PART 3 — DELETE SEPARATE REVIEW MODE / PAGE
+==================================================
+
+Remove the separate Review page/mode if it exists as a standalone page.
+
+Instead:
+- integrate Review as a section/card inside Dashboard
+- make it feel like part of the main learning flow
+
+Dashboard review section can include:
+- review flashcards
+- review phrases
+- continue where user left off
+- recent or pending review items if current data supports it
+
+Do not overbuild new review logic if current data is limited.
+Just reorganize the UX so review lives inside Dashboard.
+
+==================================================
+PART 4 — NEW DASHBOARD STRUCTURE
+==================================================
+
+Build a clean organized dashboard.
+
+Suggested structure:
+
+1. Greeting Header
+- show: “Hi, {name}”
+- if no name exists yet, fall back safely
+- also show plan badge: Free / Premium
+
+2. Main Learning Card
+- current level
+- status: In Progress / Passed / Locked
+- progress bar
+- main CTA:
+  - Continue Learning
+  - Start Current Level
+  - Continue to Next Level
+
+3. Review Section
+- review card(s) integrated into dashboard
+- examples:
+  - Review Flashcards
+  - Review Phrases
+  - Resume last session
+
+4. Metrics Section
+Add only useful real metrics, such as:
+- current streak
+- levels passed
+- current level
+- exam pass count
+- referral count if already implemented
+- saved flashcard progress / last active category if available
+
+Do not add fake analytics.
+
+5. Level Overview
+- small organized level cards or strip
+- show:
+  - Passed
+  - Unlocked
+  - Locked
+
+6. Quick Actions
+Only useful actions:
+- Continue Learning
+- Go to current level
+- Review now
+- Take exam if relevant
+
+Keep dashboard:
+- organized
+- minimal
+- easy to scan
+- mobile-friendly
+
+==================================================
+PART 5 — CHINESE THEMES PAGE RULES
+==================================================
+
+I want Chinese Themes to stay in the sidebar and not be hidden there, but it should NOT be public anymore.
+
+Requirements:
+- remove Chinese Themes from public navigation / pre-login menu
+- keep Chinese Themes in app/sidebar for logged-in premium users
+- if non-premium user tries to access it, apply premium gating
+- if premium user is logged in, it should be accessible and visible in sidebar
+- keep the page structure already created, do not delete it
+
+So:
+- NOT public
+- premium-only
+- visible in app sidebar
+
+==================================================
+PART 6 — SIGNUP PAGE: ADD NAME FIELD
+==================================================
+
+Update signup flow to include a name field.
+
+Requirements:
+- add a “name” field to signup form
+- store it properly in the user profile / existing profile table
+- keep auth flow working
+- after signup/login, dashboard greeting should show:
+  - “Hi, Name”
+
+If profiles table lacks a name/full_name field:
+- add a migration for it
+- wire it safely into existing profile creation/update flow
+
+==================================================
+PART 7 — NAVIGATION CLEANUP
+==================================================
+
+Update navigation/sidebar/menu accordingly.
+
+Public navigation (before login):
+- Home
+- Pricing
+- Demo (if still used)
+- Login / Sign up
+
+Authenticated sidebar:
+- Dashboard
+- Settings
+- Chinese Themes (premium only, visible in app sidebar)
+- other essential items only
+
+Remove:
+- Progress page
+- standalone Review page
+- public Chinese Themes link
+
+Keep navigation clean and consistent.
+
+==================================================
+PART 8 — DATA / MIGRATIONS
+==================================================
+
+Audit current schema and add migration(s) only if needed.
+
+Potential needed additions:
+- profiles.name or profiles.full_name
+- any dashboard-derived fields if truly needed
+
+Do not duplicate correct existing fields.
+Reuse current schema if possible.
+
+==================================================
+PART 9 — SECURITY / ACCESS
+==================================================
+
+Verify:
+- Chinese Themes is not accessible publicly anymore
+- premium gating still works
+- logged-in premium users can access Chinese Themes
+- signup name field is stored securely
+- users only access their own profile data
+- no broken redirects or dead routes after removing Progress/Review pages
+
+==================================================
+PART 10 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. what you changed
+2. files/routes removed
+3. files/routes updated
+4. dashboard new structure
+5. metrics shown on dashboard
+6. how review is now integrated
+7. how Chinese Themes access works now
+8. whether a migration was added for name field
+9. any manual steps still needed
+
+IMPORTANT
+- Do not overengineer
+- Keep the product organized and clean
+- Reuse current logic where possible
+- Focus on better UX and structure, not unnecessary complexity

@@ -4,8 +4,6 @@ import {
   LayoutDashboard,
   BookOpen,
   PenLine,
-  Star,
-  BarChart3,
   Settings,
   LogOut,
   ChevronLeft,
@@ -41,30 +39,26 @@ interface NavSection {
   items: NavItem[];
 }
 
-const NAV_SECTIONS: NavSection[] = [
-  {
-    title: "Learning",
-    items: [
-      { label: "Dashboard",       icon: LayoutDashboard, href: "/dashboard" },
-      { label: "Levels",          icon: BookOpen,        href: "/levels" },
-      { label: "Stroke Learning", icon: PenLine,         href: "/strokes", badge: "NEW" },
-    ],
-  },
-  {
-    title: "Practice",
-    items: [
-      { label: "Review Mode",     icon: Star,            href: "/review" },
-    ],
-  },
-  {
-    title: "Account",
-    items: [
-      { label: "Progress",        icon: BarChart3,       href: "/progress" },
-      { label: "Settings",        icon: Settings,        href: "/settings" },
-      { label: "Chinese Themes",  icon: Palette,         href: "/chinese-themes" },
-    ],
-  },
-];
+function getNavSections(isPremium: boolean): NavSection[] {
+  return [
+    {
+      title: "Learning",
+      items: [
+        { label: "Dashboard",       icon: LayoutDashboard, href: "/dashboard" },
+        { label: "Stroke Learning", icon: PenLine,         href: "/strokes", badge: "NEW" },
+      ],
+    },
+    {
+      title: "Account",
+      items: [
+        { label: "Settings",        icon: Settings,        href: "/settings" },
+        ...(isPremium
+          ? [{ label: "Chinese Themes", icon: Palette, href: "/chinese-themes" }]
+          : []),
+      ],
+    },
+  ];
+}
 
 // ─── Single nav item button ───────────────────────────────────────────────────
 
@@ -220,7 +214,7 @@ function SidebarContent({
 
       {/* Nav sections */}
       <nav className="flex-1 overflow-y-auto overflow-x-hidden py-3 px-2 flex flex-col gap-4 scrollbar-none">
-        {NAV_SECTIONS.map((section) => (
+        {getNavSections(isPremium).map((section) => (
           <div key={section.title}>
             {/* Section label */}
             <AnimatePresence initial={false}>
@@ -436,8 +430,7 @@ export function Sidebar() {
   };
 
   const isActive = (href: string) => {
-    if (href === "/dashboard") return location === "/dashboard";
-    if (href === "/levels") return location === "/levels";
+    if (href === "/dashboard") return location === "/dashboard" || location === "/levels";
     if (href === "/flashcards/1") return location.startsWith("/flashcards");
     return location === href;
   };

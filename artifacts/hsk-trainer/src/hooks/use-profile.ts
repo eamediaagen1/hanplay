@@ -5,6 +5,7 @@ import { apiFetch } from "@/lib/api";
 export interface Profile {
   id: string;
   email: string;
+  name: string | null;
   is_premium: boolean;
   premium_source: string | null;
   premium_granted_at: string | null;
@@ -19,7 +20,7 @@ export function useProfile() {
     queryKey: ["profile", user?.id],
     queryFn: () => apiFetch<Profile>("/api/me"),
     enabled: !!user,
-    staleTime: 5 * 60 * 1000,   // 5 minutes
+    staleTime: 5 * 60 * 1000,
     retry: 1,
   });
 }

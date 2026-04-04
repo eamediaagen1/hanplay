@@ -153,7 +153,7 @@ export default function FlashcardPage() {
               : "Something went wrong. Please check your connection and try again."}
           </p>
           <button
-            onClick={() => setLocation("/levels")}
+            onClick={() => setLocation("/dashboard")}
             className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors"
           >
             Back to Levels
@@ -168,7 +168,7 @@ export default function FlashcardPage() {
       <div className="min-h-full flex items-center justify-center">
         <div className="text-center p-8">
           <h2 className="text-2xl font-bold mb-4 text-foreground">No words found</h2>
-          <button onClick={() => setLocation("/levels")} className="text-primary hover:underline">
+          <button onClick={() => setLocation("/dashboard")} className="text-primary hover:underline">
             Go back
           </button>
         </div>
@@ -197,7 +197,7 @@ export default function FlashcardPage() {
         {/* Header row */}
         <div className="flex items-center justify-between gap-3 px-4 h-[52px]">
           <button
-            onClick={() => setLocation("/levels")}
+            onClick={() => setLocation("/dashboard")}
             className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors rounded-lg py-1.5 px-2 -ml-2 hover:bg-muted"
           >
             <ChevronLeft className="w-4 h-4" />

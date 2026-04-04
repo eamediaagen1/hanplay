@@ -9,16 +9,15 @@ const router = Router();
 router.get("/me", requireAuth, async (req, res) => {
   const { data: profile, error } = await supabaseAdmin
     .from("profiles")
-    .select("id, email, is_premium, premium_source, premium_granted_at, role, created_at")
+    .select("id, email, name, is_premium, premium_source, premium_granted_at, role, created_at")
     .eq("id", req.user!.id)
     .single();
 
   if (error || !profile) {
-    // Profile may not exist yet (trigger delay) — create it
     const { data: newProfile, error: insertError } = await supabaseAdmin
       .from("profiles")
       .insert({ id: req.user!.id, email: req.user!.email })
-      .select("id, email, is_premium, premium_source, premium_granted_at, role, created_at")
+      .select("id, email, name, is_premium, premium_source, premium_granted_at, role, created_at")
       .single();
 
     if (insertError) {
@@ -32,8 +31,29 @@ router.get("/me", requireAuth, async (req, res) => {
   res.json(profile);
 });
 
+// PATCH /api/me — update editable profile fields (name)
+router.patch("/me", requireAuth, async (req, res) => {
+  const { name } = req.body as { name?: unknown };
+  if (!name || typeof name !== "string" || !name.trim()) {
+    res.status(400).json({ error: "name is required" });
+    return;
+  }
+  const safeName = name.trim().slice(0, 60);
+
+  const { error } = await supabaseAdmin
+    .from("profiles")
+    .update({ name: safeName })
+    .eq("id", req.user!.id);
+
+  if (error) {
+    res.status(500).json({ error: "Failed to update profile" });
+    return;
+  }
+
+  res.json({ success: true, name: safeName });
+});
+
 // POST /api/premium/sync — check if a Gumroad purchase exists for this email
-// and grant premium if so. Rate limited to prevent abuse.
 router.post("/premium/sync", requireAuth, syncLimiter, async (req, res) => {
   const userEmail = req.user!.email.toLowerCase().trim();
 

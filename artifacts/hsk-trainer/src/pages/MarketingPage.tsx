@@ -90,12 +90,6 @@ export default function MarketingPage() {
               Pricing
             </button>
             <button
-              onClick={() => setLocation("/chinese-themes")}
-              className="hidden md:flex text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Themes
-            </button>
-            <button
               onClick={goDemo}
               className="hidden sm:flex text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >

@@ -1,9 +1,9 @@
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import {
-  BookOpen, Brain, Star, Trophy, ChevronRight,
+  BookOpen, Brain, Star, ChevronRight,
   Lock, CheckCircle2, RefreshCw, ExternalLink, Play,
-  RotateCcw, Flame, Copy, Check, Users,
+  RotateCcw, Flame, Copy, Check, Users, PenLine,
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { useProfile } from "@/hooks/use-profile";
@@ -15,7 +15,8 @@ import { useReferral } from "@/hooks/use-referral";
 import { apiFetch } from "@/lib/api";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { consumePendingName } from "@/lib/pending-name";
 
 import { buildGumroadUrl } from "@/lib/gumroad";
 import { getStoredReferralCode } from "@/hooks/use-referral-capture";
@@ -149,7 +150,17 @@ export default function DashboardPage() {
   const savedCount = savedWords.length;
   const lastLevel  = prefs.lastLevel ?? 1;
   const email      = user?.email ?? "";
-  const firstName  = email.split("@")[0] || "learner";
+  const firstName  = profile?.name || email.split("@")[0] || "learner";
+
+  // Save pending name (stored during email-confirmation signup) once profile loads
+  useEffect(() => {
+    if (!profile || profile.name) return;
+    const pending = consumePendingName();
+    if (!pending) return;
+    apiFetch("/api/me", { method: "PATCH", body: JSON.stringify({ name: pending }) })
+      .then(() => qc.invalidateQueries({ queryKey: ["profile"] }))
+      .catch(() => {/* non-fatal */});
+  }, [profile?.id]);
 
   // Derive the best level to highlight as "active" for Continue Learning
   // Priority: last studied level → first unlocked in-progress → 1
@@ -294,12 +305,6 @@ export default function DashboardPage() {
           <h2 className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-0.5">
             Level Progress
           </h2>
-          <button
-            onClick={() => navigate("/levels")}
-            className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
-          >
-            All levels <ChevronRight className="w-3 h-3" />
-          </button>
         </div>
         <div className="grid grid-cols-6 gap-2">
           {LEVELS.map((level) => {
@@ -310,11 +315,7 @@ export default function DashboardPage() {
                 level={level}
                 state={state}
                 active={level.id === activeLevel.id}
-                onClick={() => navigate(
-                  level.id === 1 || isPremium
-                    ? `/flashcards/${level.id}`
-                    : "/levels"
-                )}
+                onClick={() => navigate(`/flashcards/${level.id}`)}
               />
             );
           })}
@@ -401,13 +402,13 @@ export default function DashboardPage() {
           </button>
 
           <button
-            onClick={() => navigate("/levels")}
+            onClick={() => navigate("/strokes")}
             className="flex flex-col items-start gap-2 rounded-2xl border border-border/60 bg-card p-4 text-left shadow-sm hover:border-primary/30 hover:shadow-md hover:shadow-primary/5 transition-all duration-200"
           >
-            <Trophy className="w-5 h-5 text-primary" />
+            <PenLine className="w-5 h-5 text-primary" />
             <div>
-              <p className="text-sm font-semibold text-foreground leading-tight">Levels</p>
-              <p className="text-xs text-muted-foreground mt-0.5">All HSK 1–6</p>
+              <p className="text-sm font-semibold text-foreground leading-tight">Strokes</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Writing practice</p>
             </div>
           </button>
         </div>

@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Loader2, Mail, Lock, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Loader2, Mail, Lock, User, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { DecorativeBackground, Lanterns } from "@/components/Decorations";
+import { apiFetch } from "@/lib/api";
+import { savePendingName } from "@/lib/pending-name";
 
 type Mode = "magic" | "login" | "signup";
 
@@ -30,6 +32,7 @@ export default function LandingPage() {
   const [mode, setMode] = useState<Mode>("magic");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [needsConfirm, setNeedsConfirm] = useState(false);
@@ -57,10 +60,24 @@ export default function LandingPage() {
         await signInWithPassword(email, password);
         setLocation("/dashboard");
       } else {
+        // Sign up — save name first if provided
+        const trimmedName = name.trim();
         const { needsConfirmation } = await signUpWithPassword(email, password);
+
         if (needsConfirmation) {
+          // Email confirmation required — stash name for when user returns
+          if (trimmedName) savePendingName(trimmedName);
           setNeedsConfirm(true);
         } else {
+          // Immediate session — save name right now via API
+          if (trimmedName) {
+            try {
+              await apiFetch("/api/me", {
+                method: "PATCH",
+                body: JSON.stringify({ name: trimmedName }),
+              });
+            } catch { /* non-fatal — user can update name in settings later */ }
+          }
           setLocation("/dashboard");
         }
       }
@@ -86,7 +103,6 @@ export default function LandingPage() {
         className="w-full max-w-md relative z-10"
       >
         <div className="bg-card/80 backdrop-blur-md rounded-3xl p-8 shadow-2xl border border-border/50 text-center relative overflow-hidden">
-          {/* Top gradient bar */}
           <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-primary via-gold to-primary" />
 
           <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-primary/10 flex items-center justify-center p-2">
@@ -170,7 +186,7 @@ export default function LandingPage() {
                   Click the link to activate your account.
                 </p>
                 <button
-                  onClick={() => { setNeedsConfirm(false); setEmail(""); setPassword(""); }}
+                  onClick={() => { setNeedsConfirm(false); setEmail(""); setPassword(""); setName(""); }}
                   className="text-xs text-muted-foreground underline underline-offset-2 mt-2"
                 >
                   Use a different email
@@ -188,6 +204,22 @@ export default function LandingPage() {
                 onSubmit={handleSubmit}
                 className="space-y-3"
               >
+                {/* Name field — signup only */}
+                {mode === "signup" && (
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                    <input
+                      type="text"
+                      placeholder="Your name (optional)"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      maxLength={60}
+                      className="w-full pl-11 pr-5 py-4 rounded-xl bg-background border-2 border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-200"
+                    />
+                  </div>
+                )}
+
+                {/* Email */}
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                   <input
@@ -200,6 +232,7 @@ export default function LandingPage() {
                   />
                 </div>
 
+                {/* Password */}
                 {(mode === "login" || mode === "signup") && (
                   <div className="relative">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />

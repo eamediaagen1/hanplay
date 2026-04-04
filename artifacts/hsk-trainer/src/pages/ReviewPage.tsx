@@ -49,7 +49,7 @@ export default function ReviewPage() {
       {/* Sticky header */}
       <header className="sticky top-[52px] md:top-0 z-40 bg-background/90 backdrop-blur-xl border-b border-border/50 h-[52px] flex items-center justify-between px-4 shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
         <button
-          onClick={() => setLocation("/levels")}
+          onClick={() => setLocation("/dashboard")}
           className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors rounded-lg py-1.5 px-2 -ml-2 hover:bg-muted"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -79,10 +79,10 @@ export default function ReviewPage() {
                 You've reviewed all your due cards for now. Great job sticking to your habit.
               </p>
               <button
-                onClick={() => setLocation("/levels")}
+                onClick={() => setLocation("/dashboard")}
                 className="w-full py-3.5 rounded-xl font-bold bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:-translate-y-0.5 transition-all"
               >
-                Back to Levels
+                Back to Dashboard
               </button>
             </motion.div>
           ) : (
