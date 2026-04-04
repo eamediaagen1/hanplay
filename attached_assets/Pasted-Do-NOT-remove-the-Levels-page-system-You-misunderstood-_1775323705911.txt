@@ -1,0 +1,73 @@
+Do NOT remove the Levels page system.
+
+You misunderstood the request.
+
+What I want is:
+
+- KEEP the current Levels page system and all its logic
+- KEEP the level cards, progression, locking, and exam-based unlock flow
+- RENAME the Levels page/menu label so it becomes the Dashboard
+- MERGE the useful old dashboard sections into this Levels-based page
+- Do NOT delete or replace the levels structure
+- Do NOT turn Dashboard into a completely different page
+
+Correct interpretation:
+The current Levels page should become the main Dashboard experience.
+
+That means:
+- the existing Levels page stays
+- the existing level navigation/progression stays
+- the page name/label becomes “Dashboard”
+- useful old dashboard blocks/sections should be added into this page in an organized way
+
+What to do now:
+
+1. Restore or keep the existing Levels page structure
+- level cards
+- passed/unlocked/locked states
+- progression logic
+- exam unlock logic
+- continue/start buttons
+
+2. Rename it in navigation/UI only:
+- “Levels” -> “Dashboard”
+
+3. Add the useful old dashboard content ABOVE or AROUND the level cards, without destroying the levels system.
+Suggested sections:
+- greeting: “Hi, Name”
+- plan badge: Free / Premium
+- small useful metrics
+- review section
+- continue learning section
+
+4. Remove only the standalone old Dashboard page if there is duplication
+- but keep the Levels page system as the main screen
+
+5. Keep these pages/actions:
+- levels logic/page system
+- current progression flow
+- review inside the new Dashboard page
+- Chinese Themes premium-only in sidebar
+
+6. Remove only:
+- separate Progress page
+- separate standalone Review page if it exists
+- public Chinese Themes link
+
+7. Final expected result:
+- user clicks “Dashboard” in sidebar
+- this opens the OLD Levels page system
+- but enhanced with useful dashboard sections
+- level cards still exist and still drive the core learning flow
+
+Important:
+Do not delete the Levels page structure again.
+Do not rebuild from scratch.
+Just restore/use the existing Levels page as the new Dashboard and integrate the old dashboard sections into it cleanly.
+
+At the end, tell me:
+1. what was restored/kept
+2. what was renamed
+3. what old dashboard sections were merged in
+4. what routes/navigation labels changed
+5. what was removed
