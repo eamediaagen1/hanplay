@@ -3,7 +3,7 @@ import { apiFetch } from "@/lib/api";
 
 interface ReferralData {
   referral_code: string;
-  referral_count: number;
+  referral_count: number; // purchase-attributed referrals only
 }
 
 export function useReferral() {
@@ -15,7 +15,7 @@ export function useReferral() {
 
   return {
     referralCode: query.data?.referral_code ?? null,
-    referralCount: query.data?.referral_count ?? 0,
+    referralCount: query.data?.referral_count ?? 0, // friends who completed a purchase
     isLoading: query.isLoading,
   };
 }

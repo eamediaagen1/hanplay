@@ -1,0 +1,161 @@
+Continue from the current project state.
+
+Important change:
+The referral system must be linked to Gumroad, because payments happen on Gumroad.
+
+Do not wait for me and do not stop at DB-only setup.
+Implement the app-side structure needed so the referral system is ready for Gumroad-based attribution and purchase tracking.
+
+GOAL
+Make the referral system work around Gumroad purchases, not just app signups.
+
+==================================================
+PART 1 — AUDIT CURRENT REFERRAL SYSTEM
+==================================================
+
+First inspect what already exists:
+- referral tables / migrations
+- referral codes
+- referral UI
+- signup-based referral logic
+- Gumroad integration/webhooks
+- purchase tables / premium access tables
+
+Then adapt the referral system to a Gumroad-based model instead of a signup-only model.
+
+==================================================
+PART 2 — NEW REFERRAL MODEL
+==================================================
+
+Referral logic should work like this:
+
+1. Existing user gets a referral code/link
+2. They share the referral link
+3. New visitor lands on the site with the referral code
+4. Referral code is stored client-side and/or server-side
+5. User goes to Gumroad checkout
+6. When payment succeeds, the referral code is attached to the purchase if possible
+7. The referral is credited based on the Gumroad purchase, not only on signup
+
+Important:
+- referral credit should be tied to successful purchase
+- not just visit
+- not just account creation
+
+==================================================
+PART 3 — WHAT TO IMPLEMENT NOW
+==================================================
+
+Implement the app-side logic needed for this flow.
+
+A. Referral capture
+- detect referral code from URL
+- persist it safely (cookie/local storage/session, whichever fits best)
+- keep it through the user journey until payment
+
+B. Referral UI
+Show in app:
+- referral code
+- referral link
+- referred purchases count if available
+- copy button
+- simple “Invite friends” section
+
+C. Gumroad handoff preparation
+Prepare the system so the referral code can be passed into Gumroad flow in the cleanest possible way supported by the current integration.
+
+Examples:
+- pass referral code in checkout URL params if supported
+- attach referral code to redirect flow
+- store pending referral attribution before checkout
+- connect purchase record to referral code when webhook/confirmation returns
+
+Do this based on the current Gumroad setup already in the codebase.
+
+==================================================
+PART 4 — PURCHASE-BASED REFERRAL TRACKING
+==================================================
+
+Use existing DB structures if possible.
+If needed, add minimal migration(s).
+
+I want the system to support:
+- referrer user id
+- referral code
+- referred buyer email or user id if available
+- purchase id / sale id from Gumroad if available
+- referral status
+- created_at / updated_at
+
+Referral statuses can be simple:
+- pending
+- purchased
+- rewarded
+
+Do not overbuild rewards yet.
+Just make the tracking structure correct.
+
+==================================================
+PART 5 — GUMROAD INTEGRATION
+==================================================
+
+Audit the current Gumroad flow and connect referral attribution properly.
+
+Check:
+- Gumroad checkout links
+- redirect URLs
+- webhook payload handling
+- purchase record creation
+- premium unlock logic
+
+Then:
+- make referral data survive the handoff to Gumroad
+- when purchase is confirmed, link the purchase to the referral code if possible
+- avoid breaking current premium unlock logic
+
+If some Gumroad-side part cannot be fully automated without a specific field/config from me, implement everything possible in the app now and clearly list the one exact missing piece at the end.
+
+==================================================
+PART 6 — SECURITY / VALIDATION
+==================================================
+
+Verify:
+- users only see their own referral data
+- self-referral is prevented if possible
+- duplicate referral credit is prevented
+- one purchase is not counted multiple times
+- referral logic does not weaken premium/payment security
+
+==================================================
+PART 7 — UI REQUIREMENTS
+==================================================
+
+Keep the referral UI simple and clean.
+
+Show:
+- referral code
+- shareable referral link
+- copy button
+- referrals / referred purchases count
+- short helper text
+
+Place it where it best fits the current app:
+- dashboard or settings
+
+==================================================
+PART 8 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. what already existed
+2. what you changed
+3. files changed
+4. routes/endpoints updated
+5. DB changes/migrations added
+6. how Gumroad-based referral attribution works now
+7. what still requires manual Gumroad config from me, if anything
+8. how to test the full referral flow
+
+Important:
+Do not just explain the architecture.
+Implement the app changes now so the referral system is ready for Gumroad-based purchases.

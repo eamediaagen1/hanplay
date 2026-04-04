@@ -48,7 +48,14 @@ workspace/
   - `useStudyPrefs()` → `{ prefs: { showPinyin, autoPlay, lastLevel }, set }` — persisted to `hsk_study_prefs` in localStorage
   - `useStreak()` → `{ streak: { current_streak, longest_streak, last_active_date }, ping }` — calls `/api/streak/ping` on flashcard mount
   - `useFlashcardPosition(level)` → `{ savedPosition, savePosition }` — debounced auto-save of category + card index per level
-  - `useReferral()` → `{ referralCode, referralCount }` — unique referral link per user
+  - `useReferral()` → `{ referralCode, referralCount }` — referral code + count of **purchase-attributed** referrals
+- **Referral system** (`use-referral-capture.ts` + `lib/gumroad.ts`):
+  - `captureReferralCode()` — reads `?ref=CODE` from URL, stores in localStorage (`hsk_ref`)
+  - `getStoredReferralCode()` — returns stored code; used in all upgrade CTA hrefs
+  - `buildGumroadUrl(code?)` — appends `?ref=CODE` to the `VITE_GUMROAD_URL` checkout URL
+  - `ReferralCaptureEffect` component in `App.tsx` — captures on every route change
+  - All upgrade links (Paywall, Sidebar, PricingPage, DashboardPage, DemoPage, LevelSelection, QuizPage, SettingsPage) use `buildGumroadUrl(getStoredReferralCode())`
+  - Webhook parses `ref` back from Gumroad's `url_params` field and records purchase-attributed referral row
 - **API layer**: `src/lib/api.ts` — `apiFetch` with Bearer token injection + `ApiError` class
 - **Supabase client**: `src/lib/supabase.ts` — graceful no-op if secrets absent
 - **Route guard**: `ProtectedPages` in `App.tsx` (redirects to `/app` if unauthenticated)
@@ -74,11 +81,14 @@ workspace/
 - **Middleware**: `src/middleware/auth.ts` (verifyJwt, requirePremium), rate limiter
 - **Supabase**: `src/supabase.ts` — service role client, logs warning if secrets absent
 
-### Database Schema (`migrations/001_supabase_schema.sql`)
-- `profiles` — id (Supabase UID), email, is_premium, role ('user' | 'admin'), timestamps
+### Database Schema
+- `profiles` — id (Supabase UID), email, is_premium, role ('user' | 'admin'), referral_code, timestamps
 - `saved_words` — user_id, word_id, next_review, interval, ease_factor, reps (SRS)
-- `purchases` — id, user_id, gumroad_sale_id, product_permalink, status, timestamps
-- Row Level Security enabled on all tables
+- `purchases` — id, user_id, sale_id (Gumroad), buyer_email, product_permalink, price_cents, refunded, raw_payload (JSONB)
+- `referrals` — referral_code, referrer_id, buyer_email, referred_id (nullable), sale_id (FK → purchases), status ('purchased'|'rewarded')
+- `streaks` — user_id, current_streak, longest_streak, last_active_date
+- `flashcard_positions` — user_id, level, category_index, card_index
+- Row Level Security enabled on all tables; users only see their own rows
 
 ## Required Secrets (Replit Secrets)
 
@@ -158,11 +168,12 @@ src/pages/
 6. Run `migrations/006_level_progress.sql` in Supabase SQL editor
 7. Run `migrations/007_flashcard_resume.sql` in Supabase SQL editor (flashcard position table)
 8. Run `migrations/008_streaks.sql` in Supabase SQL editor (daily streak table)
-9. Run `migrations/009_referrals.sql` in Supabase SQL editor (referral code + referrals table)
-10. Set all secrets listed above in Replit Secrets
-11. After first sign-in, promote yourself to admin: `UPDATE profiles SET role = 'admin' WHERE email = 'YOUR_EMAIL';`
-12. Configure Gumroad webhook URL: `https://<APP_URL>/api/gumroad/webhook?secret=<GUMROAD_WEBHOOK_SECRET>`
-13. Access admin panel at `<APP_URL>/admin` — verify at `/admin/login` to enable write actions
+9. Run `migrations/009_referrals.sql` in Supabase SQL editor (adds `referral_code` to profiles)
+10. Run `migrations/010_referrals_v2.sql` in Supabase SQL editor (purchase-attributed referrals table)
+11. Set all secrets listed above in Replit Secrets
+12. After first sign-in, promote yourself to admin: `UPDATE profiles SET role = 'admin' WHERE email = 'YOUR_EMAIL';`
+13. Configure Gumroad webhook URL: `https://<APP_URL>/api/gumroad/webhook?secret=<GUMROAD_WEBHOOK_SECRET>`
+14. Access admin panel at `<APP_URL>/admin` — verify at `/admin/login` to enable write actions
 
 ## TypeScript & Composite Projects
 

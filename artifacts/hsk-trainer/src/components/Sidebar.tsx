@@ -23,6 +23,8 @@ import { useProfile } from "@/hooks/use-profile";
 import { useSavedWords } from "@/hooks/use-saved-words";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { cn } from "@/lib/utils";
+import { buildGumroadUrl } from "@/lib/gumroad";
+import { getStoredReferralCode } from "@/hooks/use-referral-capture";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -167,9 +169,6 @@ function NavButton({
 
 // ─── Inner sidebar content (shared between desktop + mobile) ──────────────────
 
-const GUMROAD_URL =
-  (import.meta.env.VITE_GUMROAD_URL as string | undefined) ?? "https://gumroad.com";
-
 function SidebarContent({
   isExpanded,
   navigate,
@@ -287,7 +286,7 @@ function SidebarContent({
                 Try Free Demo
               </button>
               <a
-                href={GUMROAD_URL}
+                href={buildGumroadUrl(getStoredReferralCode())}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-primary hover:bg-primary/10 transition-colors"
@@ -301,7 +300,7 @@ function SidebarContent({
             <Tooltip>
               <TooltipTrigger asChild>
                 <a
-                  href={GUMROAD_URL}
+                  href={buildGumroadUrl(getStoredReferralCode())}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex justify-center py-1.5 text-primary hover:text-primary/80 transition-colors"

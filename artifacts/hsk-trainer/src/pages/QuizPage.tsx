@@ -11,6 +11,8 @@ import { apiFetch } from "@/lib/api";
 import { useStudyPrefs } from "@/hooks/use-study-prefs";
 import { useLevelProgress } from "@/hooks/use-level-progress";
 import { cn } from "@/lib/utils";
+import { buildGumroadUrl } from "@/lib/gumroad";
+import { getStoredReferralCode } from "@/hooks/use-referral-capture";
 
 type QuestionType = "char-to-meaning" | "meaning-to-char" | "pinyin-to-char";
 
@@ -255,7 +257,7 @@ export default function QuizPage() {
           </p>
           {isPremiumError && (
             <a
-              href={import.meta.env.VITE_GUMROAD_URL ?? "#"}
+              href={buildGumroadUrl(getStoredReferralCode())}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block bg-primary text-primary-foreground px-6 py-2.5 rounded-lg font-semibold hover:bg-primary/90 transition-colors"

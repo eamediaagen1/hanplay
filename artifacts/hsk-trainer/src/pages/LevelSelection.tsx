@@ -13,6 +13,8 @@ import { PageShell } from "@/components/PageShell";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { buildGumroadUrl } from "@/lib/gumroad";
+import { getStoredReferralCode } from "@/hooks/use-referral-capture";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -24,9 +26,6 @@ const LEVELS = [
   { id: 5, count: 1300, title: "Advanced" },
   { id: 6, count: 2500, title: "Mastery" },
 ];
-
-const GUMROAD_URL =
-  (import.meta.env.VITE_GUMROAD_URL as string | undefined) ?? "https://gumroad.com";
 
 // ─── Card state ───────────────────────────────────────────────────────────────
 
@@ -366,7 +365,7 @@ export default function LevelSelection() {
               {syncing ? "Syncing…" : "Sync"}
             </button>
             <a
-              href={GUMROAD_URL}
+              href={buildGumroadUrl(getStoredReferralCode())}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"

@@ -3,9 +3,8 @@ import { useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-
-const GUMROAD_URL =
-  (import.meta.env.VITE_GUMROAD_URL as string | undefined) ?? "https://gumroad.com";
+import { buildGumroadUrl } from "@/lib/gumroad";
+import { getStoredReferralCode } from "@/hooks/use-referral-capture";
 
 const FEATURES = [
   { icon: BookOpen, text: "All 6 HSK levels — 5,000+ vocabulary words" },
@@ -72,7 +71,7 @@ export function Paywall({
           </ul>
 
           <a
-            href={GUMROAD_URL}
+            href={buildGumroadUrl(getStoredReferralCode())}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-bold text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-md shadow-primary/20 mb-3"

@@ -7,9 +7,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/ThemeToggle";
-
-const GUMROAD_URL =
-  (import.meta.env.VITE_GUMROAD_URL as string | undefined) ?? "https://gumroad.com";
+import { buildGumroadUrl } from "@/lib/gumroad";
+import { getStoredReferralCode } from "@/hooks/use-referral-capture";
 
 interface DemoWord {
   id: string;
@@ -260,7 +259,7 @@ function UpgradeCTA({ score, total, onRetry }: { score: number; total: number; o
           </div>
 
           <a
-            href={GUMROAD_URL}
+            href={buildGumroadUrl(getStoredReferralCode())}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl font-bold text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-md shadow-primary/20 mb-3"
@@ -365,7 +364,7 @@ export default function DemoPage() {
             <p className="text-sm font-semibold text-foreground mb-1">Want all 5,000+ words?</p>
             <p className="text-xs text-muted-foreground mb-4">Upgrade for full access to HSK 1–6, quizzes, and spaced review.</p>
             <a
-              href={GUMROAD_URL}
+              href={buildGumroadUrl(getStoredReferralCode())}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-md shadow-primary/20"

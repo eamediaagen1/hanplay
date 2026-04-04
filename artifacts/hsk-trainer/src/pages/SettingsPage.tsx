@@ -11,9 +11,8 @@ import { useTheme } from "@/hooks/use-theme";
 import { PageShell } from "@/components/PageShell";
 import { cn } from "@/lib/utils";
 import { useLocation } from "wouter";
-
-const GUMROAD_URL =
-  (import.meta.env.VITE_GUMROAD_URL as string | undefined) ?? "https://gumroad.com";
+import { buildGumroadUrl } from "@/lib/gumroad";
+import { getStoredReferralCode } from "@/hooks/use-referral-capture";
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
@@ -216,7 +215,7 @@ export default function SettingsPage() {
                   </div>
                 </div>
                 <a
-                  href={GUMROAD_URL}
+                  href={buildGumroadUrl(getStoredReferralCode())}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-between w-full px-5 py-3.5 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors"

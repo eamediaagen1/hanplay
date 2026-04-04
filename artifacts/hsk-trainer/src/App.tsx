@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
+import { captureReferralCode } from "@/hooks/use-referral-capture";
 
 import MarketingPage    from "@/pages/MarketingPage";
 import PricingPage      from "@/pages/PricingPage";
@@ -50,6 +51,13 @@ function Redirect({ to }: { to: string }) {
 }
 
 // ─── Top-level router ────────────────────────────────────────────────────────
+
+/** Captures ?ref=CODE from the URL on every navigation into localStorage. */
+function ReferralCaptureEffect() {
+  const [location] = useLocation();
+  useEffect(() => { captureReferralCode(); }, [location]);
+  return null;
+}
 
 /**
  * Centralised route → component mapping with explicit auth guards.
@@ -124,6 +132,7 @@ function App() {
       <AuthProvider>
         <TooltipProvider>
           <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+            <ReferralCaptureEffect />
             <Router />
           </WouterRouter>
           <Toaster />

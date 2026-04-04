@@ -17,8 +17,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
-const GUMROAD_URL =
-  (import.meta.env.VITE_GUMROAD_URL as string | undefined) ?? "https://gumroad.com";
+import { buildGumroadUrl } from "@/lib/gumroad";
+import { getStoredReferralCode } from "@/hooks/use-referral-capture";
 
 const LEVELS = [
   { id: 1, title: "Beginner",          count: 150  },
@@ -478,7 +478,7 @@ export default function DashboardPage() {
             </div>
             <div className="flex items-center gap-2 mt-3">
               <a
-                href={GUMROAD_URL}
+                href={buildGumroadUrl(getStoredReferralCode())}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
@@ -529,8 +529,8 @@ export default function DashboardPage() {
                 <p className="text-sm font-semibold text-foreground">Invite friends</p>
                 <p className="text-xs text-muted-foreground">
                   {referralCount > 0
-                    ? `${referralCount} friend${referralCount !== 1 ? "s" : ""} joined via your link`
-                    : "Share your link to invite others"}
+                    ? `${referralCount} friend${referralCount !== 1 ? "s" : ""} purchased via your link`
+                    : "Share your link — earn credit for purchases"}
                 </p>
               </div>
             </div>

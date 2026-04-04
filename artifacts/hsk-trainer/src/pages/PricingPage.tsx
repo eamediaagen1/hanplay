@@ -1,8 +1,7 @@
 import { useLocation } from "wouter";
 import { CheckCircle2, ArrowLeft, Zap, HelpCircle } from "lucide-react";
-
-const GUMROAD_URL =
-  (import.meta.env.VITE_GUMROAD_URL as string | undefined) ?? "https://gumroad.com";
+import { buildGumroadUrl } from "@/lib/gumroad";
+import { getStoredReferralCode } from "@/hooks/use-referral-capture";
 
 const BENEFITS = [
   "Access to all HSK levels — HSK 1 through HSK 6",
@@ -110,7 +109,7 @@ export default function PricingPage() {
 
             {/* CTA */}
             <a
-              href={GUMROAD_URL}
+              href={buildGumroadUrl(getStoredReferralCode())}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl bg-primary text-primary-foreground font-bold text-base shadow-lg shadow-primary/25 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/30 transition-all duration-200"
