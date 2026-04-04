@@ -138,7 +138,7 @@ export default function MarketingPage() {
               onClick={go}
               className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-bold text-base bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/30 transition-all duration-200"
             >
-              Get Started Free
+              Get Started
               <ArrowRight className="w-4 h-4" />
             </button>
             <button
@@ -589,7 +589,7 @@ export default function MarketingPage() {
               onClick={go}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-10 py-4 rounded-2xl font-bold text-base bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:-translate-y-0.5 hover:shadow-xl transition-all duration-200"
             >
-              Get Started Free
+              Get Started
               <ArrowRight className="w-4 h-4" />
             </button>
             <button
