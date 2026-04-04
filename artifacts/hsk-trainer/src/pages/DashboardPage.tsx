@@ -3,13 +3,15 @@ import { motion } from "framer-motion";
 import {
   BookOpen, Brain, Star, Trophy, ChevronRight,
   Lock, CheckCircle2, RefreshCw, ExternalLink, Play,
-  RotateCcw,
+  RotateCcw, Flame, Copy, Check, Users,
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { useProfile } from "@/hooks/use-profile";
 import { useSavedWords } from "@/hooks/use-saved-words";
 import { useStudyPrefs } from "@/hooks/use-study-prefs";
 import { useLevelProgress, isLevelUnlocked, type LevelProgressMap } from "@/hooks/use-level-progress";
+import { useStreak } from "@/hooks/use-streak";
+import { useReferral } from "@/hooks/use-referral";
 import { apiFetch } from "@/lib/api";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
@@ -133,10 +135,13 @@ export default function DashboardPage() {
   const { savedWords, getDueCards, getDueWords, isLoading: wordsLoading } = useSavedWords();
   const { prefs } = useStudyPrefs();
   const { progressMap } = useLevelProgress();
+  const { streak } = useStreak();
+  const { referralCode, referralCount } = useReferral();
   const qc = useQueryClient();
 
   const [syncing, setSyncing] = useState(false);
   const [syncMsg, setSyncMsg] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const isPremium  = profile?.is_premium ?? false;
   const dueWords   = getDueWords();
@@ -154,6 +159,18 @@ export default function DashboardPage() {
   const savedInLevel = savedWords.filter((w) =>
     w.word_id.startsWith(`hsk${activeLevel.id}-`)
   ).length;
+
+  const referralLink = referralCode
+    ? `${window.location.origin}/?ref=${referralCode}`
+    : null;
+
+  const handleCopyReferral = () => {
+    if (!referralLink) return;
+    navigator.clipboard.writeText(referralLink).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
 
   const handleSync = async () => {
     setSyncing(true);
@@ -242,8 +259,37 @@ export default function DashboardPage() {
         </button>
       </motion.div>
 
+      {/* ── Daily Streak ────────────────────────────────────────── */}
+      {streak.current_streak > 0 && (
+        <motion.div custom={2} variants={fade} initial="hidden" animate="show">
+          <div className="flex items-center gap-4 px-5 py-3.5 rounded-2xl bg-card border border-border/60 shadow-sm">
+            <div className="w-9 h-9 rounded-xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center shrink-0">
+              <Flame className="w-4.5 h-4.5 text-orange-500" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-foreground leading-tight">
+                {streak.current_streak} day{streak.current_streak !== 1 ? "s" : ""} streak
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {streak.current_streak >= 7
+                  ? "You're on a roll — keep going!"
+                  : streak.current_streak >= 3
+                  ? "Building momentum — great work!"
+                  : "Keep your streak going. Study again tomorrow."}
+              </p>
+            </div>
+            {streak.longest_streak > streak.current_streak && (
+              <div className="shrink-0 text-right">
+                <p className="text-[10px] text-muted-foreground leading-none">Best</p>
+                <p className="text-sm font-bold text-muted-foreground tabular-nums">{streak.longest_streak}d</p>
+              </div>
+            )}
+          </div>
+        </motion.div>
+      )}
+
       {/* ── Level Status ────────────────────────────────────────── */}
-      <motion.section custom={2} variants={fade} initial="hidden" animate="show">
+      <motion.section custom={3} variants={fade} initial="hidden" animate="show">
         <div className="flex items-center justify-between mb-2.5">
           <h2 className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-0.5">
             Level Progress
@@ -469,6 +515,40 @@ export default function DashboardPage() {
             </button>
           </div>
         </motion.div>
+      )}
+
+      {/* ── Referral ─────────────────────────────────────────────── */}
+      {referralCode && (
+        <motion.section custom={7} variants={fade} initial="hidden" animate="show">
+          <div className="bg-card border border-border/60 rounded-2xl p-4 shadow-sm">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center shrink-0">
+                <Users className="w-4 h-4 text-violet-600 dark:text-violet-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-foreground">Invite friends</p>
+                <p className="text-xs text-muted-foreground">
+                  {referralCount > 0
+                    ? `${referralCount} friend${referralCount !== 1 ? "s" : ""} joined via your link`
+                    : "Share your link to invite others"}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 min-w-0 bg-muted rounded-lg px-3 py-2 font-mono text-xs text-muted-foreground truncate border border-border/60">
+                {referralLink}
+              </div>
+              <button
+                onClick={handleCopyReferral}
+                className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border border-border hover:bg-muted transition-colors"
+              >
+                {copied
+                  ? <><Check className="w-3 h-3 text-emerald-500" /> Copied</>
+                  : <><Copy className="w-3 h-3" /> Copy</>}
+              </button>
+            </div>
+          </div>
+        </motion.section>
       )}
     </div>
   );

@@ -1,10 +1,12 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useLocation, useParams } from "wouter";
 import { ArrowLeft, ArrowRight, Star, ChevronLeft, Volume2, Lock, Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { type VocabWord } from "@/data/hskData";
 import { useSavedWords } from "@/hooks/use-saved-words";
 import { useStudyPrefs } from "@/hooks/use-study-prefs";
+import { useFlashcardPosition } from "@/hooks/use-flashcard-position";
+import { useStreak } from "@/hooks/use-streak";
 import { apiFetch } from "@/lib/api";
 import { Flashcard } from "@/components/Flashcard";
 import { cn } from "@/lib/utils";
@@ -26,11 +28,16 @@ export default function FlashcardPage() {
 
   const { toggleSaveCard, isCardSaved } = useSavedWords();
   const { prefs, set: setPref } = useStudyPrefs();
+  const { savedPosition, isLoading: positionLoading, savePosition } = useFlashcardPosition(level);
+  const { ping: pingStreak } = useStreak();
+  const positionRestored = useRef(false);
 
-  // Track the last studied level for Dashboard quick-action
+  // Track the last studied level for Dashboard quick-action + ping streak
   useEffect(() => {
     setPref("lastLevel", level);
-  }, [level, setPref]);
+    pingStreak();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [level]);
 
   // All levels (1-6) are fetched from the authenticated API — premium required
   const { data: apiLevel, isLoading: wordsLoading, error: wordsError } = useQuery({
@@ -57,13 +64,41 @@ export default function FlashcardPage() {
       ? allLevelWords.filter((w) => w.category === activeCategory)
       : allLevelWords;
 
+  // Restore saved position once (when words + position are both loaded)
   useEffect(() => {
+    if (positionRestored.current) return;
+    if (wordsLoading || positionLoading) return;
+    if (!savedPosition) { positionRestored.current = true; return; }
+
+    const cat = savedPosition.category ?? ALL_CATEGORIES;
+    const idx = savedPosition.last_index ?? 0;
+    setActiveCategory(cat);
+    // We need the filtered word list after category is set — delay by one tick
+    setTimeout(() => {
+      setCurrentIndex(idx);
+      setIsFlipped(false);
+    }, 0);
+    positionRestored.current = true;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wordsLoading, positionLoading, savedPosition]);
+
+  useEffect(() => {
+    if (!positionRestored.current) return;
     setCurrentIndex(0);
     setIsFlipped(false);
   }, [activeCategory]);
 
   useEffect(() => {
     setIsFlipped(false);
+    if (!positionRestored.current) return;
+    const word = levelWords[currentIndex];
+    savePosition({
+      level,
+      category: activeCategory !== ALL_CATEGORIES ? activeCategory : null,
+      last_index: currentIndex,
+      last_word_id: word?.id ?? null,
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentIndex]);
 
   const safeIndex = levelWords.length > 0 ? Math.min(currentIndex, levelWords.length - 1) : 0;

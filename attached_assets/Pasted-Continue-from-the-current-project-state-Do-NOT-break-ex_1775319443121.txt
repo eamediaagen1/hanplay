@@ -1,0 +1,296 @@
+Continue from the current project state. Do NOT break existing features (auth, premium logic, levels, progress, admin, pricing).
+
+I want to simplify and improve the product UX and add key business features.
+
+GOAL:
+- Clean, minimal dashboard
+- Better focus on learning progression
+- Save flashcard position/progress per user
+- Add daily streak system
+- Add referral program
+- Add pricing page (public, before login)
+- Add a new public page called “Chinese Themes”
+- Add all required Supabase migrations for new data
+
+==================================================
+PART 1 — SIMPLIFIED DASHBOARD
+==================================================
+
+Redesign the dashboard to be minimal and focused.
+
+REMOVE:
+- unnecessary cards
+- duplicate stats
+- cluttered sections
+
+NEW DASHBOARD STRUCTURE:
+
+1. Main Level Card
+- show current level (e.g. HSK1)
+- show progress bar (percentage or steps)
+- show status:
+  - In Progress
+  - Passed
+- primary button:
+  - Continue Learning
+- secondary button:
+  - Go to Levels
+
+2. Progress Overview
+- small progress bar or compact chart
+- show:
+  - completed levels
+  - current level
+  - next level
+
+3. Daily Streak Section
+- show current streak
+- simple visual (progress bar or mini chart)
+- short text like:
+  - “Keep your streak going”
+
+4. Navigation Shortcut
+- clear button/icon:
+  - “Go to Levels”
+- leads to full levels page
+
+Keep dashboard:
+- very clean
+- minimal text
+- action-focused
+- mobile-friendly
+
+==================================================
+PART 2 — SAVE FLASHCARD POSITION / USER PROGRESS
+==================================================
+
+I want the app to remember where the user stopped in flashcards.
+
+Requirements:
+- save flashcard progress per authenticated user
+- when the user leaves and comes back, resume from the last flashcard/category/level they stopped at
+- this must be stored in Supabase, not only localStorage
+- must persist across refresh, logout/login, and device changes
+
+Examples of useful saved fields:
+- user_id
+- level
+- section_type (flashcards / phrases)
+- category
+- last_item_index
+- last_item_id if available
+- updated_at
+
+Implement:
+- DB migration for flashcard progress saving
+- backend/data access wiring
+- frontend resume logic
+
+Use existing schema patterns if present, but add proper migration(s) if missing.
+
+==================================================
+PART 3 — DAILY STREAK SYSTEM
+==================================================
+
+Implement a simple daily streak system.
+
+Requirements:
+- track daily activity per user
+- increment streak when user studies or completes a meaningful learning action
+- reset streak if user misses a day
+- store in Supabase
+
+Suggested fields:
+- user_id
+- current_streak
+- longest_streak
+- last_active_date
+- updated_at
+
+Please create migration(s) for this.
+
+Display:
+- current streak on dashboard
+- optional mini chart/progress visual
+- no fake stats
+
+==================================================
+PART 4 — REFERRAL PROGRAM
+==================================================
+
+Add a simple referral system.
+
+Basic logic:
+- each user has a referral code or referral link
+- user can share link
+- when a new user signs up using it, count the referral
+
+MVP features:
+- generate/store referral code per user
+- track referrals count
+- simple UI in dashboard or settings:
+  - “Invite friends”
+  - show referral link/code
+  - show number of referrals
+
+If DB changes are needed, add migration(s).
+
+Do not overbuild rewards yet.
+Just make the structure ready.
+
+==================================================
+PART 5 — PRICING PAGE (PUBLIC)
+==================================================
+
+Create a pricing page accessible BEFORE login.
+
+Add it to main menu/navigation.
+
+Route:
+- /pricing
+
+Pricing model:
+- ONE plan only
+
+Page structure:
+
+1. Header
+- “Simple Pricing”
+
+2. Plan Card
+- Plan name: Premium / Full Access
+- Price (placeholder or real)
+- description: unlock all levels
+
+3. Benefits list:
+- access to all HSK levels (HSK1–HSK6)
+- full flashcards and phrases
+- all quizzes and exams
+- progress tracking
+- level progression system
+
+4. CTA:
+- “Get Full Access”
+- link to Gumroad or current payment flow
+
+5. Optional:
+- small FAQ
+- trust message
+
+==================================================
+PART 6 — NEW PAGE: CHINESE THEMES
+==================================================
+
+Create a new page called:
+
+- /chinese-themes
+
+This page should be accessible from the public navigation/menu.
+
+Purpose:
+This page is a future shop/showcase page for themed products related to Chinese learning and aesthetics.
+
+For now, create ONLY the page structure and UI, NOT the actual content database.
+
+The page should introduce future categories such as:
+- Phone Wallpapers
+- iPad Wallpapers
+- Laptop Wallpapers
+- Stickers
+- Merch
+
+Requirements:
+- clean, attractive page
+- section header
+- short intro text
+- category cards/placeholders for each future category
+- “Coming Soon” style is acceptable
+- no need to implement store logic yet
+- no need to add real product content yet
+
+This page is just the structure and design placeholder for future expansion.
+
+==================================================
+PART 7 — MENU / NAVIGATION UPDATE
+==================================================
+
+Before login (public):
+- Home (landing)
+- Pricing
+- Chinese Themes
+- Demo (if applicable)
+- Login
+
+After login:
+- Dashboard
+- Levels
+- Settings
+- Chinese Themes (optional in logged-in menu too if it fits current nav)
+
+Keep navigation clean.
+Do not re-add removed clutter like standalone Quiz in sidebar.
+
+==================================================
+PART 8 — SUPABASE MIGRATIONS / DATABASE
+==================================================
+
+Please add all needed migration files for new features.
+
+I want proper migrations for:
+1. flashcard resume/progress saving
+2. daily streak system
+3. referral system if needed
+4. any supporting fields/tables needed for dashboard real data
+
+Use Supabase/Postgres style consistent with current project.
+
+Important:
+- preserve existing data
+- do not duplicate tables if similar structures already exist
+- adapt current schema where possible
+- add indexes where useful
+- enable/adjust RLS if needed so users only access their own data
+
+If you add new tables, include proper user ownership and secure access.
+
+==================================================
+PART 9 — UX / DATA RULES
+==================================================
+
+Use real data only:
+- user progress
+- level status
+- flashcard saved position
+- streak data
+- referral count
+
+Do not add fake analytics.
+
+The dashboard should show only meaningful data and next best actions.
+
+==================================================
+PART 10 — DELIVERABLES
+==================================================
+
+At the end, provide:
+
+1. dashboard changes
+2. flashcard resume logic added
+3. streak system implementation
+4. referral system logic
+5. pricing page implementation
+6. Chinese Themes page implementation
+7. routes added/updated
+8. DB migrations added
+9. files modified
+10. any manual steps I need to do in Supabase/Replit
+
+==================================================
+IMPORTANT
+==================================================
+
+- Do not overengineer
+- Keep MVP simple but clean
+- Reuse existing components when possible
+- Ensure everything works with current auth and premium system
+- Make sure the new DB-backed features actually persist correctly

@@ -14,6 +14,7 @@ import {
   X,
   ExternalLink,
   Sparkles,
+  Palette,
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useSidebar } from "@/contexts/sidebar-context";
@@ -58,6 +59,7 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       { label: "Progress",        icon: BarChart3,       href: "/progress" },
       { label: "Settings",        icon: Settings,        href: "/settings" },
+      { label: "Chinese Themes",  icon: Palette,         href: "/chinese-themes" },
     ],
   },
 ];

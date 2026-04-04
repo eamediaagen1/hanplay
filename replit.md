@@ -42,10 +42,13 @@ workspace/
 - **HSK 2–6**: Premium, words served exclusively from `GET /api/lessons?level=N` (requires valid Supabase JWT + `is_premium = true` in DB)
 
 ### Frontend (`artifacts/hsk-trainer`)
-- **Pages**: MarketingPage, LandingPage (magic link), AuthCallback, DashboardPage (`/dashboard`), LevelSelection (`/levels`), FlashcardPage, ReviewPage, QuizPage, ProgressPage, SettingsPage, AdminPage / AdminLoginPage
+- **Pages**: MarketingPage, PricingPage (`/pricing`), ChineseThemesPage (`/chinese-themes`), LandingPage (magic link), AuthCallback, DashboardPage (`/dashboard`), LevelSelection (`/levels`), FlashcardPage, ReviewPage, QuizPage, ProgressPage, SettingsPage, AdminPage / AdminLoginPage
 - **Auth context**: `src/contexts/auth-context.tsx` — `AuthProvider` + `useAuth` hook
-- **Data hooks**: `use-profile.ts`, `use-saved-words.ts`, `use-study-prefs.ts`
+- **Data hooks**: `use-profile.ts`, `use-saved-words.ts`, `use-study-prefs.ts`, `use-streak.ts`, `use-flashcard-position.ts`, `use-referral.ts`
   - `useStudyPrefs()` → `{ prefs: { showPinyin, autoPlay, lastLevel }, set }` — persisted to `hsk_study_prefs` in localStorage
+  - `useStreak()` → `{ streak: { current_streak, longest_streak, last_active_date }, ping }` — calls `/api/streak/ping` on flashcard mount
+  - `useFlashcardPosition(level)` → `{ savedPosition, savePosition }` — debounced auto-save of category + card index per level
+  - `useReferral()` → `{ referralCode, referralCount }` — unique referral link per user
 - **API layer**: `src/lib/api.ts` — `apiFetch` with Bearer token injection + `ApiError` class
 - **Supabase client**: `src/lib/supabase.ts` — graceful no-op if secrets absent
 - **Route guard**: `ProtectedPages` in `App.tsx` (redirects to `/app` if unauthenticated)
@@ -61,6 +64,11 @@ workspace/
   - `GET /api/lessons?level=N` — serves word list (level 1 open; 2–6 require premium)
   - `POST /api/progress` — upsert word progress (auth required)
   - `GET /api/progress` — list user progress (auth required)
+  - `GET /api/streak` — get current streak data (auth required)
+  - `POST /api/streak/ping` — record study activity, update streak (idempotent per day)
+  - `GET /api/flashcard-position?level=N` — get saved card position for a level (auth required)
+  - `POST /api/flashcard-position` — save card position for a level (auth required)
+  - `GET /api/referral` — get/generate referral code + count (auth required)
   - `POST /api/gumroad/webhook` — Gumroad ping validation + purchases insert
   - `GET /api/admin/users` — admin only, lists all profiles
 - **Middleware**: `src/middleware/auth.ts` (verifyJwt, requirePremium), rate limiter
@@ -146,10 +154,15 @@ src/pages/
 2. Run `migrations/002_admin_tables.sql` in Supabase SQL editor
 3. Run `migrations/003_password_auth_support.sql` in Supabase SQL editor
 4. Run `migrations/004_admin_panel_upgrade.sql` in Supabase SQL editor (indexes + seed)
-5. Set all secrets listed above in Replit Secrets
-6. After first sign-in, promote yourself to admin: `UPDATE profiles SET role = 'admin' WHERE email = 'YOUR_EMAIL';`
-7. Configure Gumroad webhook URL: `https://<APP_URL>/api/gumroad/webhook?secret=<GUMROAD_WEBHOOK_SECRET>`
-8. Access admin panel at `<APP_URL>/admin` — verify at `/admin/login` to enable write actions
+5. Run `migrations/005_ensure_profiles_backfill.sql` in Supabase SQL editor
+6. Run `migrations/006_level_progress.sql` in Supabase SQL editor
+7. Run `migrations/007_flashcard_resume.sql` in Supabase SQL editor (flashcard position table)
+8. Run `migrations/008_streaks.sql` in Supabase SQL editor (daily streak table)
+9. Run `migrations/009_referrals.sql` in Supabase SQL editor (referral code + referrals table)
+10. Set all secrets listed above in Replit Secrets
+11. After first sign-in, promote yourself to admin: `UPDATE profiles SET role = 'admin' WHERE email = 'YOUR_EMAIL';`
+12. Configure Gumroad webhook URL: `https://<APP_URL>/api/gumroad/webhook?secret=<GUMROAD_WEBHOOK_SECRET>`
+13. Access admin panel at `<APP_URL>/admin` — verify at `/admin/login` to enable write actions
 
 ## TypeScript & Composite Projects
 

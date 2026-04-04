@@ -84,6 +84,18 @@ export default function MarketingPage() {
           </div>
           <div className="flex items-center gap-3">
             <button
+              onClick={() => setLocation("/pricing")}
+              className="hidden md:flex text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Pricing
+            </button>
+            <button
+              onClick={() => setLocation("/chinese-themes")}
+              className="hidden md:flex text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Themes
+            </button>
+            <button
               onClick={goDemo}
               className="hidden sm:flex text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >

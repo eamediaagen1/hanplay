@@ -6,6 +6,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 
 import MarketingPage    from "@/pages/MarketingPage";
+import PricingPage      from "@/pages/PricingPage";
+import ChineseThemesPage from "@/pages/ChineseThemesPage";
 import LandingPage      from "@/pages/LandingPage";
 import AuthCallback     from "@/pages/AuthCallback";
 import DemoPage         from "@/pages/DemoPage";
@@ -70,11 +72,13 @@ function Router() {
   }
 
   // ── 2. True public pages — no auth needed, always render instantly ─────────
-  if (location === "/" || location === "/demo") {
+  if (location === "/" || location === "/demo" || location === "/pricing" || location === "/chinese-themes") {
     return (
       <Switch>
-        <Route path="/"    component={MarketingPage} />
-        <Route path="/demo" component={DemoPage} />
+        <Route path="/"                component={MarketingPage} />
+        <Route path="/demo"            component={DemoPage} />
+        <Route path="/pricing"         component={PricingPage} />
+        <Route path="/chinese-themes"  component={ChineseThemesPage} />
       </Switch>
     );
   }
