@@ -1,0 +1,158 @@
+Continue from the current project state.
+
+Current situation:
+- Only HSK1 is fully implemented and completed
+- HSK2 is not fully built yet (content + quiz/exam incomplete)
+
+GOAL:
+Fully implement HSK2 so it matches the same quality, structure, and logic as HSK1.
+
+==================================================
+PART 1 — HSK2 CONTENT (WORDS + STRUCTURE)
+==================================================
+
+Create full HSK2 content.
+
+Requirements:
+- Add all HSK2 vocabulary (standard list)
+- Organize words by categories (same pattern as HSK1)
+  Examples:
+  - Greetings
+  - Travel
+  - Daily life
+  - Time
+  - Food
+  - Numbers
+  - Work / School
+
+Each word should include:
+- Chinese (hanzi)
+- Pinyin
+- English meaning
+- optional example if system supports it
+
+Reuse the same schema and structure used for HSK1.
+Do NOT create a completely different structure.
+
+==================================================
+PART 2 — HSK2 FLASHCARDS
+==================================================
+
+Make sure HSK2 flashcards work exactly like HSK1:
+
+- category-based navigation
+- flashcard view (front/back)
+- saving last position (resume feature)
+- user progress tracking
+
+Do not break existing flashcard logic.
+
+==================================================
+PART 3 — HSK2 PHRASES
+==================================================
+
+Add HSK2 phrases section:
+
+- organize phrases by category if possible
+- follow same structure as HSK1 phrases
+- reuse existing components
+
+If phrase data is not yet supported fully, create minimal structure consistent with current system.
+
+==================================================
+PART 4 — HSK2 QUIZ SYSTEM
+==================================================
+
+Update and complete HSK2 quizzes:
+
+Requirements:
+- category-based quizzes
+- each category should have a quiz option
+- questions based only on HSK2 data
+- no mixing with HSK1 unless system already supports combined logic
+
+Question types:
+- word meaning
+- recognition
+- matching if supported
+
+Ensure:
+- scoring works
+- results are stored if system supports it
+
+==================================================
+PART 5 — HSK2 EXAM (IMPORTANT)
+==================================================
+
+Create/update the HSK2 exam:
+
+- similar structure to HSK1 exam
+- larger quiz (e.g. 20 questions or based on current logic)
+- pulls from all HSK2 categories
+- has pass/fail logic
+
+When user passes:
+- mark HSK2 as completed
+- unlock HSK3 (if exists or placeholder)
+- show “Passed” badge
+
+When user fails:
+- show retry option
+
+==================================================
+PART 6 — LEVEL PROGRESSION
+==================================================
+
+Ensure progression works:
+
+- HSK1 must be passed → unlock HSK2
+- HSK2 must be passed → unlock HSK3
+
+Make sure:
+- HSK2 is now fully usable after unlock
+- dashboard/levels page reflects correct status
+
+==================================================
+PART 7 — DATABASE / DATA
+==================================================
+
+Use existing tables and schema.
+
+If needed:
+- add HSK2 data entries
+- do NOT duplicate tables
+- do NOT break existing HSK1 data
+
+If a seed/data script exists, extend it for HSK2.
+
+==================================================
+PART 8 — UI CONSISTENCY
+==================================================
+
+Make sure HSK2 looks and behaves exactly like HSK1:
+
+- same layout
+- same buttons
+- same navigation
+- same UX flow
+
+User should not feel any difference between HSK1 and HSK2.
+
+==================================================
+PART 9 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. how HSK2 data was added
+2. categories created
+3. number of words added
+4. quiz logic updates
+5. exam implementation details
+6. files changed
+7. any migration or data script added
+8. how progression works now for HSK2
+
+IMPORTANT:
+- Do not overengineer
+- Match HSK1 system exactly
+- Focus on completeness and consistency
