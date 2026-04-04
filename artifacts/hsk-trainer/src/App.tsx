@@ -114,6 +114,7 @@ function Router() {
         <Route path="/flashcards/:level" component={FlashcardPage} />
         <Route path="/quiz/:level"       component={QuizPage} />
         <Route path="/review"            component={ReviewPage} />
+        <Route path="/phrases/:level"    component={PhrasesPage} />
         <Route path="/phrases"           component={PhrasesPage} />
         <Route path="/strokes"           component={StrokesPage} />
         <Route path="/chinese-themes"    component={ChineseThemesPage} />

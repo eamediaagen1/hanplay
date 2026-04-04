@@ -186,6 +186,31 @@ Every package extends `tsconfig.base.json` (`composite: true`). Run `pnpm run ty
 - `pnpm run build` — typecheck + build all packages
 - `pnpm run typecheck` — `tsc --build --emitDeclarationOnly`
 
+## HSK Vocabulary Content
+
+### API Access Rules
+- **HSK 1**: Any authenticated user (free tier) — `GET /api/lessons?level=1` requires auth only
+- **HSK 2–6**: Requires `is_premium = true` or `role = 'admin'` in the profiles table
+
+### Word Counts per Level
+| Level | Words | Categories |
+|-------|-------|-----------|
+| HSK 1 | 150   | 9 (Greetings, Family, Numbers, Animals, Food, Colors, Time, Actions, Places) |
+| HSK 2 | 142   | 12 (Travel, Home, Food & Dining, Health, People, School, Work, Time, Actions, Feelings, Location, Grammar) |
+| HSK 3 | 280   | 14 (Home, Nature, Travel, Food, Health, Shopping, Work, Education, Emotions, Technology, Time, Actions, Descriptions, Grammar) |
+| HSK 4 | 8     | Stub entries only |
+| HSK 5 | 8     | Stub entries only |
+| HSK 6 | 8     | Stub entries only |
+
+### Phrases Content
+Static phrase data lives in `artifacts/hsk-trainer/src/data/phraseData.ts`.
+- **HSK 1**: 6 categories — Greetings, Introductions, Food & Drink, Time, Shopping, Directions (~29 phrases)
+- **HSK 2**: 6 categories — Travel, Restaurant, Health, Daily Life, School & Work, Shopping (~30 phrases)
+- **HSK 3**: 6 categories — At Work, Travel, Health, Education, Daily Life, Shopping (~30 phrases)
+
+### Phrases Page
+Route: `/phrases/:level` (level-aware) — reads level from URL path param, displays categorized phrases with Chinese / pinyin / tap-to-reveal English translation. Also supports `/phrases` fallback to level 1.
+
 ## Word ID Format
 
-Word IDs follow the pattern `hsk{level}-{category}{n}` (e.g. `hsk1-f1`, `hsk2-1`). The ProgressPage parses the level from the id using `/^hsk(\d)/`.
+Word IDs follow the pattern `hsk{level}-{category}{n}` (e.g. `hsk1-f1`, `hsk2-1`, `hsk3-ho1`). The ProgressPage parses the level from the id using `/^hsk(\d)/`.

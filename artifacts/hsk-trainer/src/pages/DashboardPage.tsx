@@ -637,7 +637,7 @@ export default function DashboardPage() {
                 examScore={examScore}
                 onGo={() => setLocation(`/flashcards/${level.id}`)}
                 onNextLevel={() => setLocation(`/flashcards/${level.id + 1}`)}
-                onPhrases={() => setLocation(`/phrases?level=${level.id}`)}
+                onPhrases={() => setLocation(`/phrases/${level.id}`)}
                 onExam={() => setLocation(`/quiz/${level.id}`)}
               />
             );
@@ -658,7 +658,7 @@ export default function DashboardPage() {
           </div>
         </button>
         <button
-          onClick={() => setLocation(`/phrases?level=${activeLevel.id}`)}
+          onClick={() => setLocation(`/phrases/${activeLevel.id}`)}
           className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 text-left shadow-sm hover:border-primary/30 hover:shadow-md transition-all duration-200"
         >
           <MessageSquare className="w-5 h-5 text-primary shrink-0" />

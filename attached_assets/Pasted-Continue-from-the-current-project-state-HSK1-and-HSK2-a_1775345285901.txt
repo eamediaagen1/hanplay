@@ -1,0 +1,139 @@
+Continue from the current project state.
+
+HSK1 and HSK2 are already implemented.
+Now I want to implement HSK3 with ~300 words.
+
+GOAL:
+Add full HSK3 level with the same structure, UX, and logic as HSK1 and HSK2.
+
+==================================================
+PART 1 — HSK3 WORD DATA (300 WORDS)
+==================================================
+
+Add ~300 HSK3 words (standard list).
+
+Requirements:
+- Chinese (hanzi)
+- Pinyin
+- English meaning
+
+Organize into categories (same pattern as HSK1/HSK2):
+Examples:
+- Daily life
+- Work
+- Travel
+- Time
+- Food
+- Communication
+- Emotions
+- Directions
+- Shopping
+- Education
+
+Reuse existing schema and structure.
+Do NOT create a new system.
+
+==================================================
+PART 2 — FLASHCARDS
+==================================================
+
+Ensure HSK3 flashcards work exactly like HSK1/HSK2:
+
+- category-based navigation
+- flashcard UI (front/back)
+- resume last position
+- user progress saved per user
+
+==================================================
+PART 3 — PHRASES
+==================================================
+
+Add HSK3 phrases:
+
+- organized by categories if supported
+- reuse existing phrase structure/components
+- keep minimal but consistent
+
+==================================================
+PART 4 — QUIZZES
+==================================================
+
+Add HSK3 quizzes:
+
+- category-based quizzes
+- questions based only on HSK3 words
+- consistent with HSK1/HSK2 quiz logic
+
+Question types:
+- word meaning
+- recognition
+- matching (if supported)
+
+Ensure scoring works.
+
+==================================================
+PART 5 — HSK3 EXAM
+==================================================
+
+Create HSK3 exam:
+
+- similar structure to HSK1/HSK2 exams
+- larger quiz (e.g. 20 questions or current logic)
+- pulls from all HSK3 categories
+
+Logic:
+- pass → mark HSK3 completed + unlock HSK4
+- fail → allow retry
+
+==================================================
+PART 6 — LEVEL PROGRESSION
+==================================================
+
+Ensure progression works:
+
+- HSK2 passed → unlock HSK3
+- HSK3 passed → unlock HSK4
+
+Dashboard/levels page must reflect:
+- Passed
+- Unlocked
+- Locked
+
+==================================================
+PART 7 — DATA HANDLING
+==================================================
+
+Use existing tables.
+
+If needed:
+- extend seed/data files
+- do NOT duplicate tables
+- do NOT break existing HSK1/HSK2 data
+
+==================================================
+PART 8 — UI CONSISTENCY
+==================================================
+
+HSK3 must look identical to other levels:
+
+- same layout
+- same buttons
+- same navigation
+- same UX flow
+
+==================================================
+PART 9 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. number of HSK3 words added (~300)
+2. categories created
+3. quiz implementation details
+4. exam implementation details
+5. files changed
+6. how progression works now (HSK2 → HSK3 → HSK4)
+
+IMPORTANT:
+- Do not overengineer
+- Follow same structure as HSK1/HSK2
+- Focus on completeness and consistency
