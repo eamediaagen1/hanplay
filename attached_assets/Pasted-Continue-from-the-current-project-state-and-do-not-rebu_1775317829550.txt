@@ -1,0 +1,198 @@
+Continue from the current project state and do not rebuild unrelated parts.
+
+I want you to redesign and recreate the dashboard so it is clean, fully organized, and based only on necessary real data.
+
+GOAL
+Rebuild the dashboard to show only the most useful information for the user.
+Remove clutter, remove duplicate blocks, and make the dashboard structured, simple, and actionable.
+
+IMPORTANT RULES
+- Audit the current dashboard first
+- Reuse existing data and components where possible
+- Do not invent fake metrics
+- Only show real data that already exists or can be derived safely from the database
+- Keep the UI simple, modern, and organized
+- Do not break auth, premium checks, progress logic, or navigation
+- Make it mobile-friendly
+
+================================
+PART 1 — AUDIT CURRENT DASHBOARD
+================================
+
+First inspect the current dashboard and identify:
+- what sections currently exist
+- which cards are useful
+- which cards are redundant
+- which data is fake, static, duplicated, or not important
+- what real user data is already available
+- what progress data is already available
+- what premium / level progression data is already available
+
+Then rebuild the dashboard around only essential data.
+
+================================
+PART 2 — NEW DASHBOARD STRUCTURE
+================================
+
+I want a clean dashboard with only necessary sections.
+
+Suggested structure:
+
+1. Welcome / Header section
+Show:
+- user greeting
+- current plan: Free or Premium
+- current unlocked level
+- current progress summary
+
+2. Learning Progress section
+Show real progress only, such as:
+- current level
+- completed levels
+- passed exams
+- current active level
+- progress percentage if available
+
+3. Continue Learning section
+This is the most important action area.
+Show the next best action:
+- Continue HSK1
+- Continue HSK2
+- Review passed level
+- Take exam
+- Go to newly unlocked level
+
+4. Level Status overview
+Show compact level cards or a progress strip:
+- Passed
+- Unlocked
+- Locked
+
+5. Quick Actions
+Only useful actions:
+- Continue learning
+- Review phrases
+- Take current exam
+- Go to levels page
+
+6. Premium / Upgrade section
+Only if user is free:
+- show clear upgrade CTA
+- short explanation of premium benefits
+
+If user is premium:
+- do not show unnecessary upgrade banners
+
+================================
+PART 3 — REMOVE CLUTTER
+================================
+
+Please remove or avoid:
+- empty cards
+- repeated stats
+- fake analytics
+- generic filler text
+- too many buttons
+- too many unrelated widgets
+- duplicate navigation inside the dashboard
+
+The dashboard should feel focused and useful.
+
+================================
+PART 4 — DATA-BASED CONTENT ONLY
+================================
+
+Use only real or safely derived data from the app.
+
+Examples of allowed data:
+- user name/email
+- plan type
+- premium status
+- current unlocked level
+- passed exams
+- completed levels
+- progress percentage
+- best score
+- next recommended action
+
+Do not show fake numbers like:
+- “1200 words learned” unless it is real
+- “7 day streak” unless it is tracked
+- “hours studied” unless it is tracked
+
+If some useful dashboard data is missing but easy to derive from existing tables, derive it cleanly.
+
+================================
+PART 5 — ORGANIZATION / UX
+================================
+
+Dashboard should be easy to scan.
+
+Requirements:
+- strong visual hierarchy
+- clear section titles
+- no confusion
+- next action visible immediately
+- passed/unlocked/locked status easy to understand
+- premium/free state easy to understand
+- mobile responsive
+
+Make the dashboard feel polished and organized, not crowded.
+
+================================
+PART 6 — USER STATES
+================================
+
+Handle both states properly:
+
+A. Free user
+- show limited access state
+- show demo / upgrade CTA
+- avoid showing inaccessible actions that confuse the user
+
+B. Premium user
+- show full learning dashboard
+- show current level progress
+- show next unlocked level
+- show passed badges and continue actions
+
+================================
+PART 7 — OPTIONAL DERIVED METRICS
+================================
+
+If supported by current data, you may include a small set of useful derived stats:
+- levels passed
+- current level
+- exams passed
+- completion percentage
+
+Only include them if real and useful.
+
+================================
+PART 8 — IMPLEMENTATION
+================================
+
+Please:
+1. audit current dashboard
+2. propose the clean data structure it should use
+3. rebuild the dashboard UI
+4. connect it to real data
+5. remove redundant sections
+6. keep styling consistent with the rest of the app
+
+================================
+PART 9 — DELIVERABLES
+================================
+
+At the end, provide:
+1. dashboard audit summary
+2. what sections were removed
+3. what sections were added
+4. what real data the dashboard now uses
+5. files changed
+6. any DB/API changes if needed
+7. any manual steps required
+
+Important:
+Do not overengineer this.
+I want a clean, structured, data-based dashboard with only necessary information.
