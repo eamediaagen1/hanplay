@@ -150,13 +150,6 @@ export default function MarketingPage() {
             </button>
           </motion.div>
 
-          <motion.p
-            variants={fadeUp} initial="hidden" animate="show" custom={4}
-            className="mt-4 text-xs text-muted-foreground"
-          >
-            HSK 1 is free. Upgrade once for lifetime access to all 6 levels.
-          </motion.p>
-
           {/* Hero flashcard mockup */}
           <motion.div
             variants={fadeUp} initial="hidden" animate="show" custom={5}
