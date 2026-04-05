@@ -1,0 +1,153 @@
+Continue from the current project state.
+
+HSK1, HSK2, and HSK3 are already implemented.
+Now I want to implement HSK4 with ~600 words.
+
+GOAL:
+Add full HSK4 level with the same structure, UX, and logic as previous levels.
+
+==================================================
+PART 1 — HSK4 WORD DATA (600 WORDS)
+==================================================
+
+Add ~600 HSK4 words (standard HSK list).
+
+Each word must include:
+- Chinese (hanzi)
+- Pinyin
+- English meaning
+
+Organize into categories (same pattern as previous levels):
+Examples:
+- Daily life
+- Work & Business
+- Travel
+- Time & Dates
+- Food & Dining
+- Communication
+- Emotions
+- Directions
+- Shopping
+- Education
+- Culture
+
+Reuse existing schema and structure.
+Do NOT create a new system.
+
+==================================================
+PART 2 — FLASHCARDS
+==================================================
+
+Ensure HSK4 flashcards work exactly like previous levels:
+
+- category-based navigation
+- flashcard UI (front/back)
+- resume last position (saved per user)
+- user progress tracking
+
+==================================================
+PART 3 — PHRASES
+==================================================
+
+Add HSK4 phrases:
+
+- organized by categories if supported
+- reuse existing phrase structure/components
+- keep consistent with previous levels
+
+==================================================
+PART 4 — QUIZZES
+==================================================
+
+Add HSK4 quizzes:
+
+- category-based quizzes
+- questions based only on HSK4 words
+- consistent with existing quiz system
+
+Question types:
+- word meaning
+- recognition
+- matching (if supported)
+
+Ensure scoring and results work correctly.
+
+==================================================
+PART 5 — HSK4 EXAM
+==================================================
+
+Create HSK4 exam:
+
+- same structure as previous exams
+- larger quiz (e.g. 20–30 questions depending on current system)
+- pulls from all HSK4 categories
+
+Logic:
+- pass → mark HSK4 completed + unlock HSK5
+- fail → allow retry
+
+==================================================
+PART 6 — LEVEL PROGRESSION
+==================================================
+
+Ensure progression works:
+
+- HSK3 passed → unlock HSK4
+- HSK4 passed → unlock HSK5
+
+Dashboard/levels page must reflect:
+- Passed
+- Unlocked
+- Locked
+
+==================================================
+PART 7 — DATA HANDLING
+==================================================
+
+Use existing tables and schema.
+
+If needed:
+- extend seed/data files for HSK4
+- do NOT duplicate tables
+- do NOT break existing levels data
+
+==================================================
+PART 8 — PERFORMANCE CONSIDERATION
+==================================================
+
+Since HSK4 has many words (~600):
+
+- ensure queries are efficient
+- paginate or chunk data if needed
+- avoid loading all words at once if unnecessary
+
+==================================================
+PART 9 — UI CONSISTENCY
+==================================================
+
+HSK4 must match previous levels:
+
+- same layout
+- same components
+- same navigation
+- same UX flow
+
+User should not feel any difference between levels.
+
+==================================================
+PART 10 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. number of HSK4 words added (~600)
+2. categories created
+3. quiz implementation details
+4. exam implementation details
+5. files changed
+6. any performance adjustments
+7. progression update (HSK3 → HSK4 → HSK5)
+
+IMPORTANT:
+- Do not overengineer
+- Follow same structure as existing levels
+- Focus on consistency and scalability

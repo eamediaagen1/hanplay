@@ -132,6 +132,48 @@ export const phraseData: Phrase[] = [
   { id: "p3-sh3", hskLevel: 3, category: "Shopping",      chinese: "我想退换这件商品。",       pinyin: "Wǒ xiǎng tuì huàn zhè jiàn shāngpǐn.", english: "I'd like to return or exchange this item." },
   { id: "p3-sh4", hskLevel: 3, category: "Shopping",      chinese: "这个尺码对我来说太小了。", pinyin: "Zhège chǐmǎ duì wǒ lái shuō tài xiǎo le.", english: "This size is too small for me." },
   { id: "p3-sh5", hskLevel: 3, category: "Shopping",      chinese: "你们有会员卡吗？",         pinyin: "Nǐmen yǒu huìyuán kǎ ma?",        english: "Do you have a membership card?" },
+
+  // ─── HSK 4 — Society & Work ──────────────────────────────────────────────────
+  { id: "p4-sw1", hskLevel: 4, category: "Society & Work",  chinese: "这个政策对社会影响很大。",     pinyin: "Zhège zhèngcè duì shèhuì yǐngxiǎng hěn dà.",        english: "This policy has a huge impact on society." },
+  { id: "p4-sw2", hskLevel: 4, category: "Society & Work",  chinese: "公民有责任遵守法律。",         pinyin: "Gōngmín yǒu zérèn zūnshǒu fǎlǜ.",                   english: "Citizens have a responsibility to obey the law." },
+  { id: "p4-sw3", hskLevel: 4, category: "Society & Work",  chinese: "我们需要共同解决这个问题。",   pinyin: "Wǒmen xūyào gòngtóng jiějué zhège wèntí.",           english: "We need to solve this problem together." },
+  { id: "p4-sw4", hskLevel: 4, category: "Society & Work",  chinese: "这家公司的发展速度很快。",     pinyin: "Zhè jiā gōngsī de fāzhǎn sùdù hěn kuài.",           english: "This company is growing very quickly." },
+  { id: "p4-sw5", hskLevel: 4, category: "Society & Work",  chinese: "我下个月要参加一个重要会议。", pinyin: "Wǒ xià gè yuè yào cānjiā yīgè zhòngyào huìyì.",      english: "I have an important meeting next month." },
+
+  // ─── HSK 4 — Education & Research ────────────────────────────────────────────
+  { id: "p4-ed1", hskLevel: 4, category: "Education",        chinese: "我正在写毕业论文。",           pinyin: "Wǒ zhèngzài xiě bìyè lùnwén.",                       english: "I am writing my graduation thesis." },
+  { id: "p4-ed2", hskLevel: 4, category: "Education",        chinese: "他申请了奖学金，结果被录取了。",pinyin: "Tā shēnqǐng le jiǎngxuéjīn, jiéguǒ bèi lùqǔ le.",   english: "He applied for a scholarship and was accepted." },
+  { id: "p4-ed3", hskLevel: 4, category: "Education",        chinese: "这门课的理论和实践结合得很好。",pinyin: "Zhè mén kè de lǐlùn hé shíjiàn jiéhé de hěn hǎo.",   english: "This course combines theory and practice very well." },
+  { id: "p4-ed4", hskLevel: 4, category: "Education",        chinese: "我的导师建议我研究这个课题。", pinyin: "Wǒ de dǎoshī jiànyì wǒ yánjiū zhège kètí.",           english: "My supervisor suggested I research this topic." },
+  { id: "p4-ed5", hskLevel: 4, category: "Education",        chinese: "掌握知识需要长期积累。",       pinyin: "Zhǎngwò zhīshi xūyào chángqī jīlěi.",                english: "Mastering knowledge requires long-term accumulation." },
+
+  // ─── HSK 4 — Business & Economy ──────────────────────────────────────────────
+  { id: "p4-bu1", hskLevel: 4, category: "Business",         chinese: "市场需求正在快速增长。",       pinyin: "Shìchǎng xūqiú zhèngzài kuàisù zēngzhǎng.",          english: "Market demand is growing rapidly." },
+  { id: "p4-bu2", hskLevel: 4, category: "Business",         chinese: "这次谈判进行得很顺利。",       pinyin: "Zhè cì tánpàn jìnxíng de hěn shùnlì.",               english: "The negotiation went very smoothly." },
+  { id: "p4-bu3", hskLevel: 4, category: "Business",         chinese: "我们公司决定进入国际市场。",   pinyin: "Wǒmen gōngsī juédìng jìnrù guójì shìchǎng.",         english: "Our company has decided to enter the international market." },
+  { id: "p4-bu4", hskLevel: 4, category: "Business",         chinese: "这个产品的成本需要进一步降低。",pinyin: "Zhège chǎnpǐn de chéngběn xūyào jìnyībù jiàngdī.",   english: "The cost of this product needs to be reduced further." },
+  { id: "p4-bu5", hskLevel: 4, category: "Business",         chinese: "良好的客户服务是成功的关键。", pinyin: "Liánghǎo de kèhù fúwù shì chénggōng de guānjiàn.",   english: "Good customer service is the key to success." },
+
+  // ─── HSK 4 — Technology ───────────────────────────────────────────────────────
+  { id: "p4-te1", hskLevel: 4, category: "Technology",       chinese: "人工智能正在改变我们的生活方式。",pinyin: "Réngōng zhìnéng zhèngzài gǎibiàn wǒmen de shēnghuó fāngshì.", english: "AI is changing our way of life." },
+  { id: "p4-te2", hskLevel: 4, category: "Technology",       chinese: "这个应用程序需要定期更新。",   pinyin: "Zhège yìngyòng chéngxù xūyào dìngqī gēngxīn.",       english: "This application needs to be updated regularly." },
+  { id: "p4-te3", hskLevel: 4, category: "Technology",       chinese: "网络安全是一个重要问题。",     pinyin: "Wǎngluò ānquán shì yīgè zhòngyào wèntí.",            english: "Cybersecurity is an important issue." },
+  { id: "p4-te4", hskLevel: 4, category: "Technology",       chinese: "云计算让数据存储更加便利。",   pinyin: "Yún jìsuàn ràng shùjù cúnchǔ gèngjiā biànlì.",       english: "Cloud computing makes data storage more convenient." },
+  { id: "p4-te5", hskLevel: 4, category: "Technology",       chinese: "请保护好你的个人隐私信息。",   pinyin: "Qǐng bǎohù hǎo nǐ de gèrén yǐnsī xìnxī.",           english: "Please protect your personal privacy information." },
+
+  // ─── HSK 4 — Travel & Culture ────────────────────────────────────────────────
+  { id: "p4-tr1", hskLevel: 4, category: "Travel & Culture", chinese: "我需要在大使馆申请签证。",     pinyin: "Wǒ xūyào zài dàshǐguǎn shēnqǐng qiānzhèng.",         english: "I need to apply for a visa at the embassy." },
+  { id: "p4-tr2", hskLevel: 4, category: "Travel & Culture", chinese: "这个世界遗产非常值得参观。",   pinyin: "Zhège shìjiè yíchǎn fēicháng zhídé cānguān.",         english: "This World Heritage Site is well worth visiting." },
+  { id: "p4-tr3", hskLevel: 4, category: "Travel & Culture", chinese: "我的航班因为天气原因延误了。", pinyin: "Wǒ de hángbān yīnwèi tiānqì yuányīn yánwù le.",       english: "My flight was delayed due to weather conditions." },
+  { id: "p4-tr4", hskLevel: 4, category: "Travel & Culture", chinese: "出国旅行前要了解当地的风俗习惯。",pinyin: "Chūguó lǚxíng qián yào liǎojiě dāngdì de fēngsú xíguàn.", english: "Before travelling abroad, learn about local customs." },
+  { id: "p4-tr5", hskLevel: 4, category: "Travel & Culture", chinese: "这里的文化遗产有着悠久的历史。",pinyin: "Zhèlǐ de wénhuà yíchǎn yǒuzhe yōujiǔ de lìshǐ.",      english: "The cultural heritage here has a long history." },
+
+  // ─── HSK 4 — Health & Environment ────────────────────────────────────────────
+  { id: "p4-he1", hskLevel: 4, category: "Health & Environment", chinese: "医生建议我每天坚持锻炼。", pinyin: "Yīshēng jiànyì wǒ měitiān jiānchí duànliàn.",        english: "The doctor advised me to exercise every day." },
+  { id: "p4-he2", hskLevel: 4, category: "Health & Environment", chinese: "保护环境是每个人的责任。", pinyin: "Bǎohù huánjìng shì měi gè rén de zérèn.",            english: "Protecting the environment is everyone's responsibility." },
+  { id: "p4-he3", hskLevel: 4, category: "Health & Environment", chinese: "气候变化对地球影响越来越大。",pinyin: "Qìhòu biànhuà duì dìqiú yǐngxiǎng yuè lái yuè dà.", english: "Climate change is having an increasing impact on the Earth." },
+  { id: "p4-he4", hskLevel: 4, category: "Health & Environment", chinese: "良好的睡眠对健康非常重要。", pinyin: "Liánghǎo de shuìmián duì jiànkāng fēicháng zhòngyào.", english: "Good sleep is very important for health." },
+  { id: "p4-he5", hskLevel: 4, category: "Health & Environment", chinese: "我们应该减少碳排放来保护地球。",pinyin: "Wǒmen yīnggāi jiǎnshǎo tàn páifàng lái bǎohù dìqiú.", english: "We should reduce carbon emissions to protect the Earth." },
 ];
 
 export function getPhrasesByLevel(level: number): Phrase[] {
