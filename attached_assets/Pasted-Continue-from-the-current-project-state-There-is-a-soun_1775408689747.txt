@@ -1,0 +1,127 @@
+Continue from the current project state.
+
+There is a sound/audio bug in the app.
+
+Current issue:
+- The sound button works correctly for HSK1
+- But it does NOT work for HSK2, HSK3, HSK4, HSK5, and HSK6
+
+GOAL:
+Fix the audio/sound feature so it works consistently across all HSK levels, not only HSK1.
+
+==================================================
+PART 1 — AUDIT THE ROOT CAUSE
+==================================================
+
+First inspect how audio currently works in HSK1:
+- where the sound button is implemented
+- how audio is generated or played
+- whether it uses browser speech synthesis, stored audio URLs, or another approach
+- how HSK1 word/phrase data is structured
+
+Then compare that with HSK2–HSK6 and find the exact reason audio is failing there.
+
+Possible causes to inspect:
+- missing text field mapping
+- wrong property names in data
+- audio function only wired to HSK1 components
+- unsupported characters/data shape mismatch
+- event handler not passed down
+- sound button rendered but not connected
+- browser speech synthesis called with wrong value
+- higher levels using different data structure
+
+Do not guess. Find the actual cause in the codebase.
+
+==================================================
+PART 2 — FIX AUDIO FOR ALL LEVELS
+==================================================
+
+Make the sound button work for:
+- flashcards
+- phrases
+- any word/phrase cards that already show the sound button
+
+Levels to support:
+- HSK1
+- HSK2
+- HSK3
+- HSK4
+- HSK5
+- HSK6
+
+Requirements:
+- same behavior across all levels
+- same UX across all levels
+- use the existing sound approach if it is already good
+- do not create a separate audio system per level
+
+==================================================
+PART 3 — DATA CONSISTENCY
+==================================================
+
+Audit word/phrase data fields used for audio.
+
+Ensure all levels provide the correct field for pronunciation playback, such as:
+- hanzi
+- chinese
+- text
+or whichever field the current audio function expects
+
+If higher levels use inconsistent field names, normalize them cleanly.
+
+Do not duplicate data unnecessarily.
+Adapt mapping logic if needed.
+
+==================================================
+PART 4 — COMPONENT CONSISTENCY
+==================================================
+
+Check whether:
+- HSK1 uses one card component
+- HSK2–HSK6 use another
+- or props are passed differently
+
+If needed:
+- unify the sound button behavior in shared components
+- ensure the audio handler is passed correctly everywhere
+
+==================================================
+PART 5 — BROWSER SAFETY / UX
+==================================================
+
+Keep audio UX simple and consistent.
+
+Requirements:
+- clicking sound button should pronounce the Chinese text
+- if browser speech synthesis is used, keep it stable
+- avoid duplicate playback bugs
+- avoid crashes if a field is missing
+- optionally disable button gracefully when no valid text exists
+
+==================================================
+PART 6 — DO NOT BREAK HSK1
+==================================================
+
+Important:
+- HSK1 audio already works
+- do not break it while fixing the others
+
+Final result should be:
+- HSK1 still works
+- HSK2–HSK6 now also work
+
+==================================================
+PART 7 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. root cause of the bug
+2. what files/components were changed
+3. what data inconsistency was fixed, if any
+4. how audio now works across all levels
+5. any edge cases still remaining
+
+Important:
+Do not only explain.
+Fix the sound feature in the app for all levels.

@@ -106,7 +106,7 @@ export default function FlashcardPage() {
   const handleSpeak = useCallback((word?: string) => {
     const wordEntry = levelWords[safeIndex];
     const target = word ?? wordEntry?.word;
-    if (!target) return;
+    if (!target || typeof target !== "string") return;
     const didSpeak = speakChinese(target);
     if (didSpeak) {
       setIsSpeaking(true);
@@ -115,13 +115,14 @@ export default function FlashcardPage() {
     }
   }, [levelWords, safeIndex]);
 
-  // Auto-play when card changes if pref is enabled
+  // Auto-play when card changes, or when words first finish loading (HSK2-6 API fetch)
   useEffect(() => {
+    if (wordsLoading) return;
     if (prefs.autoPlay && levelWords[safeIndex]?.word) {
       handleSpeak(levelWords[safeIndex].word);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [safeIndex, prefs.autoPlay]);
+  }, [safeIndex, prefs.autoPlay, wordsLoading]);
 
   // Show loading state while fetching words
   if (wordsLoading) {
@@ -298,7 +299,7 @@ export default function FlashcardPage() {
               {/* Voice + Save */}
               <div className="flex gap-3">
                 <button
-                  onClick={handleSpeak}
+                  onClick={() => handleSpeak()}
                   disabled={!speechSupported}
                   className={cn(
                     "flex-1 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-200 border text-sm",
