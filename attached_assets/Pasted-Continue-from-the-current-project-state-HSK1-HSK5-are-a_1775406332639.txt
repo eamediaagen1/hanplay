@@ -1,0 +1,178 @@
+Continue from the current project state.
+
+HSK1–HSK5 are already implemented.
+Now implement HSK6 with ~2500 words.
+
+IMPORTANT:
+- Do NOT create duplicate or repeated words
+- Do NOT reuse words from HSK1–HSK5
+- Ensure all HSK6 vocabulary is unique and accurate
+
+GOAL:
+Add full HSK6 level with the same structure, UX, and logic as previous levels, while handling large-scale data efficiently.
+
+==================================================
+PART 1 — HSK6 WORD DATA (~2500 WORDS)
+==================================================
+
+Add ~2500 HSK6 words (standard list).
+
+STRICT REQUIREMENTS:
+- no duplicates within HSK6
+- no overlap with HSK1–HSK5 vocabulary
+- validate uniqueness before inserting
+
+Each word must include:
+- Chinese (hanzi)
+- Pinyin
+- English meaning
+
+Organize into categories (same pattern as previous levels):
+Examples:
+- Daily life
+- Work & Business
+- Travel
+- Time & Dates
+- Food & Dining
+- Communication
+- Emotions
+- Society
+- Culture
+- Politics
+- Technology
+- Education
+- Health
+- Economy
+
+Reuse existing schema and structure.
+Do NOT create a new system.
+
+==================================================
+PART 2 — DUPLICATION PREVENTION (IMPORTANT)
+==================================================
+
+Before inserting HSK6 data:
+
+1. Check existing vocabulary (HSK1–HSK5)
+2. Ensure HSK6 words are not already present
+3. Enforce uniqueness using:
+   - DB constraints OR
+   - validation logic before insert
+
+If needed:
+- add a unique constraint on (hanzi + level)
+- or global uniqueness if schema supports it
+
+==================================================
+PART 3 — FLASHCARDS
+==================================================
+
+Ensure HSK6 flashcards work exactly like previous levels:
+
+- category-based navigation
+- flashcard UI (front/back)
+- resume last position (DB-backed)
+- user progress tracking
+
+==================================================
+PART 4 — PHRASES
+==================================================
+
+Add HSK6 phrases:
+
+- organized by categories if supported
+- reuse existing structure/components
+- keep consistent with previous levels
+
+==================================================
+PART 5 — QUIZZES
+==================================================
+
+Add HSK6 quizzes:
+
+- category-based quizzes
+- questions based only on HSK6 words
+- consistent with existing system
+
+Ensure:
+- scoring works
+- results saved if applicable
+
+==================================================
+PART 6 — HSK6 EXAM
+==================================================
+
+Create HSK6 exam:
+
+- same structure as previous exams
+- larger quiz (e.g. 40–50 questions depending on system)
+- pulls from all HSK6 categories
+
+Logic:
+- pass → mark HSK6 completed
+- no further unlock (final level)
+- show completion badge
+
+==================================================
+PART 7 — PERFORMANCE (CRITICAL)
+==================================================
+
+HSK6 is large (~2500 words), so optimize:
+
+- do NOT load all words at once
+- paginate or chunk by category
+- lazy load flashcards
+- optimize DB queries
+- ensure UI remains fast
+
+==================================================
+PART 8 — DATA HANDLING
+==================================================
+
+Use existing tables and schema.
+
+If needed:
+- extend seed/data files
+- do NOT duplicate tables
+- do NOT break existing levels
+
+==================================================
+PART 9 — UI CONSISTENCY
+==================================================
+
+HSK6 must match previous levels:
+
+- same layout
+- same UX
+- same navigation
+
+==================================================
+PART 10 — FINAL LEVEL UX
+==================================================
+
+Since HSK6 is final level:
+
+- show special “Completed HSK6” state
+- optional:
+  - completion badge
+  - congratulation message
+
+==================================================
+PART 11 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. number of HSK6 words added (~2500)
+2. confirmation no duplicates exist
+3. categories created
+4. quiz implementation details
+5. exam implementation details
+6. files changed
+7. performance optimizations
+8. final level completion behavior
+
+IMPORTANT:
+- No duplication across levels
+- Maintain performance
+- Follow same structure as previous levels
+- Do not overengineer

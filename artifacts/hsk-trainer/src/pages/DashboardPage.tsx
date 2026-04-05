@@ -190,6 +190,16 @@ function LevelCard({
 
           {isPassed && (
             <>
+              {isLastLevel && (
+                <div className="w-full py-3 px-3 rounded-xl bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-950/30 dark:to-amber-950/30 border border-yellow-200/70 dark:border-yellow-800/50 flex flex-col items-center gap-1.5 text-center">
+                  <div className="flex items-center gap-1.5">
+                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-400" />
+                    <span className="text-sm font-bold text-yellow-700 dark:text-yellow-400">HSK Master</span>
+                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-400" />
+                  </div>
+                  <p className="text-xs text-yellow-600 dark:text-yellow-500 leading-tight">You have completed all six HSK levels. Congratulations!</p>
+                </div>
+              )}
               {!isLastLevel && (
                 <button
                   onClick={(e) => { e.stopPropagation(); onNextLevel(); }}

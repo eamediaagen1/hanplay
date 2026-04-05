@@ -216,6 +216,48 @@ export const phraseData: Phrase[] = [
   { id: "p5-he3", hskLevel: 5, category: "Environment & Health", chinese: "精准医疗将根据个人基因提供定制化治疗。", pinyin: "Jīngzhǔn yīliáo jiāng gēnjù gèrén jīyīn tígōng dìngzhìhuà zhìliáo.", english: "Precision medicine will provide personalised treatment based on individual genes." },
   { id: "p5-he4", hskLevel: 5, category: "Environment & Health", chinese: "生物多样性的减少威胁着人类的长期生存。", pinyin: "Shēngwù duōyàngxìng de jiǎnshǎo wēixiézhe rénlèi de chánggī shēngcún.", english: "The decline of biodiversity threatens the long-term survival of humanity." },
   { id: "p5-he5", hskLevel: 5, category: "Environment & Health", chinese: "预防胜于治疗，健康的生活方式至关重要。", pinyin: "Yùfáng shèng yú zhìliáo, jiànkāng de shēnghuó fāngshì zhìguān zhòngyào.", english: "Prevention is better than cure — a healthy lifestyle is of vital importance." },
+
+  // ─── HSK 6 — Academic & Philosophy ───────────────────────────────────────────
+  { id: "p6-ap1", hskLevel: 6, category: "Academic & Philosophy", chinese: "辩证唯物主义认为，物质是世界的本原。", pinyin: "Biànzhèng wéiwù zhǔyì rènwéi, wùzhì shì shìjiè de běnyuán.", english: "Dialectical materialism holds that matter is the foundation of the world." },
+  { id: "p6-ap2", hskLevel: 6, category: "Academic & Philosophy", chinese: "认识论探讨人类获取知识的途径和方法。", pinyin: "Rèn shí lùn tàntǎo rénlèi huòqǔ zhīshi de tújìng hé fāngfǎ.", english: "Epistemology explores the means and methods by which humans acquire knowledge." },
+  { id: "p6-ap3", hskLevel: 6, category: "Academic & Philosophy", chinese: "学术争鸣是推动人文科学进步的重要动力。", pinyin: "Xuéshù zhēngmíng shì tuīdòng rénwén kēxué jìnbù de zhòngyào dònglì.", english: "Academic debate is an important driving force behind the progress of the humanities." },
+  { id: "p6-ap4", hskLevel: 6, category: "Academic & Philosophy", chinese: "形而上学的核心问题是存在与本质的关系。", pinyin: "Xíng ér shàngxué de héxīn wèntí shì cúnzài yǔ běnzhì de guānxi.", english: "The central question of metaphysics is the relationship between existence and essence." },
+  { id: "p6-ap5", hskLevel: 6, category: "Academic & Philosophy", chinese: "道德相对主义质疑普遍伦理标准的存在性。", pinyin: "Dàodé xiāngduì zhǔyì zhíyí pǔbiàn lúnlǐ biāozhǔn de cúnzàixìng.", english: "Moral relativism questions the existence of universal ethical standards." },
+
+  // ─── HSK 6 — Politics & Law ──────────────────────────────────────────────────
+  { id: "p6-pl1", hskLevel: 6, category: "Politics & Law", chinese: "司法独立是维护社会公正的重要保障。", pinyin: "Sīfǎ dúlì shì wéihù shèhuì gōngzhèng de zhòngyào bǎozhàng.", english: "Judicial independence is an important safeguard for maintaining social justice." },
+  { id: "p6-pl2", hskLevel: 6, category: "Politics & Law", chinese: "宪政体制强调法律高于任何个人或机构。", pinyin: "Xiànzhèng tǐzhì qiángdiào fǎlǜ gāoyú rènhé gèrén huò jīgòu.", english: "A constitutional system emphasises that law is superior to any individual or institution." },
+  { id: "p6-pl3", hskLevel: 6, category: "Politics & Law", chinese: "国际人道法旨在保护武装冲突中的平民。", pinyin: "Guójì réndào fǎ zhǐ zài bǎohù wǔzhuāng chōngtú zhōng de píngmín.", english: "International humanitarian law aims to protect civilians in armed conflicts." },
+  { id: "p6-pl4", hskLevel: 6, category: "Politics & Law", chinese: "腐败治理需要强有力的监督与问责机制。", pinyin: "Fǔbài zhìlǐ xūyào qiáng yǒulì de jiāndū yǔ wènzé jīzhì.", english: "Combating corruption requires robust oversight and accountability mechanisms." },
+  { id: "p6-pl5", hskLevel: 6, category: "Politics & Law", chinese: "公民权利与国家权力之间须保持合理平衡。", pinyin: "Gōngmín quánlì yǔ guójiā quánlì zhī jiān xū bǎochí hélǐ pínghéng.", english: "A reasonable balance must be maintained between citizens' rights and state power." },
+
+  // ─── HSK 6 — Economics & Society ─────────────────────────────────────────────
+  { id: "p6-es1", hskLevel: 6, category: "Economics & Society", chinese: "通货膨胀率直接影响居民的实际购买力。", pinyin: "Tōnghuò péngzhàng lǜ zhíjiē yǐngxiǎng jūmín de shíjì gòumǎilì.", english: "The inflation rate directly affects the real purchasing power of residents." },
+  { id: "p6-es2", hskLevel: 6, category: "Economics & Society", chinese: "社会流动性下降是当今许多国家面临的挑战。", pinyin: "Shèhuì liúdòngxìng xiàjiàng shì dāngjīn xǔduō guójiā miànlín de tiǎozhàn.", english: "Declining social mobility is a challenge faced by many countries today." },
+  { id: "p6-es3", hskLevel: 6, category: "Economics & Society", chinese: "垄断行为损害市场竞争秩序和消费者利益。", pinyin: "Lǒngduàn xíngwéi sǔnhài shìchǎng jìngzhēng zhìxù hé xiāofèizhě lìyì.", english: "Monopolistic behaviour undermines market competition order and consumer interests." },
+  { id: "p6-es4", hskLevel: 6, category: "Economics & Society", chinese: "劳动力市场的灵活性对经济复苏至关重要。", pinyin: "Láodòng lì shìchǎng de línghuóxìng duì jīngjì fùsū zhìguān zhòngyào.", english: "Labour market flexibility is vital for economic recovery." },
+  { id: "p6-es5", hskLevel: 6, category: "Economics & Society", chinese: "贫富差距扩大是全球性的社会公平问题。", pinyin: "Pínfù chājù kuòdà shì quánqiúxìng de shèhuì gōngpíng wèntí.", english: "Widening wealth inequality is a global social justice issue." },
+
+  // ─── HSK 6 — Culture & History ───────────────────────────────────────────────
+  { id: "p6-ch1", hskLevel: 6, category: "Culture & History", chinese: "文化遗产承载着一个民族的集体记忆与认同。", pinyin: "Wénhuà yíchǎn chéngzǎizhe yī gè mínzú de jítǐ jìyì yǔ rèntóng.", english: "Cultural heritage carries a nation's collective memory and identity." },
+  { id: "p6-ch2", hskLevel: 6, category: "Culture & History", chinese: "丝绸之路促进了东西方文明的交流互鉴。", pinyin: "Sīchóu zhī lù cùjìnle dōng xīfāng wénmíng de jiāoliú hù jiàn.", english: "The Silk Road promoted the exchange and mutual learning between Eastern and Western civilisations." },
+  { id: "p6-ch3", hskLevel: 6, category: "Culture & History", chinese: "史书是研究古代社会最重要的第一手资料。", pinyin: "Shǐshū shì yánjiū gǔdài shèhuì zuì zhòngyào de dì yī shǒu zīliào.", english: "Historical records are the most important primary sources for studying ancient societies." },
+  { id: "p6-ch4", hskLevel: 6, category: "Culture & History", chinese: "非物质文化遗产的保护需要代际传承。", pinyin: "Fēi wùzhì wénhuà yíchǎn de bǎohù xūyào dài jì chuánchéng.", english: "The protection of intangible cultural heritage requires intergenerational transmission." },
+  { id: "p6-ch5", hskLevel: 6, category: "Culture & History", chinese: "历史的评价应放在当时的社会背景中理解。", pinyin: "Lìshǐ de píngjià yīng fàng zài dāngshí de shèhuì bèijǐng zhōng lǐjiě.", english: "Historical assessments should be understood within the social context of the time." },
+
+  // ─── HSK 6 — Science & Technology ────────────────────────────────────────────
+  { id: "p6-st1", hskLevel: 6, category: "Science & Technology", chinese: "量子计算有望突破传统计算机的运算极限。", pinyin: "Liàngzǐ jìsuàn yǒuwàng tūpò chuántǒng jìsuànjī de yùnsuàn jíxiàn.", english: "Quantum computing is expected to break through the computational limits of traditional computers." },
+  { id: "p6-st2", hskLevel: 6, category: "Science & Technology", chinese: "基因编辑技术引发了深刻的生命伦理争议。", pinyin: "Jīyīn biānjí jìshù yǐnfāle shēnkè de shēngmìng lúnlǐ zhēngyì.", english: "Gene editing technology has sparked profound bioethical controversies." },
+  { id: "p6-st3", hskLevel: 6, category: "Science & Technology", chinese: "人工智能的发展对劳动力市场产生深远影响。", pinyin: "Réngōng zhìnéng de fāzhǎn duì láodòng lì shìchǎng chǎnshēng shēnyuǎn yǐngxiǎng.", english: "The development of artificial intelligence has a far-reaching impact on the labour market." },
+  { id: "p6-st4", hskLevel: 6, category: "Science & Technology", chinese: "数字鸿沟加剧了社会各群体之间的不平等。", pinyin: "Shùzì hónggōu jiājùle shèhuì gè qúntǐ zhī jiān de bù píngděng.", english: "The digital divide has exacerbated inequality among different groups in society." },
+  { id: "p6-st5", hskLevel: 6, category: "Science & Technology", chinese: "科学研究的严谨性体现在可重复验证的实验中。", pinyin: "Kēxué yánjiū de yánjǐn xìng tǐxiàn zài kě chóngfù yànzhèng de shíyàn zhōng.", english: "The rigour of scientific research is reflected in reproducible and verifiable experiments." },
+
+  // ─── HSK 6 — Environment & International Affairs ─────────────────────────────
+  { id: "p6-ei1", hskLevel: 6, category: "Environment & International Affairs", chinese: "气候变化是全人类面临的最紧迫的共同挑战之一。", pinyin: "Qìhòu biànhuà shì quán rénlèi miànlín de zuì jǐnpò de gòngtóng tiǎozhàn zhī yī.", english: "Climate change is one of the most urgent shared challenges facing all of humanity." },
+  { id: "p6-ei2", hskLevel: 6, category: "Environment & International Affairs", chinese: "多边主义是解决全球性问题的有效框架。", pinyin: "Duōbiān zhǔyì shì jiějué quánqiúxìng wèntí de yǒuxiào kuàngjià.", english: "Multilateralism is an effective framework for resolving global issues." },
+  { id: "p6-ei3", hskLevel: 6, category: "Environment & International Affairs", chinese: "碳排放交易机制为减排提供了市场化激励。", pinyin: "Tàn páifàng jiāoyì jīzhì wèi jiǎn pái tígōngle shìchǎnghuà jīlì.", english: "Carbon emissions trading mechanisms provide market-based incentives for emission reductions." },
+  { id: "p6-ei4", hskLevel: 6, category: "Environment & International Affairs", chinese: "地缘政治格局的变化重塑了国际合作的基础。", pinyin: "Dìyuán zhèngzhì géjú de biànhuà chóng sùle guójì hézuò de jīchǔ.", english: "Shifts in geopolitical structures have reshaped the foundations of international cooperation." },
+  { id: "p6-ei5", hskLevel: 6, category: "Environment & International Affairs", chinese: "生态系统服务的价值评估是环境经济学的核心议题。", pinyin: "Shēngtài xìtǒng fúwù de jiàzhí pínggū shì huánjìng jīngjìxué de héxīn yìtí.", english: "Valuation of ecosystem services is a core topic in environmental economics." },
 ];
 
 export function getPhrasesByLevel(level: number): Phrase[] {

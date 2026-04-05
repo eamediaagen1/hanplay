@@ -198,15 +198,18 @@ Every package extends `tsconfig.base.json` (`composite: true`). Run `pnpm run ty
 | HSK 1 | 150   | 9 (Greetings, Family, Numbers, Animals, Food, Colors, Time, Actions, Places) |
 | HSK 2 | 142   | 12 (Travel, Home, Food & Dining, Health, People, School, Work, Time, Actions, Feelings, Location, Grammar) |
 | HSK 3 | 280   | 14 (Home, Nature, Travel, Food, Health, Shopping, Work, Education, Emotions, Technology, Time, Actions, Descriptions, Grammar) |
-| HSK 4 | 8     | Stub entries only |
-| HSK 5 | 8     | Stub entries only |
-| HSK 6 | 8     | Stub entries only |
+| HSK 4 | ~1,240 | 16 categories (full data) |
+| HSK 5 | ~1,240 | 16 categories (full data) |
+| HSK 6 | 2,406 | 20 categories (Academic & Scholarly, Classical Literature & Poetry, Politics & Governance, Law & Jurisprudence, Economics Advanced, Business & Management, Science & Innovation, Medicine & Biology, Culture & Heritage, History & Civilization, Society & Social Issues, Philosophy & Religion, Psychology & Behaviour, Language & Communication, Environment & Ecology, Geography & International Relations, Arts & Aesthetics, Technology & Digital Society, Military/Sports/Recreation, Idioms & Advanced Expressions) |
 
 ### Phrases Content
 Static phrase data lives in `artifacts/hsk-trainer/src/data/phraseData.ts`.
 - **HSK 1**: 6 categories — Greetings, Introductions, Food & Drink, Time, Shopping, Directions (~29 phrases)
 - **HSK 2**: 6 categories — Travel, Restaurant, Health, Daily Life, School & Work, Shopping (~30 phrases)
 - **HSK 3**: 6 categories — At Work, Travel, Health, Education, Daily Life, Shopping (~30 phrases)
+- **HSK 4**: 6 categories — Business, Technology, Society, Health & Medicine, Arts & Culture, Environment (~30 phrases)
+- **HSK 5**: 6 categories — Advanced Business, Government & Policy, Science & Research, Media & Communication, Education & Psychology, Environment & Health (~30 phrases)
+- **HSK 6**: 6 categories — Academic & Philosophy, Politics & Law, Economics & Society, Culture & History, Science & Technology, Environment & International Affairs (~30 phrases)
 
 ### Phrases Page
 Route: `/phrases/:level` (level-aware) — reads level from URL path param, displays categorized phrases with Chinese / pinyin / tap-to-reveal English translation. Also supports `/phrases` fallback to level 1.
