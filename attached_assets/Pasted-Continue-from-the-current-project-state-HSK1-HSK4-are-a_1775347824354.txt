@@ -1,0 +1,154 @@
+Continue from the current project state.
+
+HSK1–HSK4 are already implemented.
+Now implement HSK5 with ~1300 words.
+
+GOAL:
+Add full HSK5 level with the same structure, UX, and logic as previous levels, while handling larger data efficiently.
+
+==================================================
+PART 1 — HSK5 WORD DATA (~1300 WORDS)
+==================================================
+
+Add ~1300 HSK5 words (standard list).
+
+Each word must include:
+- Chinese (hanzi)
+- Pinyin
+- English meaning
+
+Organize into categories (same pattern as previous levels):
+Examples:
+- Daily life
+- Work & Business
+- Travel
+- Time & Dates
+- Food & Dining
+- Communication
+- Emotions
+- Directions
+- Shopping
+- Education
+- Culture
+- Society
+- Technology
+
+Reuse existing schema and structure.
+Do NOT create a new system.
+
+==================================================
+PART 2 — FLASHCARDS
+==================================================
+
+Ensure HSK5 flashcards work exactly like previous levels:
+
+- category-based navigation
+- flashcard UI (front/back)
+- resume last position (DB-backed per user)
+- user progress tracking
+
+==================================================
+PART 3 — PHRASES
+==================================================
+
+Add HSK5 phrases:
+
+- organized by categories if supported
+- reuse existing structure/components
+- keep consistent with previous levels
+
+==================================================
+PART 4 — QUIZZES
+==================================================
+
+Add HSK5 quizzes:
+
+- category-based quizzes
+- questions based only on HSK5 words
+- consistent with existing quiz system
+
+Question types:
+- word meaning
+- recognition
+- matching (if supported)
+
+Ensure scoring and results work correctly.
+
+==================================================
+PART 5 — HSK5 EXAM
+==================================================
+
+Create HSK5 exam:
+
+- same structure as previous exams
+- larger quiz (e.g. 30–40 questions or based on current logic)
+- pulls from all HSK5 categories
+
+Logic:
+- pass → mark HSK5 completed + unlock HSK6
+- fail → allow retry
+
+==================================================
+PART 6 — LEVEL PROGRESSION
+==================================================
+
+Ensure progression works:
+
+- HSK4 passed → unlock HSK5
+- HSK5 passed → unlock HSK6
+
+Dashboard/levels page must reflect:
+- Passed
+- Unlocked
+- Locked
+
+==================================================
+PART 7 — PERFORMANCE (IMPORTANT)
+==================================================
+
+HSK5 has many words (~1300), so optimize:
+
+- avoid loading all words at once
+- use pagination or chunking per category
+- optimize queries
+- lazy load flashcards if needed
+
+==================================================
+PART 8 — DATA HANDLING
+==================================================
+
+Use existing tables and schema.
+
+If needed:
+- extend seed/data files for HSK5
+- do NOT duplicate tables
+- do NOT break existing levels data
+
+==================================================
+PART 9 — UI CONSISTENCY
+==================================================
+
+HSK5 must match previous levels:
+
+- same layout
+- same components
+- same navigation
+- same UX flow
+
+==================================================
+PART 10 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. number of HSK5 words added (~1300)
+2. categories created
+3. quiz implementation details
+4. exam implementation details
+5. files changed
+6. performance adjustments
+7. progression update (HSK4 → HSK5 → HSK6)
+
+IMPORTANT:
+- Do not overengineer
+- Keep consistency with previous levels
+- Ensure performance is handled properly
