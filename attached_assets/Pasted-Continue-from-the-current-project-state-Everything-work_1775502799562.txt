@@ -1,0 +1,87 @@
+Continue from the current project state.
+
+Everything works well now except one design detail:
+
+I want the Chinese Themes category covers/cards to look like the PREVIOUS design again, while keeping all the new functionality working.
+
+GOAL
+Restore the previous visual design/style of the category cards on the main Chinese Themes page, but keep the new category-first routing and product logic.
+
+IMPORTANT
+- Do NOT break the current working functionality
+- Do NOT remove category-first browsing
+- Do NOT remove real product/category logic
+- Only restore the previous visual design for the category covers/cards
+
+==================================================
+PART 1 — RESTORE PREVIOUS CATEGORY CARD DESIGN
+==================================================
+
+I want the category cards on the main Chinese Themes page to match the previous design style shown before.
+
+That means restoring the old look and feel of the category cover cards, including things like:
+- overall card proportions
+- spacing
+- icon placement
+- title/subtitle layout
+- badge placement (like “Soon” / top-right badge style if still needed)
+- dark premium visual style
+- previous visual balance and polish
+
+Keep the page aesthetically close to the earlier version.
+
+==================================================
+PART 2 — KEEP NEW FUNCTIONALITY
+==================================================
+
+Do NOT remove the current functional improvements.
+
+Keep:
+- category-first navigation
+- clickable category cards
+- category routes/pages
+- premium gating
+- product loading by category
+- admin upload/product system
+- view/download logic
+
+So the result should be:
+old visual design + new working logic
+
+==================================================
+PART 3 — MAIN CHINESE THEMES PAGE ONLY
+==================================================
+
+Focus this design restoration mainly on:
+- the main Chinese Themes category hub page
+
+The category cards should visually look like the previous design again.
+
+If category detail pages already work well, do not unnecessarily redesign them.
+
+==================================================
+PART 4 — PRESERVE CURRENT STRUCTURE
+==================================================
+
+Please preserve:
+- page title
+- section hierarchy
+- routing
+- premium-only access
+- product/category data wiring
+
+Just update the category cover/card presentation back to the previous design language.
+
+==================================================
+PART 5 — DELIVERABLES
+==================================================
+
+At the end, tell me:
+1. what visual parts were restored
+2. what files changed
+3. confirmation that category routing still works
+4. confirmation that premium/product logic still works
+
+IMPORTANT:
+This is mainly a design restoration request.
+Bring back the previous category cover/card design without breaking the new system.

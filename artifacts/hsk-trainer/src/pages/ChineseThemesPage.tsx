@@ -6,6 +6,7 @@ import { PageShell } from "@/components/PageShell";
 import { buildGumroadUrl } from "@/lib/gumroad";
 import { getStoredReferralCode } from "@/hooks/use-referral-capture";
 import { apiFetch } from "@/lib/api";
+import { cn } from "@/lib/utils";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -94,27 +95,18 @@ function CategoryCard({
   return (
     <button
       onClick={onClick}
-      className="group relative bg-card border border-border/60 rounded-2xl overflow-hidden text-left hover:shadow-lg hover:border-border transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border/60 hover:border-border transition-all text-left group"
     >
-      {/* Gradient header */}
-      <div className={`relative h-28 bg-gradient-to-br ${cat.gradient} flex items-center justify-center border-b border-border/40`}>
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/5 dark:bg-white/5" />
-        <Icon className={`w-14 h-14 ${cat.iconColor} opacity-70 group-hover:opacity-90 group-hover:scale-110 transition-all duration-200`} />
-        {count > 0 && (
-          <span className="absolute top-3 right-3 text-[10px] font-bold px-2 py-0.5 rounded-full bg-background/80 backdrop-blur-sm text-foreground border border-border/60">
-            {count} item{count !== 1 ? "s" : ""}
-          </span>
-        )}
+      <div className={cn("w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0", cat.iconColor)}>
+        <Icon className="w-4 h-4" />
       </div>
-
-      {/* Body */}
-      <div className="p-4 flex items-center justify-between gap-3">
-        <div>
-          <h3 className="font-bold text-foreground text-sm">{cat.name}</h3>
-          <p className="text-xs text-muted-foreground mt-0.5">{cat.description}</p>
-        </div>
-        <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 group-hover:translate-x-0.5 group-hover:text-foreground transition-all" />
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold text-foreground truncate">{cat.name}</p>
+        <p className="text-xs text-muted-foreground">
+          {count > 0 ? `${count} item${count !== 1 ? "s" : ""}` : "Coming soon"}
+        </p>
       </div>
+      <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 group-hover:translate-x-0.5 transition-transform" />
     </button>
   );
 }
@@ -193,7 +185,7 @@ export default function ChineseThemesPage() {
       </div>
 
       {/* Category grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {CATEGORIES.map((cat) => (
           <CategoryCard
             key={cat.slug}
