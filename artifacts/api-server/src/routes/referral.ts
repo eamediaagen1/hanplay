@@ -9,8 +9,8 @@ function generateCode(userId: string): string {
   return userId.replace(/-/g, "").slice(0, 8).toUpperCase();
 }
 
-// GET /api/referral — get referral code + purchase-attributed count for current user
-router.get("/api/referral", requireAuth, async (req, res) => {
+// GET /referral — get referral code + purchase-attributed count for current user
+router.get("/referral", requireAuth, async (req, res) => {
   const userId = req.user!.id;
 
   // Fetch or generate referral code

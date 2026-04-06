@@ -2,10 +2,15 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
 import { useCallback, useRef } from "react";
 
-interface FlashcardPosition {
+export interface FlashcardPosition {
   category: string | null;
   last_index: number;
   last_word_id: string | null;
+  updated_at?: string;
+}
+
+export interface LatestFlashcardPosition extends FlashcardPosition {
+  level: number;
 }
 
 interface SavePositionPayload {
@@ -15,6 +20,7 @@ interface SavePositionPayload {
   last_word_id?: string | null;
 }
 
+// Hook for FlashcardPage — fetch + save position for a specific level
 export function useFlashcardPosition(level: number) {
   const query = useQuery<FlashcardPosition | null>({
     queryKey: ["flashcard-position", level],
@@ -45,5 +51,20 @@ export function useFlashcardPosition(level: number) {
     savedPosition: query.data ?? null,
     isLoading: query.isLoading,
     savePosition,
+  };
+}
+
+// Hook for Dashboard — fetch the most recently updated position across all levels
+export function useLatestFlashcardPosition() {
+  const query = useQuery<LatestFlashcardPosition | null>({
+    queryKey: ["flashcard-position-latest"],
+    queryFn: () =>
+      apiFetch<LatestFlashcardPosition | null>("/api/flashcard-position/latest").catch(() => null),
+    staleTime: 2 * 60 * 1000,
+  });
+
+  return {
+    latestPosition: query.data ?? null,
+    isLoading: query.isLoading,
   };
 }

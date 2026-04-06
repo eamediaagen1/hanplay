@@ -24,6 +24,31 @@ CREATE INDEX IF NOT EXISTS level_progress_user_id_idx ON public.level_progress (
 CREATE INDEX IF NOT EXISTS level_progress_level_idx   ON public.level_progress (user_id, level);
 `;
 
+const MIGRATION_007_SQL = `
+CREATE TABLE IF NOT EXISTS flashcard_positions (
+  id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id      UUID        NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  level        INTEGER     NOT NULL CHECK (level BETWEEN 1 AND 6),
+  category     TEXT,
+  last_index   INTEGER     NOT NULL DEFAULT 0,
+  last_word_id TEXT,
+  updated_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (user_id, level)
+);
+
+ALTER TABLE flashcard_positions ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "users_manage_own_flashcard_positions" ON flashcard_positions;
+CREATE POLICY "users_manage_own_flashcard_positions" ON flashcard_positions
+  FOR ALL USING (auth.uid() = user_id);
+
+CREATE INDEX IF NOT EXISTS flashcard_positions_user_level_idx
+  ON flashcard_positions (user_id, level);
+
+CREATE INDEX IF NOT EXISTS flashcard_positions_updated_at_idx
+  ON flashcard_positions (user_id, updated_at DESC);
+`;
+
 export const MIGRATION_006_SQL_EXPORT = MIGRATION_006_SQL;
 
 async function tryPgQuery(supabaseUrl: string, serviceKey: string, sql: string): Promise<boolean> {
@@ -84,5 +109,49 @@ export async function runMigration006IfNeeded(): Promise<{ ran: boolean; note: s
   return {
     ran: false,
     note: "Auto-migration failed. Run migrations/006_level_progress.sql manually in Supabase SQL Editor.",
+  };
+}
+
+export async function runMigration007IfNeeded(): Promise<{ ran: boolean; note: string }> {
+  const { error } = await supabaseAdmin
+    .from("flashcard_positions")
+    .select("id")
+    .limit(0);
+
+  if (!error) {
+    return { ran: false, note: "flashcard_positions table already exists" };
+  }
+
+  const isMissing =
+    error.code === "42P01" ||
+    error.code === "PGRST205" ||
+    (error.message ?? "").toLowerCase().includes("does not exist") ||
+    (error.message ?? "").toLowerCase().includes("schema cache");
+
+  if (!isMissing) {
+    logger.warn(
+      { code: error.code, msg: error.message },
+      "Unexpected error checking flashcard_positions table — treating as missing"
+    );
+  }
+
+  logger.warn("flashcard_positions table missing — attempting auto-migration 007...");
+
+  const supabaseUrl = process.env.SUPABASE_URL ?? "";
+  const serviceKey  = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+
+  const ok = await tryPgQuery(supabaseUrl, serviceKey, MIGRATION_007_SQL);
+
+  if (ok) {
+    logger.info("Migration 007 applied automatically ✓");
+    return { ran: true, note: "Migration 007 applied via pg/query" };
+  }
+
+  logger.warn(
+    "Auto-migration 007 failed — please run migrations/007_flashcard_resume.sql in Supabase SQL Editor"
+  );
+  return {
+    ran: false,
+    note: "Auto-migration failed. Run migrations/007_flashcard_resume.sql manually in Supabase SQL Editor.",
   };
 }

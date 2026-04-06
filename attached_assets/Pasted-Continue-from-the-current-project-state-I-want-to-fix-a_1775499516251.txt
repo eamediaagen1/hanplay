@@ -1,0 +1,150 @@
+Continue from the current project state.
+
+I want to fix and upgrade the dashboard “Continue” system and flashcard resume logic.
+
+Current issue:
+- The “Continue HSK X” bar is not accurate
+- It does not remember exactly where the user stopped
+- When the user leaves flashcards and comes back, it does not resume from the last position
+- Dashboard button does not correctly resume learning
+
+GOAL:
+Make the learning experience fully persistent and accurate.
+
+==================================================
+PART 1 — FLASHCARD RESUME (CRITICAL)
+==================================================
+
+When a user is studying flashcards:
+
+- Save the exact position in real-time (or on change):
+  - user_id
+  - level (HSK1–HSK6)
+  - category
+  - index (current flashcard position)
+  - section type (flashcards / phrases)
+  - updated_at
+
+Requirements:
+- Save to Supabase (not only localStorage)
+- Persist across:
+  - refresh
+  - logout/login
+  - device change
+
+When user returns:
+- automatically resume at last flashcard
+- same category
+- same level
+- same index
+
+==================================================
+PART 2 — DASHBOARD “CONTINUE” BAR FIX
+==================================================
+
+The big “Continue HSK X” bar must:
+
+- read real saved progress from DB
+- show correct current level
+- know exactly where user left off
+
+When clicked:
+- redirect user directly to:
+  - correct level
+  - correct category
+  - correct flashcard index
+
+Example:
+User stopped at:
+HSK4 → Travel → card #12
+
+Click “Continue” →
+→ open HSK4
+→ open Travel
+→ open flashcard #12
+
+==================================================
+PART 3 — DATA SOURCE (IMPORTANT)
+==================================================
+
+Do NOT rely on:
+- temporary state
+- hardcoded defaults
+
+Use:
+- DB-backed progress
+- latest saved user position
+
+If multiple sessions exist:
+- use most recent updated_at
+
+==================================================
+PART 4 — METRICS FIX (DASHBOARD CARDS)
+==================================================
+
+Fix and make metrics accurate:
+
+Examples:
+- “Words saved” → real count from saved progress
+- “All reviewed” → only if actually completed
+- “Quiz” → reflect actual level
+
+Do NOT show:
+- fake or static numbers
+
+If data is missing:
+- compute it from existing tables
+- or leave minimal clean state
+
+==================================================
+PART 5 — REAL-TIME SAVE STRATEGY
+==================================================
+
+Save progress:
+- when user changes flashcard
+- when user switches category
+- when user exits page (fallback)
+
+Avoid:
+- excessive DB calls
+- duplicate writes
+
+Use:
+- debouncing if needed
+- update only when position changes
+
+==================================================
+PART 6 — FALLBACK LOGIC
+==================================================
+
+If no saved progress exists:
+- default to:
+  - first level (HSK1)
+  - first category
+  - first card
+
+==================================================
+PART 7 — DO NOT BREAK
+==================================================
+
+- existing flashcard system
+- level progression
+- premium logic
+- quiz/exam logic
+
+==================================================
+PART 8 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. where progress is stored
+2. fields used for resume logic
+3. how dashboard continue works now
+4. how resume works after refresh/login
+5. files changed
+6. any migration added
+7. any performance optimization used
+
+IMPORTANT:
+Do not simulate behavior.
+Make the system truly persistent and accurate using real user data.

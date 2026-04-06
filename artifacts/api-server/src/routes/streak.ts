@@ -4,8 +4,8 @@ import { requireAuth } from "../middleware/auth.js";
 
 const router = Router();
 
-// GET /api/streak — current user's streak data
-router.get("/api/streak", requireAuth, async (req, res) => {
+// GET /streak — current user's streak data
+router.get("/streak", requireAuth, async (req, res) => {
   const { data, error } = await supabaseAdmin
     .from("user_streaks")
     .select("current_streak, longest_streak, last_active_date")
@@ -20,8 +20,8 @@ router.get("/api/streak", requireAuth, async (req, res) => {
   res.json(data ?? { current_streak: 0, longest_streak: 0, last_active_date: null });
 });
 
-// POST /api/streak/ping — record a study activity (idempotent per day)
-router.post("/api/streak/ping", requireAuth, async (req, res) => {
+// POST /streak/ping — record a study activity (idempotent per day)
+router.post("/streak/ping", requireAuth, async (req, res) => {
   const userId = req.user!.id;
   const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
 

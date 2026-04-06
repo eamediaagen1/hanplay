@@ -13,6 +13,7 @@ import { useSavedWords } from "@/hooks/use-saved-words";
 import { useStudyPrefs } from "@/hooks/use-study-prefs";
 import { useLevelProgress, isLevelUnlocked, type LevelProgressMap, type LevelProgressEntry } from "@/hooks/use-level-progress";
 import { useStreak } from "@/hooks/use-streak";
+import { useLatestFlashcardPosition } from "@/hooks/use-flashcard-position";
 import { useReferral } from "@/hooks/use-referral";
 import { apiFetch } from "@/lib/api";
 import { useQueryClient } from "@tanstack/react-query";
@@ -308,6 +309,7 @@ export default function DashboardPage() {
   const { prefs } = useStudyPrefs();
   const { query: lpQuery, progressMap } = useLevelProgress();
   const { streak } = useStreak();
+  const { latestPosition } = useLatestFlashcardPosition();
   const { referralCode, referralCount } = useReferral();
   const qc = useQueryClient();
 
@@ -333,9 +335,18 @@ export default function DashboardPage() {
       .catch(() => {/* non-fatal */});
   }, [profile?.id]);
 
-  // Best level to reference for the continue CTA
-  const activeLevel = LEVELS.find((l) => l.id === lastLevel) ?? LEVELS[0];
+  // Use DB-backed last position if available; fall back to localStorage pref
+  const dbLastLevel = latestPosition?.level ?? null;
+  const activeLevelId = dbLastLevel ?? lastLevel;
+  const activeLevel = LEVELS.find((l) => l.id === activeLevelId) ?? LEVELS[0];
   const savedInLevel = savedWords.filter((w) => w.word_id.startsWith(`hsk${activeLevel.id}-`)).length;
+
+  // Position hint for the Continue CTA (category + card index from DB)
+  const positionHint = latestPosition
+    ? latestPosition.category
+      ? `${latestPosition.category} · card ${latestPosition.last_index + 1}`
+      : `Card ${latestPosition.last_index + 1}`
+    : null;
 
   const referralLink = referralCode
     ? `${window.location.origin}/?ref=${referralCode}`
@@ -370,10 +381,10 @@ export default function DashboardPage() {
 
   // Primary CTA based on what the user should do next
   const continueCta = dueCount > 0
-    ? { label: "Review Due Cards", sub: `${dueCount} card${dueCount !== 1 ? "s" : ""} waiting`, action: () => setLocation("/review") }
-    : savedCount > 0
-    ? { label: `Continue HSK ${activeLevel.id}`, sub: activeLevel.title, action: () => setLocation(`/flashcards/${activeLevel.id}`) }
-    : { label: `Start HSK ${activeLevel.id}`, sub: activeLevel.title, action: () => setLocation(`/flashcards/${activeLevel.id}`) };
+    ? { label: "Review Due Cards", sub: `${dueCount} card${dueCount !== 1 ? "s" : ""} waiting`, hint: null, action: () => setLocation("/review") }
+    : savedCount > 0 || latestPosition
+    ? { label: `Continue HSK ${activeLevel.id}`, sub: activeLevel.title, hint: positionHint, action: () => setLocation(`/flashcards/${activeLevel.id}`) }
+    : { label: `Start HSK ${activeLevel.id}`, sub: activeLevel.title, hint: null, action: () => setLocation(`/flashcards/${activeLevel.id}`) };
 
   return (
     <PageShell maxWidth="xl">
@@ -429,7 +440,12 @@ export default function DashboardPage() {
           <div className="flex-1 min-w-0">
             <p className="text-base font-bold leading-tight">{continueCta.label}</p>
             <p className="text-sm text-primary-foreground/70 mt-0.5">{continueCta.sub}</p>
-            {savedInLevel > 0 && dueCount === 0 && (
+            {continueCta.hint && (
+              <p className="text-xs text-primary-foreground/60 mt-1 font-medium">
+                ↩ {continueCta.hint}
+              </p>
+            )}
+            {!continueCta.hint && savedInLevel > 0 && dueCount === 0 && (
               <p className="text-xs text-primary-foreground/60 mt-1">
                 {savedInLevel} word{savedInLevel !== 1 ? "s" : ""} saved in this level
               </p>

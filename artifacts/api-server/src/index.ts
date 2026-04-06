@@ -1,6 +1,6 @@
 import app from "./app";
 import { logger } from "./lib/logger";
-import { runMigration006IfNeeded } from "./lib/migrate.js";
+import { runMigration006IfNeeded, runMigration007IfNeeded } from "./lib/migrate.js";
 
 const rawPort = process.env["PORT"];
 
@@ -24,8 +24,12 @@ app.listen(port, (err) => {
 
   logger.info({ port }, "Server listening");
 
-  // Best-effort: create level_progress table if migration 006 hasn't been run yet
+  // Best-effort: auto-apply DB migrations if tables are missing
   runMigration006IfNeeded().catch((e) => {
-    logger.error({ err: e }, "Migration check failed");
+    logger.error({ err: e }, "Migration 006 check failed");
+  });
+
+  runMigration007IfNeeded().catch((e) => {
+    logger.error({ err: e }, "Migration 007 check failed");
   });
 });
