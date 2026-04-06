@@ -8,7 +8,8 @@ import { captureReferralCode } from "@/hooks/use-referral-capture";
 
 import MarketingPage    from "@/pages/MarketingPage";
 import PricingPage      from "@/pages/PricingPage";
-import ChineseThemesPage from "@/pages/ChineseThemesPage";
+import ChineseThemesPage         from "@/pages/ChineseThemesPage";
+import ChineseThemesCategoryPage from "@/pages/ChineseThemesCategoryPage";
 import LandingPage      from "@/pages/LandingPage";
 import AuthCallback     from "@/pages/AuthCallback";
 import DemoPage         from "@/pages/DemoPage";
@@ -117,7 +118,8 @@ function Router() {
         <Route path="/phrases/:level"    component={PhrasesPage} />
         <Route path="/phrases"           component={PhrasesPage} />
         <Route path="/strokes"           component={StrokesPage} />
-        <Route path="/chinese-themes"    component={ChineseThemesPage} />
+        <Route path="/chinese-themes/:category" component={ChineseThemesCategoryPage} />
+        <Route path="/chinese-themes"           component={ChineseThemesPage} />
         <Route path="/settings"          component={SettingsPage} />
         <Route component={NotFound} />
       </Switch>

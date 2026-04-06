@@ -11,7 +11,7 @@ interface ThemeProduct {
   category: string;
   description: string | null;
   cover_image_url: string | null;
-  cover_image_url_display: string | null;
+  cover_image_url_display?: string | null;
   preview_image_url: string | null;
   file_url: string | null;
   file_type: string | null;

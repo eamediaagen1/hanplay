@@ -1,0 +1,143 @@
+Continue from the current project state.
+
+The Chinese Themes product system now works, but I want to improve the category browsing UX and image formats.
+
+GOAL
+Turn Chinese Themes into a category-first browsing experience.
+
+I want users to first enter a category, then browse the products inside that category.
+
+Also, each category should use the correct image/display format based on the product type.
+
+==================================================
+PART 1 — CATEGORY-FIRST STRUCTURE
+==================================================
+
+Current issue:
+The page still feels like a generic placeholder/category card view.
+
+I want this flow:
+
+1. User opens Chinese Themes page
+2. They see category cards only:
+- Phone Wallpapers
+- iPad Wallpapers
+- Laptop Wallpapers
+- Stickers
+- Merch
+
+3. When user clicks a category:
+- go into that category page/view
+- then show products for that category only
+
+Examples:
+- /chinese-themes/phone-wallpapers
+- /chinese-themes/ipad-wallpapers
+- /chinese-themes/laptop-wallpapers
+- /chinese-themes/stickers
+- /chinese-themes/merch
+
+Implement this using current routing style.
+
+==================================================
+PART 2 — CATEGORY COVER / FORMAT RULES
+==================================================
+
+I want each category to display products using the appropriate visual format.
+
+Category display requirements:
+
+1. Phone Wallpapers
+- portrait format
+- card/preview ratio should feel like phone wallpaper
+- tall aspect ratio
+
+2. iPad Wallpapers
+- tablet-like aspect ratio
+- more vertical/medium rectangle
+
+3. Laptop Wallpapers
+- widescreen landscape ratio
+- should feel like desktop wallpaper preview
+
+4. Stickers
+- keep 1:1 square format
+
+5. Merch
+- keep 1:1 square format
+
+Important:
+- these format differences should affect the product cards/previews inside each category
+- and optionally the category cover cards too if appropriate
+
+==================================================
+PART 3 — CATEGORY PAGE UX
+==================================================
+
+Inside each category page, show:
+- category title
+- short description
+- products grid for that category
+- view button
+- download button
+
+If there are no products yet:
+- show a clean empty state
+
+Keep current premium protection and download protection working.
+
+==================================================
+PART 4 — ADMIN PANEL SUPPORT
+==================================================
+
+Make sure admin product creation/editing still works with category-based display.
+
+Requirements:
+- category chosen in admin determines where product appears
+- product card format on frontend should automatically adapt based on category
+- no manual layout setup per product needed
+
+==================================================
+PART 5 — CHINESE THEMES HOMEPAGE
+==================================================
+
+Update the main Chinese Themes page so it acts like a category hub.
+
+Requirements:
+- category cards only (or mostly)
+- each category card should be clickable
+- cleaner “enter category” UX
+- less placeholder feel
+- more like a real store/gallery navigation page
+
+==================================================
+PART 6 — KEEP EXISTING LOGIC
+==================================================
+
+Do NOT break:
+- premium-only access
+- admin uploads
+- product storage
+- view/download logic
+- sidebar navigation
+
+==================================================
+PART 7 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. routes added/updated
+2. how category-first browsing works now
+3. how image/card formats differ per category
+4. files changed
+5. any admin panel changes
+6. confirmation premium/download logic still works
+
+IMPORTANT:
+Implement this carefully.
+I want a category-first experience and automatic display format based on category:
+- Phone = portrait
+- iPad = tablet ratio
+- Laptop = widescreen
+- Stickers = 1:1
+- Merch = 1:1
