@@ -11,7 +11,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { useProfile } from "@/hooks/use-profile";
 import { useSavedWords } from "@/hooks/use-saved-words";
 import { useStudyPrefs } from "@/hooks/use-study-prefs";
-import { useLevelProgress, isLevelUnlocked, type LevelProgressMap } from "@/hooks/use-level-progress";
+import { useLevelProgress, isLevelUnlocked, type LevelProgressMap, type LevelProgressEntry } from "@/hooks/use-level-progress";
 import { useStreak } from "@/hooks/use-streak";
 import { useReferral } from "@/hooks/use-referral";
 import { apiFetch } from "@/lib/api";
@@ -43,18 +43,23 @@ function getCardState(
   isPremium: boolean,
   progressMap: LevelProgressMap
 ): CardState {
+  // A level counts as passed if exam_passed is true OR completed_at is set
+  // (the second check is a safety net for rows corrupted by the old retry bug)
+  const everPassed = (e: LevelProgressEntry) =>
+    e.exam_passed === true || e.completed_at !== null;
+
   // Level 1 is always accessible regardless of premium status
   if (levelId === 1) {
     const entry = progressMap[1];
     if (!entry) return "fresh";
-    if (entry.exam_passed) return "passed";
+    if (everPassed(entry)) return "passed";
     return "in_progress";
   }
   // Levels 2–6: require premium + exam-based unlock
   if (!isPremium || !isLevelUnlocked(levelId, progressMap)) return "locked";
   const entry = progressMap[levelId];
   if (!entry) return "fresh";
-  if (entry.exam_passed) return "passed";
+  if (everPassed(entry)) return "passed";
   return "in_progress";
 }
 

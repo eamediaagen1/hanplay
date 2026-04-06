@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { useProfile } from "@/hooks/use-profile";
 import { useSavedWords } from "@/hooks/use-saved-words";
-import { useLevelProgress, isLevelUnlocked, type LevelProgressMap } from "@/hooks/use-level-progress";
+import { useLevelProgress, isLevelUnlocked, type LevelProgressMap, type LevelProgressEntry } from "@/hooks/use-level-progress";
 import { apiFetch } from "@/lib/api";
 import { PageShell } from "@/components/PageShell";
 import { useQueryClient } from "@tanstack/react-query";
@@ -36,10 +36,15 @@ function getCardState(
   isPremium: boolean,
   progressMap: LevelProgressMap
 ): CardState {
+  // A level counts as passed if exam_passed is true OR completed_at is set
+  // (completed_at check is a safety net for rows corrupted by the old retry bug)
+  const everPassed = (e: LevelProgressEntry) =>
+    e.exam_passed === true || e.completed_at !== null;
+
   if (!isPremium || !isLevelUnlocked(levelId, progressMap)) return "locked";
   const entry = progressMap[levelId];
   if (!entry) return "fresh";
-  if (entry.exam_passed) return "passed";
+  if (everPassed(entry)) return "passed";
   return "in_progress";
 }
 

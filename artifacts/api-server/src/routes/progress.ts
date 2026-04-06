@@ -139,6 +139,11 @@ router.get("/progress/levels", requireAuth, async (req, res) => {
 
 // POST /api/progress/exam — record a quiz/exam result and unlock next level
 // Body: { level: 1-6, correct: number, total: number }
+//
+// Sticky-pass rule:
+//   - exam_passed and completed_at are NEVER downgraded once set to true/non-null.
+//   - exam_score records the best (highest) score ever achieved.
+//   - Retrying and failing does NOT re-lock the next level.
 router.post("/progress/exam", requireAuth, requirePremium, async (req, res) => {
   const { level, correct, total } = req.body as {
     level?: number;
@@ -159,22 +164,38 @@ router.post("/progress/exam", requireAuth, requirePremium, async (req, res) => {
   const passed = scorePct >= 70;
   const now = new Date().toISOString();
 
+  // Fetch the existing record so we can apply sticky-pass logic
+  const { data: existing } = await supabaseAdmin
+    .from("level_progress")
+    .select("exam_passed, exam_score, completed_at")
+    .eq("user_id", req.user!.id)
+    .eq("level", level)
+    .maybeSingle();
+
+  // Sticky: once passed, always passed — retrying and failing must not roll back
+  const wasAlreadyPassed = existing?.exam_passed === true;
+  const stickyPassed     = wasAlreadyPassed || passed;
+  const stickyCompleted  = wasAlreadyPassed
+    ? existing!.completed_at               // keep the original completion timestamp
+    : (passed ? now : null);
+  // Always record the best score ever achieved
+  const bestScore = Math.max(scorePct, existing?.exam_score ?? 0);
+
   const { error } = await supabaseAdmin
     .from("level_progress")
     .upsert(
       {
-        user_id: req.user!.id,
+        user_id:      req.user!.id,
         level,
-        exam_passed: passed,
-        exam_score: scorePct,
-        completed_at: passed ? now : null,
-        updated_at: now,
+        exam_passed:  stickyPassed,
+        exam_score:   bestScore,
+        completed_at: stickyCompleted,
+        updated_at:   now,
       },
       { onConflict: "user_id,level", ignoreDuplicates: false }
     );
 
   if (error) {
-    // Table may not exist yet (migration pending)
     const msg = error.message?.includes("does not exist")
       ? "Level progress table not found. Please run migration 006 in Supabase."
       : "Failed to save exam result";
@@ -182,9 +203,15 @@ router.post("/progress/exam", requireAuth, requirePremium, async (req, res) => {
     return;
   }
 
-  const nextLevelUnlocked = passed && level < 6;
+  const nextLevelUnlocked = stickyPassed && level < 6;
 
-  res.json({ success: true, passed, score_pct: scorePct, next_level_unlocked: nextLevelUnlocked });
+  res.json({
+    success: true,
+    passed,
+    score_pct: scorePct,
+    best_score: bestScore,
+    next_level_unlocked: nextLevelUnlocked,
+  });
 });
 
 // POST /api/progress/migrate — migrate localStorage saved cards on first sign-in

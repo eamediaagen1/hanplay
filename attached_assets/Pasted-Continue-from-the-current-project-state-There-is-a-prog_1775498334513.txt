@@ -1,0 +1,103 @@
+Continue from the current project state.
+
+There is a progression logic bug.
+
+Current issue:
+- If a user passes HSK3, HSK4 becomes unlocked
+- But if the user later retakes the HSK3 exam and fails, HSK4 becomes locked again
+
+This is wrong.
+
+GOAL:
+Once a level has been passed and the next level has been unlocked, it should stay unlocked permanently unless I explicitly reset progress from admin.
+
+==================================================
+PART 1 — FIX UNLOCK LOGIC
+==================================================
+
+Desired behavior:
+- first successful pass of HSK3 => mark HSK3 as passed/completed
+- unlock HSK4
+- if the user retakes HSK3 later and fails, HSK4 must remain unlocked
+- failing a retry must NOT remove previously earned unlocks
+
+This logic should apply to all levels:
+- HSK1 -> HSK2
+- HSK2 -> HSK3
+- HSK3 -> HSK4
+- HSK4 -> HSK5
+- HSK5 -> HSK6
+
+==================================================
+PART 2 — MAKE PASS STATE STICKY
+==================================================
+
+Once a level is passed:
+- store that pass state persistently in DB
+- do not overwrite passed=true with passed=false on future retry failures
+- best score can still update if higher
+- retry attempts can still be stored if the system tracks them
+- but unlock state must remain permanently true
+
+In other words:
+- pass/completed should be sticky
+- unlocks should be sticky
+- retries should not downgrade progress
+
+==================================================
+PART 3 — AUDIT ROOT CAUSE
+==================================================
+
+Please inspect the current logic and find the actual cause.
+
+Likely problem:
+- exam result logic is recalculating unlock state directly from latest attempt only
+- or failed retry is overwriting level completion fields
+
+Fix the real cause in:
+- DB persistence
+- exam result handling
+- levels/dashboard state calculation
+- any derived unlock logic
+
+==================================================
+PART 4 — CORRECT DATA MODEL
+==================================================
+
+The system should distinguish between:
+- latest attempt result
+- best score
+- permanent completion state
+- permanent unlock state
+
+If needed, adapt the model so:
+- is_completed / exam_passed stays true after first pass
+- unlocked levels remain unlocked
+- retries do not remove previous achievements
+
+Do not break existing progress data.
+
+==================================================
+PART 5 — UI CONSISTENCY
+==================================================
+
+After the fix:
+- if HSK3 was ever passed, it should still show as Passed
+- HSK4 should remain Unlocked
+- retrying HSK3 and failing should only affect the retry result display, not progression rollback
+
+==================================================
+PART 6 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. root cause of the bug
+2. what logic was changed
+3. files changed
+4. whether DB persistence was updated
+5. how sticky unlock logic now works
+6. confirmation that retry failure no longer re-locks next levels
+
+Important:
+Do not just patch the UI.
+Fix the underlying progression logic so unlocks remain permanent after first successful pass.

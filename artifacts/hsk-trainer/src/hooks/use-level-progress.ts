@@ -54,8 +54,14 @@ export function useLevelProgress() {
 }
 
 /** Returns true if the user can access this level based on progression only.
- *  (Premium check is separate and done in the API / LevelSelection.) */
+ *  (Premium check is separate and done in the API / LevelSelection.)
+ *
+ *  A level is unlocked if the previous level was EVER passed.
+ *  We check both exam_passed (primary) and completed_at (secondary — belt-and-suspenders
+ *  in case exam_passed was corrupted by an old bug but completed_at survived). */
 export function isLevelUnlocked(level: number, progressMap: LevelProgressMap): boolean {
   if (level === 1) return true;
-  return progressMap[level - 1]?.exam_passed === true;
+  const prev = progressMap[level - 1];
+  if (!prev) return false;
+  return prev.exam_passed === true || prev.completed_at !== null;
 }
