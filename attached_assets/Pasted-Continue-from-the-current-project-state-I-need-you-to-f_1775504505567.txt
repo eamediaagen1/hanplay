@@ -1,0 +1,162 @@
+Continue from the current project state.
+
+I need you to fix and unify the full dashboard action logic carefully.
+
+CURRENT ISSUES
+1. For free users, premium quick action cards are still clickable:
+- Strokes
+- Phrases
+- Quiz
+- Review
+
+2. Dashboard action links are not always using the user's real current unlocked level.
+Examples:
+- Continue bar shows wrong level
+- Quiz button shows wrong level
+- Phrases button shows wrong level
+- If user unlocked HSK2, dashboard should point to HSK2
+- If user unlocked HSK4, dashboard should point to HSK4
+- Dashboard must always reflect the user's current real level/progression
+
+GOAL
+Make the dashboard actions fully accurate and consistent:
+- free users = locked/inactive premium actions
+- premium users = actions point to the correct current unlocked/current active level
+
+==================================================
+PART 1 — FREE USER QUICK ACTION LOCK
+==================================================
+
+For FREE users:
+- Strokes card must not be clickable
+- Phrases card must not be clickable
+- Quiz card must not be clickable
+- Review card must not be clickable
+
+Requirements:
+- no navigation
+- no active hover/pointer style
+- visually disabled/locked
+- keyboard activation should not work either
+- if needed, show short text like:
+  - “Premium required”
+
+This must match the rest of the free-user locked dashboard logic.
+
+==================================================
+PART 2 — DASHBOARD ACTIONS MUST FOLLOW REAL CURRENT LEVEL
+==================================================
+
+For PREMIUM users:
+All dashboard actions must be based on the user's actual current unlocked/current active level.
+
+This includes:
+- top Continue bar
+- Quiz quick action
+- Phrases quick action
+- Strokes quick action if level-linked
+- Review section if level-linked
+
+Examples:
+- if user's current active level is HSK2, actions should point to HSK2
+- if user's current active level is HSK4, actions should point to HSK4
+- if HSK1 is passed and HSK2 is unlocked/current, dashboard should use HSK2
+- if HSK3 is passed and HSK4 is unlocked/current, dashboard should use HSK4
+
+Do NOT hardcode HSK1 or stale values.
+
+==================================================
+PART 3 — DEFINE CURRENT LEVEL CORRECTLY
+==================================================
+
+Please audit and define “current level” properly.
+
+Use logic like:
+- highest unlocked level not yet completed
+OR
+- latest active level from saved progress
+whichever best matches the current app logic
+
+But be consistent across dashboard actions.
+
+Dashboard should not mix:
+- old saved level
+- previous passed level
+- random default level
+
+Everything should derive from one real source of truth.
+
+==================================================
+PART 4 — UPDATE ACTION TARGETS
+==================================================
+
+Make sure each action points to the correct route for the current user level.
+
+Examples:
+- Continue bar → current level learning route / last saved position
+- Phrases → current level phrases route
+- Quiz → current level quiz/exam route
+- Strokes → current level strokes route if applicable
+- Review → current level review route if applicable
+
+If some action uses saved resume data, combine it correctly with current level logic.
+
+==================================================
+PART 5 — FREE USER PRIORITY OVERRIDE
+==================================================
+
+Very important:
+If user is NOT premium:
+- premium lock state must override current level logic
+- do not calculate actionable premium routes for them
+- do not show HSK2 / HSK4 / etc as active dashboard actions
+- show locked/disabled state instead
+
+So:
+1. check premium access first
+2. if not premium → lock premium actions
+3. if premium → use correct current level
+
+==================================================
+PART 6 — CHECK ALL DASHBOARD LINKS
+==================================================
+
+Audit all dashboard clickable items and fix any stale or incorrect level links.
+
+Check:
+- Continue bar
+- Phrases card/button
+- Quiz card/button
+- Review card/button
+- Strokes card/button
+- any dashboard CTA tied to levels
+
+I want all of them to stay synchronized with the user's actual progression state.
+
+==================================================
+PART 7 — UX CONSISTENCY
+==================================================
+
+After the fix:
+- free user sees disabled premium actions
+- premium user sees correct current-level actions
+- no wrong HSK label
+- no mixed states
+- no stale HSK1 links when user is already at HSK2/HSK4/etc
+
+==================================================
+PART 8 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. what logic was changed
+2. how current level is now determined
+3. which dashboard actions were updated
+4. which free-user actions were disabled
+5. files changed
+6. confirmation that dashboard links now follow the real current unlocked level
+7. confirmation that free users cannot click premium quick actions
+
+IMPORTANT:
+Do not patch only one button.
+Audit and fix the whole dashboard action/link system consistently.

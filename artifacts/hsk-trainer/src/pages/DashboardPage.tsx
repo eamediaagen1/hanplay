@@ -10,7 +10,6 @@ import {
 import { useAuth } from "@/contexts/auth-context";
 import { useProfile } from "@/hooks/use-profile";
 import { useSavedWords } from "@/hooks/use-saved-words";
-import { useStudyPrefs } from "@/hooks/use-study-prefs";
 import { useLevelProgress, isLevelUnlocked, type LevelProgressMap, type LevelProgressEntry } from "@/hooks/use-level-progress";
 import { useStreak } from "@/hooks/use-streak";
 import { useLatestFlashcardPosition } from "@/hooks/use-flashcard-position";
@@ -67,6 +66,23 @@ function getCardState(
   return "in_progress";
 }
 
+// ─── Current level (progression frontier) ────────────────────────────────────
+// Returns the lowest unlocked level that has not yet been passed.
+// This is the level the user is actively working toward — used as the
+// single source of truth for all action targets (Phrases, Quiz, etc.).
+// Falls back to 6 if all levels are passed or level 6 is the frontier.
+
+function getCurrentLevelId(progressMap: LevelProgressMap): number {
+  const everPassed = (e: LevelProgressEntry) =>
+    e.exam_passed === true || e.completed_at !== null;
+  for (let id = 1; id <= 6; id++) {
+    if (!isLevelUnlocked(id, progressMap)) break; // can't access this or higher
+    const entry = progressMap[id];
+    if (!entry || !everPassed(entry)) return id;
+  }
+  return 6;
+}
+
 // ─── Animations ───────────────────────────────────────────────────────────────
 
 const container = {
@@ -86,6 +102,66 @@ const fade = {
     transition: { duration: 0.3, delay: i * 0.06, ease: "easeOut" as const },
   }),
 };
+
+// ─── Quick Action Card ────────────────────────────────────────────────────────
+// Handles the full locked / inactive-but-enabled / active states in one place.
+// `locked`  → premium gate: renders a non-interactive div, no pointer events
+// `onClick` → present: active button with hover styles
+// `onClick` → absent:  disabled-looking button (dueCount === 0 for Review)
+
+function QuickAction({
+  icon: Icon,
+  label,
+  sub,
+  onClick,
+  locked,
+  badge,
+}: {
+  icon: React.ElementType;
+  label: string;
+  sub: string;
+  onClick?: () => void;
+  locked?: boolean;
+  badge?: number;
+}) {
+  if (locked) {
+    return (
+      <div
+        aria-disabled="true"
+        className="relative flex items-center gap-3 rounded-2xl border border-border/40 bg-muted/30 p-4 text-left opacity-50 cursor-not-allowed select-none"
+      >
+        <Lock className="w-5 h-5 text-muted-foreground/60 shrink-0" />
+        <div>
+          <p className="text-sm font-semibold text-foreground/60 leading-tight">{label}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">{sub}</p>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <button
+      onClick={onClick}
+      disabled={!onClick}
+      className={cn(
+        "relative flex items-center gap-3 rounded-2xl border p-4 text-left shadow-sm transition-all duration-200",
+        onClick
+          ? "border-border/60 bg-card hover:border-primary/30 hover:shadow-md cursor-pointer"
+          : "border-border/40 bg-muted/30 opacity-50 cursor-not-allowed",
+      )}
+    >
+      {badge !== undefined && badge > 0 && (
+        <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white shadow-sm ring-2 ring-background">
+          {badge > 9 ? "9+" : badge}
+        </span>
+      )}
+      <Icon className={cn("w-5 h-5 shrink-0", onClick ? "text-primary" : "text-muted-foreground")} />
+      <div>
+        <p className="text-sm font-semibold text-foreground leading-tight">{label}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">{sub}</p>
+      </div>
+    </button>
+  );
+}
 
 // ─── Level Card ───────────────────────────────────────────────────────────────
 
@@ -320,7 +396,6 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const { data: profile, isLoading: profileLoading, refetch: refetchProfile } = useProfile();
   const { savedWords, getDueCards, getDueWords, isLoading: wordsLoading } = useSavedWords();
-  const { prefs } = useStudyPrefs();
   const { query: lpQuery, progressMap } = useLevelProgress();
   const { streak } = useStreak();
   const { latestPosition } = useLatestFlashcardPosition();
@@ -335,7 +410,6 @@ export default function DashboardPage() {
   const dueWords   = getDueWords();
   const dueCount   = getDueCards().length;
   const savedCount = savedWords.length;
-  const lastLevel  = prefs.lastLevel ?? 1;
   const email      = user?.email ?? "";
   const firstName  = profile?.name || email.split("@")[0] || "learner";
 
@@ -349,13 +423,21 @@ export default function DashboardPage() {
       .catch(() => {/* non-fatal */});
   }, [profile?.id]);
 
-  // Use DB-backed last position if available; fall back to localStorage pref.
-  // For FREE users: always cap to level 1 — stale DB positions from a prior premium
-  // period must never drive the active level or continue CTA for a free user.
-  const dbLastLevel = latestPosition?.level ?? null;
-  const activeLevelId = isPremium ? (dbLastLevel ?? lastLevel) : 1;
-  const activeLevel = LEVELS.find((l) => l.id === activeLevelId) ?? LEVELS[0];
-  const savedInLevel = savedWords.filter((w) => w.word_id.startsWith(`hsk${activeLevel.id}-`)).length;
+  // ── Progression-derived "current level" ─────────────────────────────────────
+  // The single source of truth for action targets (Phrases, Quiz, etc.).
+  // For premium users: lowest unlocked level not yet passed (the frontier).
+  // For free users: irrelevant — all actions are locked anyway.
+  const currentLevelId = isPremium ? getCurrentLevelId(progressMap) : 1;
+  const currentLevel   = LEVELS.find((l) => l.id === currentLevelId) ?? LEVELS[0];
+
+  // ── Resume position for the Continue bar ─────────────────────────────────────
+  // Uses the DB-backed flashcard position (where they last left off in the deck).
+  // Falls back to currentLevelId (frontier) instead of stale localStorage pref.
+  // For free users: locked — always 1, irrelevant.
+  const dbLastLevel  = latestPosition?.level ?? null;
+  const activeLevelId = isPremium ? (dbLastLevel ?? currentLevelId) : 1;
+  const activeLevel   = LEVELS.find((l) => l.id === activeLevelId) ?? LEVELS[0];
+  const savedInLevel  = savedWords.filter((w) => w.word_id.startsWith(`hsk${activeLevel.id}-`)).length;
 
   // Position hint for the Continue CTA (only meaningful for premium users)
   const positionHint = isPremium && latestPosition
@@ -550,15 +632,28 @@ export default function DashboardPage() {
             </div>
           </div>
           <button
-            onClick={() => setLocation(`/quiz/${activeLevel.id}`)}
-            className="bg-card rounded-2xl border border-border/60 p-4 flex items-center gap-3 shadow-sm hover:border-primary/30 hover:shadow-md transition-all text-left"
+            onClick={isPremium ? () => setLocation(`/quiz/${currentLevel.id}`) : undefined}
+            disabled={!isPremium}
+            className={cn(
+              "bg-card rounded-2xl border p-4 flex items-center gap-3 shadow-sm transition-all text-left",
+              isPremium
+                ? "border-border/60 hover:border-primary/30 hover:shadow-md cursor-pointer"
+                : "border-border/40 opacity-50 cursor-not-allowed",
+            )}
           >
-            <div className="w-9 h-9 rounded-xl bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0">
-              <Brain className="w-4 h-4" />
+            <div className={cn(
+              "w-9 h-9 rounded-xl flex items-center justify-center shrink-0",
+              isPremium
+                ? "bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400"
+                : "bg-muted text-muted-foreground/40",
+            )}>
+              {isPremium ? <Brain className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
             </div>
             <div>
               <p className="text-sm font-bold text-foreground leading-none">Quiz</p>
-              <p className="text-xs text-muted-foreground mt-0.5">HSK {activeLevel.id}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {isPremium ? `HSK ${currentLevel.id}` : "Premium required"}
+              </p>
             </div>
           </button>
         </motion.div>
@@ -712,60 +807,37 @@ export default function DashboardPage() {
       )}
 
       {/* ── Quick practice strip ──────────────────────────────────── */}
+      {/* Free users see all four locked; premium users see actions pointing to currentLevel */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-        <button
-          onClick={() => setLocation("/strokes")}
-          className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 text-left shadow-sm hover:border-primary/30 hover:shadow-md transition-all duration-200"
-        >
-          <PenLine className="w-5 h-5 text-primary shrink-0" />
-          <div>
-            <p className="text-sm font-semibold text-foreground leading-tight">Strokes</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Writing practice</p>
-          </div>
-        </button>
-        <button
-          onClick={() => setLocation(`/phrases/${activeLevel.id}`)}
-          className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 text-left shadow-sm hover:border-primary/30 hover:shadow-md transition-all duration-200"
-        >
-          <MessageSquare className="w-5 h-5 text-primary shrink-0" />
-          <div>
-            <p className="text-sm font-semibold text-foreground leading-tight">Phrases</p>
-            <p className="text-xs text-muted-foreground mt-0.5">HSK {activeLevel.id}</p>
-          </div>
-        </button>
-        <button
-          onClick={() => setLocation(`/quiz/${activeLevel.id}`)}
-          className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 text-left shadow-sm hover:border-primary/30 hover:shadow-md transition-all duration-200"
-        >
-          <Brain className="w-5 h-5 text-primary shrink-0" />
-          <div>
-            <p className="text-sm font-semibold text-foreground leading-tight">Quiz</p>
-            <p className="text-xs text-muted-foreground mt-0.5">HSK {activeLevel.id}</p>
-          </div>
-        </button>
-        <button
-          onClick={() => setLocation("/review")}
-          disabled={dueCount === 0}
-          className={cn(
-            "relative flex items-center gap-3 rounded-2xl border p-4 text-left shadow-sm transition-all duration-200",
-            dueCount > 0
-              ? "border-border/60 bg-card hover:border-primary/30 hover:shadow-md"
-              : "border-border/40 bg-muted/30 opacity-50 cursor-not-allowed",
-          )}
-        >
-          {dueCount > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white shadow-sm ring-2 ring-background">
-              {dueCount > 9 ? "9+" : dueCount}
-            </span>
-          )}
-          <RotateCcw className="w-5 h-5 text-primary shrink-0" />
-          <div>
-            <p className="text-sm font-semibold text-foreground leading-tight">Review</p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {dueCount > 0 ? `${dueCount} due` : "All done"}
-            </p>
-          </div>
-        </button>
+        <QuickAction
+          icon={PenLine}
+          label="Strokes"
+          sub={isPremium ? "Writing practice" : "Premium required"}
+          onClick={isPremium ? () => setLocation("/strokes") : undefined}
+          locked={!isPremium}
+        />
+        <QuickAction
+          icon={MessageSquare}
+          label="Phrases"
+          sub={isPremium ? `HSK ${currentLevel.id}` : "Premium required"}
+          onClick={isPremium ? () => setLocation(`/phrases/${currentLevel.id}`) : undefined}
+          locked={!isPremium}
+        />
+        <QuickAction
+          icon={Brain}
+          label="Quiz"
+          sub={isPremium ? `HSK ${currentLevel.id}` : "Premium required"}
+          onClick={isPremium ? () => setLocation(`/quiz/${currentLevel.id}`) : undefined}
+          locked={!isPremium}
+        />
+        <QuickAction
+          icon={RotateCcw}
+          label="Review"
+          sub={!isPremium ? "Premium required" : dueCount > 0 ? `${dueCount} due` : "All done"}
+          onClick={isPremium && dueCount > 0 ? () => setLocation("/review") : undefined}
+          locked={!isPremium}
+          badge={isPremium ? dueCount : undefined}
+        />
       </div>
 
       {/* ── Referral card ─────────────────────────────────────────── */}
