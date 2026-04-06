@@ -1,6 +1,6 @@
 import app from "./app";
 import { logger } from "./lib/logger";
-import { runMigration006IfNeeded, runMigration007IfNeeded } from "./lib/migrate.js";
+import { runMigration006IfNeeded, runMigration007IfNeeded, runMigration012IfNeeded } from "./lib/migrate.js";
 
 const rawPort = process.env["PORT"];
 
@@ -31,5 +31,9 @@ app.listen(port, (err) => {
 
   runMigration007IfNeeded().catch((e) => {
     logger.error({ err: e }, "Migration 007 check failed");
+  });
+
+  runMigration012IfNeeded().catch((e) => {
+    logger.error({ err: e }, "Migration 012 check failed");
   });
 });

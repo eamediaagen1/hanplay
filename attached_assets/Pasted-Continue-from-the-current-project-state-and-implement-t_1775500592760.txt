@@ -1,0 +1,228 @@
+Continue from the current project state and implement this carefully.
+
+I want to turn the existing “Chinese Themes” page into a real premium-only downloadable products section, with admin upload/management support.
+
+IMPORTANT:
+- Build this carefully
+- Reuse existing auth, premium, admin, and sidebar systems
+- Do not break current app logic
+- Chinese Themes must remain premium-only
+- Only premium users can view/download products
+- Admin must be able to upload/manage products from admin panel
+
+==================================================
+PART 1 — CHINESE THEMES: PRODUCT SYSTEM
+==================================================
+
+The Chinese Themes page already exists as a styled placeholder.
+Now I want to make it functional.
+
+Create a product system for Chinese Themes categories such as:
+- Phone Wallpapers
+- iPad Wallpapers
+- Laptop Wallpapers
+- Stickers
+- Merch
+
+For now, focus on digital product support first:
+- image preview
+- view button
+- download button
+
+The page should support real uploaded items, not static placeholders.
+
+==================================================
+PART 2 — PREMIUM ACCESS RULES
+==================================================
+
+Chinese Themes must be premium-only.
+
+Requirements:
+- premium users can access the page and product items
+- non-premium users should not be able to access/download products
+- if non-premium user tries to enter Chinese Themes, show premium gate / upgrade message
+- download endpoints must also be server-protected, not just UI-hidden
+
+==================================================
+PART 3 — PRODUCT DATA MODEL
+==================================================
+
+Create the required DB structure and migration(s) if needed.
+
+Each product should support fields like:
+- id
+- title
+- slug
+- category
+- description
+- cover_image_url
+- file_url
+- file_type
+- is_premium
+- is_published
+- created_at
+- updated_at
+
+Optional helpful fields:
+- sort_order
+- preview_image_url
+- download_name
+
+Use current schema style if a content/products table already exists.
+Do not duplicate if an existing suitable structure is present.
+
+==================================================
+PART 4 — STORAGE / FILE HANDLING
+==================================================
+
+Set up file handling for uploaded theme products.
+
+Requirements:
+- admin can upload cover image / preview image
+- admin can upload downloadable file
+- downloadable file can be:
+  - wallpaper image
+  - zip
+  - pdf if needed later
+- use current project storage pattern if one exists
+- if Supabase Storage is the best fit in current stack, use it
+
+Make sure storage paths are organized by category/type if practical.
+
+==================================================
+PART 5 — ADMIN PANEL: CHINESE THEMES SECTION
+==================================================
+
+Add a new admin panel section for Chinese Themes product management.
+
+Suggested route:
+- /admin/chinese-themes
+or inside current admin panel structure
+
+Admin features required:
+1. View all theme products
+2. Add new product
+3. Edit existing product
+4. Upload cover image
+5. Upload downloadable file
+6. Set category
+7. Set title
+8. Set description
+9. Publish / unpublish
+10. Delete product if needed
+
+Minimal useful admin form fields:
+- title
+- category
+- description
+- cover image upload
+- downloadable file upload
+- published toggle
+- premium toggle (default true)
+
+Keep admin UI simple and internal, not fancy.
+
+==================================================
+PART 6 — CHINESE THEMES PAGE UI
+==================================================
+
+Update the Chinese Themes page so it shows real products from DB/storage.
+
+Each product card should support:
+- cover image
+- title
+- short description
+- category label
+- button: View
+- button: Download
+
+Behavior:
+- View = open preview/details modal or product detail page
+- Download = download actual premium file
+
+If a product has no file or is unpublished, it should not appear to users.
+
+==================================================
+PART 7 — VIEW + DOWNLOAD BUTTONS
+==================================================
+
+I specifically want:
+- a button to view
+- a button to download
+
+Requirements:
+- both must work from real uploaded data
+- download should be premium-protected
+- view should show the product more clearly:
+  - modal OR detail page
+  - whichever fits current app better
+
+If using a modal:
+- show larger preview image
+- title
+- description
+- download button
+
+==================================================
+PART 8 — SECURITY
+==================================================
+
+This is important.
+
+Please verify:
+- only admins can upload/edit/delete theme products
+- only premium users can access/download products
+- downloads are not publicly exposed in an unsafe way
+- if using storage URLs, protect access properly where possible
+- if a secure signed URL flow is better, use it
+- do not rely only on frontend hiding
+
+==================================================
+PART 9 — NAVIGATION
+==================================================
+
+Keep Chinese Themes in the authenticated sidebar.
+Do not make it public.
+
+Requirements:
+- visible in sidebar for logged-in users as currently intended
+- premium gating enforced when accessed
+- not shown in public marketing navigation
+
+==================================================
+PART 10 — MVP SCOPE
+==================================================
+
+Focus on a clean MVP:
+- admin can upload products
+- products appear on Chinese Themes page
+- premium users can view and download
+- non-premium users are gated
+- build digital product flow first
+
+No need yet for:
+- checkout/store logic on this page
+- inventory
+- shipping
+- advanced merch system
+
+==================================================
+PART 11 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. what DB changes/migrations were added
+2. what storage setup was added
+3. what admin panel section was added
+4. how uploads work
+5. how Chinese Themes page now loads products
+6. how view works
+7. how download works
+8. how premium protection works
+9. files/routes changed
+10. any manual setup I need to do in Supabase storage or env vars
+
+IMPORTANT:
+Build this carefully and fully wire it.
+Do not leave it as placeholder UI only.
+Make it functional end to end for premium users and admin uploads.

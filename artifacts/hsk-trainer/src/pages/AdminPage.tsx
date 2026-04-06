@@ -9,6 +9,7 @@ import UsersTab      from "./admin/UsersTab";
 import PurchasesTab  from "./admin/PurchasesTab";
 import LogsTab       from "./admin/LogsTab";
 import ConfigTab     from "./admin/ConfigTab";
+import ThemesTab     from "./admin/ThemesTab";
 
 // ── Tab definitions ───────────────────────────────────────────────────────────
 
@@ -16,6 +17,7 @@ const TABS = [
   { id: "dashboard",  label: "Dashboard",  path: "/admin" },
   { id: "users",      label: "Users",      path: "/admin/users" },
   { id: "purchases",  label: "Purchases",  path: "/admin/purchases" },
+  { id: "themes",     label: "Themes",     path: "/admin/themes" },
   { id: "logs",       label: "Logs",       path: "/admin/logs" },
   { id: "settings",   label: "Config",     path: "/admin/settings" },
 ] as const;
@@ -25,6 +27,7 @@ type TabId = (typeof TABS)[number]["id"];
 function pathToTab(pathname: string): TabId {
   if (pathname.startsWith("/admin/users"))     return "users";
   if (pathname.startsWith("/admin/purchases")) return "purchases";
+  if (pathname.startsWith("/admin/themes"))    return "themes";
   if (pathname.startsWith("/admin/logs"))      return "logs";
   if (pathname.startsWith("/admin/settings"))  return "settings";
   return "dashboard";
@@ -73,7 +76,6 @@ export default function AdminPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Identity status */}
             {verified ? (
               <span className="hidden sm:flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
                 <Shield className="w-3 h-3" />
@@ -143,6 +145,7 @@ export default function AdminPage() {
         {activeTab === "dashboard"  && <DashboardTab />}
         {activeTab === "users"      && <UsersTab />}
         {activeTab === "purchases"  && <PurchasesTab />}
+        {activeTab === "themes"     && <ThemesTab />}
         {activeTab === "logs"       && <LogsTab />}
         {activeTab === "settings"   && <ConfigTab />}
       </main>

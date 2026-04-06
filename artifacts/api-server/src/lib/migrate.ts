@@ -49,6 +49,36 @@ CREATE INDEX IF NOT EXISTS flashcard_positions_updated_at_idx
   ON flashcard_positions (user_id, updated_at DESC);
 `;
 
+const MIGRATION_012_SQL = `
+CREATE TABLE IF NOT EXISTS theme_products (
+  id                UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  title             TEXT        NOT NULL,
+  slug              TEXT        NOT NULL,
+  category          TEXT        NOT NULL,
+  description       TEXT,
+  cover_image_url   TEXT,
+  preview_image_url TEXT,
+  file_url          TEXT,
+  file_type         TEXT,
+  download_name     TEXT,
+  is_premium        BOOLEAN     NOT NULL DEFAULT true,
+  is_published      BOOLEAN     NOT NULL DEFAULT false,
+  sort_order        INTEGER     NOT NULL DEFAULT 0,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (slug)
+);
+
+ALTER TABLE theme_products ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "anyone_read_published" ON theme_products;
+CREATE POLICY "anyone_read_published" ON theme_products
+  FOR SELECT USING (is_published = true);
+
+CREATE INDEX IF NOT EXISTS theme_products_category_idx ON theme_products (category);
+CREATE INDEX IF NOT EXISTS theme_products_published_idx ON theme_products (is_published, sort_order);
+`;
+
 export const MIGRATION_006_SQL_EXPORT = MIGRATION_006_SQL;
 
 async function tryPgQuery(supabaseUrl: string, serviceKey: string, sql: string): Promise<boolean> {
@@ -153,5 +183,49 @@ export async function runMigration007IfNeeded(): Promise<{ ran: boolean; note: s
   return {
     ran: false,
     note: "Auto-migration failed. Run migrations/007_flashcard_resume.sql manually in Supabase SQL Editor.",
+  };
+}
+
+export async function runMigration012IfNeeded(): Promise<{ ran: boolean; note: string }> {
+  const { error } = await supabaseAdmin
+    .from("theme_products")
+    .select("id")
+    .limit(0);
+
+  if (!error) {
+    return { ran: false, note: "theme_products table already exists" };
+  }
+
+  const isMissing =
+    error.code === "42P01" ||
+    error.code === "PGRST205" ||
+    (error.message ?? "").toLowerCase().includes("does not exist") ||
+    (error.message ?? "").toLowerCase().includes("schema cache");
+
+  if (!isMissing) {
+    logger.warn(
+      { code: error.code, msg: error.message },
+      "Unexpected error checking theme_products table — treating as missing"
+    );
+  }
+
+  logger.warn("theme_products table missing — attempting auto-migration 012...");
+
+  const supabaseUrl = process.env.SUPABASE_URL ?? "";
+  const serviceKey  = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+
+  const ok = await tryPgQuery(supabaseUrl, serviceKey, MIGRATION_012_SQL);
+
+  if (ok) {
+    logger.info("Migration 012 applied automatically ✓");
+    return { ran: true, note: "Migration 012 applied via pg/query" };
+  }
+
+  logger.warn(
+    "Auto-migration 012 failed — please run migrations/012_theme_products.sql in Supabase SQL Editor"
+  );
+  return {
+    ran: false,
+    note: "Auto-migration failed. Run migrations/012_theme_products.sql manually in Supabase SQL Editor.",
   };
 }

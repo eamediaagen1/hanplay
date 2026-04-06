@@ -8,6 +8,7 @@ import adminRouter           from "./admin.js";
 import streakRouter          from "./streak.js";
 import flashcardPositionRouter from "./flashcard-position.js";
 import referralRouter        from "./referral.js";
+import themesRouter          from "./themes.js";
 
 const router: IRouter = Router();
 
@@ -20,5 +21,6 @@ router.use(adminRouter);
 router.use(streakRouter);
 router.use(flashcardPositionRouter);
 router.use(referralRouter);
+router.use(themesRouter);
 
 export default router;

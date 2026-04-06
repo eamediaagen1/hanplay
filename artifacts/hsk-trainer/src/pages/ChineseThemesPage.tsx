@@ -1,47 +1,237 @@
-import { Smartphone, Tablet, Laptop, Sticker, Shirt, Sparkles, Lock, ExternalLink } from "lucide-react";
+import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import {
+  Smartphone, Tablet, Laptop, Sticker, Shirt, Sparkles,
+  Lock, ExternalLink, Download, Eye, X, Loader2, ImageIcon, ChevronRight,
+} from "lucide-react";
 import { useProfile } from "@/hooks/use-profile";
 import { PageShell } from "@/components/PageShell";
 import { buildGumroadUrl } from "@/lib/gumroad";
 import { getStoredReferralCode } from "@/hooks/use-referral-capture";
+import { apiFetch } from "@/lib/api";
+import { cn } from "@/lib/utils";
 
-const CATEGORIES = [
-  {
-    icon: Smartphone,
-    title: "Phone Wallpapers",
-    desc: "Beautiful Chinese-inspired wallpapers for your lock screen and home screen.",
-    color: "bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400",
-  },
-  {
-    icon: Tablet,
-    title: "iPad Wallpapers",
-    desc: "Stunning full-resolution artwork sized for every iPad model.",
-    color: "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400",
-  },
-  {
-    icon: Laptop,
-    title: "Laptop Wallpapers",
-    desc: "Widescreen wallpapers blending calligraphy, ink wash, and modern design.",
-    color: "bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400",
-  },
-  {
-    icon: Sticker,
-    title: "Stickers",
-    desc: "Character and phrase stickers — perfect for notebooks, laptops, and water bottles.",
-    color: "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400",
-  },
-  {
-    icon: Shirt,
-    title: "Merch",
-    desc: "Apparel and accessories featuring HSK vocabulary, idioms, and Chinese aesthetics.",
-    color: "bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400",
-  },
-];
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+interface ThemeProduct {
+  id: string;
+  title: string;
+  slug: string;
+  category: string;
+  description: string | null;
+  cover_image_url: string | null;
+  preview_image_url: string | null;
+  file_type: string | null;
+  download_name: string | null;
+}
+
+// ─── Category config ─────────────────────────────────────────────────────────
+
+const CATEGORY_META: Record<string, { icon: React.ElementType; color: string }> = {
+  "Phone Wallpapers": { icon: Smartphone, color: "text-violet-600 dark:text-violet-400" },
+  "iPad Wallpapers":  { icon: Tablet,     color: "text-blue-600 dark:text-blue-400" },
+  "Laptop Wallpapers":{ icon: Laptop,     color: "text-sky-600 dark:text-sky-400" },
+  "Stickers":         { icon: Sticker,    color: "text-amber-600 dark:text-amber-400" },
+  "Merch":            { icon: Shirt,      color: "text-rose-600 dark:text-rose-400" },
+};
+
+// ─── View modal ───────────────────────────────────────────────────────────────
+
+function ProductModal({
+  product,
+  onClose,
+}: {
+  product: ThemeProduct;
+  onClose: () => void;
+}) {
+  const imgUrl = product.preview_image_url ?? product.cover_image_url;
+
+  const downloadMut = useMutation({
+    mutationFn: () =>
+      apiFetch<{ url: string; name: string }>(`/api/themes/${product.id}/download`),
+    onSuccess: ({ url, name }) => {
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = name;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.click();
+    },
+  });
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="relative bg-card border border-border rounded-3xl shadow-2xl w-full max-w-md overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 z-10 p-1.5 rounded-xl bg-background/80 hover:bg-muted transition-colors"
+        >
+          <X className="w-4 h-4 text-muted-foreground" />
+        </button>
+
+        {/* Preview image */}
+        <div className="aspect-video bg-muted relative overflow-hidden">
+          {imgUrl ? (
+            <img src={imgUrl} alt={product.title} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <ImageIcon className="w-12 h-12 text-muted-foreground/30" />
+            </div>
+          )}
+        </div>
+
+        {/* Info */}
+        <div className="p-5 space-y-3">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                {product.category}
+              </span>
+              <h2 className="text-lg font-bold text-foreground mt-0.5">{product.title}</h2>
+            </div>
+            <span className="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+              Premium
+            </span>
+          </div>
+
+          {product.description && (
+            <p className="text-sm text-muted-foreground leading-relaxed">{product.description}</p>
+          )}
+
+          {downloadMut.isError && (
+            <p className="text-xs text-red-600 bg-red-50 dark:bg-red-900/20 rounded-lg px-3 py-2">
+              Download failed — please try again.
+            </p>
+          )}
+
+          <button
+            onClick={() => downloadMut.mutate()}
+            disabled={downloadMut.isPending}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-60 transition-colors shadow-lg shadow-primary/20"
+          >
+            {downloadMut.isPending ? (
+              <><Loader2 className="w-4 h-4 animate-spin" /> Preparing…</>
+            ) : (
+              <><Download className="w-4 h-4" /> Download</>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Product card ─────────────────────────────────────────────────────────────
+
+function ProductCard({
+  product,
+  onView,
+}: {
+  product: ThemeProduct;
+  onView: () => void;
+}) {
+  const coverUrl = product.cover_image_url;
+  const downloadMut = useMutation({
+    mutationFn: () =>
+      apiFetch<{ url: string; name: string }>(`/api/themes/${product.id}/download`),
+    onSuccess: ({ url, name }) => {
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = name;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.click();
+    },
+  });
+
+  return (
+    <div className="group bg-card border border-border/60 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:border-border transition-all duration-200">
+      {/* Cover */}
+      <div className="aspect-video bg-muted relative overflow-hidden">
+        {coverUrl ? (
+          <img
+            src={coverUrl}
+            alt={product.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <ImageIcon className="w-10 h-10 text-muted-foreground/20" />
+          </div>
+        )}
+        {/* Category badge */}
+        <span className="absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-black/50 text-white backdrop-blur-sm">
+          {product.category}
+        </span>
+      </div>
+
+      {/* Body */}
+      <div className="p-4 space-y-3">
+        <div>
+          <h3 className="font-bold text-foreground text-sm leading-tight">{product.title}</h3>
+          {product.description && (
+            <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
+              {product.description}
+            </p>
+          )}
+        </div>
+
+        {downloadMut.isError && (
+          <p className="text-xs text-red-600">Download failed — try again</p>
+        )}
+
+        {/* Actions */}
+        <div className="flex gap-2 pt-1">
+          <button
+            onClick={onView}
+            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold bg-muted text-foreground hover:bg-muted/80 transition-colors border border-border/60"
+          >
+            <Eye className="w-3.5 h-3.5" />
+            View
+          </button>
+          <button
+            onClick={() => downloadMut.mutate()}
+            disabled={downloadMut.isPending}
+            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-60 transition-colors shadow-sm shadow-primary/20"
+          >
+            {downloadMut.isPending ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Download className="w-3.5 h-3.5" />
+            )}
+            {downloadMut.isPending ? "…" : "Download"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main page ────────────────────────────────────────────────────────────────
 
 export default function ChineseThemesPage() {
-  const { data: profile, isLoading } = useProfile();
+  const { data: profile, isLoading: profileLoading } = useProfile();
   const isPremium = profile?.is_premium ?? false;
 
-  if (isLoading) {
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [viewing, setViewing] = useState<ThemeProduct | null>(null);
+
+  const { data: products, isLoading: productsLoading } = useQuery<ThemeProduct[]>({
+    queryKey: ["themes"],
+    queryFn: () => apiFetch<ThemeProduct[]>("/api/themes"),
+    enabled: isPremium && !profileLoading,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // ── Loading ───────────────────────────────────────────────────────────────
+  if (profileLoading) {
     return (
       <PageShell maxWidth="lg">
         <div className="flex items-center justify-center py-24">
@@ -51,6 +241,7 @@ export default function ChineseThemesPage() {
     );
   }
 
+  // ── Premium gate ──────────────────────────────────────────────────────────
   if (!isPremium) {
     return (
       <PageShell maxWidth="md">
@@ -77,66 +268,133 @@ export default function ChineseThemesPage() {
     );
   }
 
+  // ── Derive categories from loaded products ────────────────────────────────
+  const categories = Array.from(new Set((products ?? []).map((p) => p.category)));
+  const displayCat = activeCategory ?? categories[0] ?? null;
+  const visibleProducts = displayCat
+    ? (products ?? []).filter((p) => p.category === displayCat)
+    : (products ?? []);
+
   return (
-    <PageShell maxWidth="lg">
-      {/* Hero */}
-      <div className="text-center mb-12">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-5">
-          <Sparkles className="w-4 h-4" />
-          Coming Soon
+    <>
+      {viewing && (
+        <ProductModal product={viewing} onClose={() => setViewing(null)} />
+      )}
+
+      <PageShell maxWidth="lg">
+        {/* Hero */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-5">
+            <Sparkles className="w-4 h-4" />
+            Premium Downloads
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-serif font-bold text-foreground leading-tight">
+            Chinese Themes
+          </h1>
+          <p className="mt-4 text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
+            Exclusive wallpapers, stickers, and aesthetic content — curated for Chinese language learners.
+          </p>
         </div>
-        <h1 className="text-4xl sm:text-5xl font-serif font-bold text-foreground leading-tight">
-          Chinese Themes
-        </h1>
-        <p className="mt-4 text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
-          A curated shop for Chinese learning aesthetics — wallpapers, stickers, and merch 
-          inspired by the beauty of the language you're studying.
-        </p>
-      </div>
 
-      {/* Category grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {CATEGORIES.map((cat) => {
-          const Icon = cat.icon;
-          return (
-            <div
-              key={cat.title}
-              className="group bg-card border border-border/60 rounded-3xl p-6 flex flex-col gap-4 shadow-sm relative overflow-hidden transition-all duration-200 hover:shadow-md hover:border-border"
-            >
-              <div className="absolute top-4 right-4 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-muted text-muted-foreground border border-border/60">
-                Soon
+        {/* Loading state */}
+        {productsLoading && (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        )}
+
+        {/* Empty state */}
+        {!productsLoading && (products ?? []).length === 0 && (
+          <div className="text-center py-16 bg-card border border-border/60 rounded-3xl">
+            <div className="text-4xl font-serif mb-4">美</div>
+            <h2 className="text-lg font-bold text-foreground mb-2">Products Coming Soon</h2>
+            <p className="text-sm text-muted-foreground max-w-xs mx-auto leading-relaxed">
+              The first batch of wallpapers, stickers, and aesthetics is being prepared. 
+              Check back soon — new content drops regularly for premium members.
+            </p>
+          </div>
+        )}
+
+        {/* Category tabs + product grid */}
+        {!productsLoading && (products ?? []).length > 0 && (
+          <>
+            {/* Category tab bar */}
+            {categories.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto scrollbar-none pb-1 mb-6">
+                {categories.map((cat) => {
+                  const meta = CATEGORY_META[cat];
+                  const Icon = meta?.icon;
+                  return (
+                    <button
+                      key={cat}
+                      onClick={() => setActiveCategory(cat)}
+                      className={cn(
+                        "shrink-0 flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-150 border",
+                        displayCat === cat
+                          ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                          : "bg-card text-muted-foreground border-border hover:border-border/80 hover:text-foreground"
+                      )}
+                    >
+                      {Icon && <Icon className="w-3.5 h-3.5" />}
+                      {cat}
+                    </button>
+                  );
+                })}
               </div>
-              <div className={`w-11 h-11 rounded-2xl flex items-center justify-center ${cat.color}`}>
-                <Icon className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-bold text-foreground text-base">{cat.title}</h3>
-                <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{cat.desc}</p>
-              </div>
-              <div className="mt-auto">
-                <div className="h-8 rounded-xl bg-muted/60 flex items-center justify-center">
-                  <span className="text-xs text-muted-foreground font-medium">Notify me when ready</span>
-                </div>
-              </div>
+            )}
+
+            {/* Product grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {visibleProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onView={() => setViewing(product)}
+                />
+              ))}
             </div>
-          );
-        })}
-      </div>
 
-      {/* Bottom note */}
-      <div className="mt-12 text-center bg-card border border-border/60 rounded-3xl p-8">
-        <div className="text-3xl font-serif mb-3">美</div>
-        <h2 className="text-lg font-bold text-foreground mb-2">
-          Where learning meets aesthetics
-        </h2>
-        <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
-          We're building a collection that celebrates Chinese language and culture — 
-          designed for learners who want to carry their passion beyond the screen.
-        </p>
-        <p className="text-xs text-muted-foreground mt-4">
-          Check back soon. New products will appear here as they launch.
-        </p>
-      </div>
-    </PageShell>
+            {/* Category quick-links (if showing all) */}
+            {!activeCategory && categories.length > 1 && (
+              <div className="mt-8 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {categories.map((cat) => {
+                  const meta = CATEGORY_META[cat];
+                  const Icon = meta?.icon;
+                  const count = (products ?? []).filter((p) => p.category === cat).length;
+                  return (
+                    <button
+                      key={cat}
+                      onClick={() => setActiveCategory(cat)}
+                      className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border/60 hover:border-border transition-all text-left group"
+                    >
+                      {Icon && (
+                        <div className={cn("w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0", meta.color)}>
+                          <Icon className="w-4 h-4" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-foreground truncate">{cat}</p>
+                        <p className="text-xs text-muted-foreground">{count} item{count !== 1 ? "s" : ""}</p>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Footer note */}
+        <div className="mt-10 text-center bg-card border border-border/60 rounded-3xl p-8">
+          <div className="text-3xl font-serif mb-3">美</div>
+          <h2 className="text-base font-bold text-foreground mb-1">Where learning meets aesthetics</h2>
+          <p className="text-xs text-muted-foreground max-w-md mx-auto leading-relaxed">
+            Designed for learners who want to carry their passion for Chinese beyond the screen.
+            New content added regularly — check back soon.
+          </p>
+        </div>
+      </PageShell>
+    </>
   );
 }
