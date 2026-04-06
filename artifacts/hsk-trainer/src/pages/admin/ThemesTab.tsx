@@ -51,18 +51,28 @@ async function uploadFile(file: File, folder: string, type: "cover" | "file"): P
   const ext = file.name.split(".").pop() ?? "bin";
   const uniqueName = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
+  // Step 1: get a signed upload URL from our API
   const { signedUrl, path } = await apiFetch<{ signedUrl: string; path: string }>(
     "/api/admin/themes/upload-url",
     { method: "POST", body: JSON.stringify({ path: uniqueName, type }) }
   );
 
+  // Step 2: PUT the file directly to Supabase Storage using the signed URL
   const uploadRes = await fetch(signedUrl, {
     method: "PUT",
-    headers: { "Content-Type": file.type },
+    headers: { "Content-Type": file.type || "application/octet-stream" },
     body: file,
   });
 
-  if (!uploadRes.ok) throw new Error("File upload failed");
+  if (!uploadRes.ok) {
+    let detail = `HTTP ${uploadRes.status}`;
+    try {
+      const body = await uploadRes.text();
+      if (body) detail += `: ${body.slice(0, 120)}`;
+    } catch { /* ignore */ }
+    throw new Error(`File upload to storage failed (${detail})`);
+  }
+
   return path;
 }
 

@@ -1,6 +1,7 @@
 import app from "./app";
 import { logger } from "./lib/logger";
 import { runMigration006IfNeeded, runMigration007IfNeeded, runMigration012IfNeeded } from "./lib/migrate.js";
+import { ensureStorageBuckets } from "./lib/storage.js";
 
 const rawPort = process.env["PORT"];
 
@@ -35,5 +36,10 @@ app.listen(port, (err) => {
 
   runMigration012IfNeeded().catch((e) => {
     logger.error({ err: e }, "Migration 012 check failed");
+  });
+
+  // Ensure storage buckets exist for theme product uploads
+  ensureStorageBuckets().catch((e) => {
+    logger.error({ err: e }, "Storage bucket setup failed");
   });
 });

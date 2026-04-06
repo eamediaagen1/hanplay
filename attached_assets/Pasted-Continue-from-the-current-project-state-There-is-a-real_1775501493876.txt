@@ -1,0 +1,155 @@
+Continue from the current project state.
+
+There is a real bug in the Chinese Themes admin upload flow.
+
+Current issue:
+- In admin → Chinese Themes → Add Product
+- file inputs appear
+- but upload fails with:
+  “Failed to create upload URL”
+
+I want you to debug and fix the full upload pipeline carefully.
+
+GOAL
+Make admin product uploads work end to end:
+- cover image upload
+- preview image upload
+- downloadable file upload
+- save product successfully
+- product appears on Chinese Themes page
+- premium users can view/download it
+
+==================================================
+PART 1 — FIND THE REAL ROOT CAUSE
+==================================================
+
+Please inspect the actual upload flow and identify the exact reason “Failed to create upload URL” is happening.
+
+Check all likely causes:
+- missing Supabase storage bucket
+- wrong bucket name
+- storage bucket not public/private as expected
+- missing storage policies
+- wrong env vars
+- broken signed upload URL generation
+- API route failing
+- admin auth not being passed correctly
+- wrong content-type handling
+- filename/path issue
+- frontend calling wrong endpoint
+- server using wrong Supabase client
+
+Do not guess.
+Find the actual failing point in the code.
+
+==================================================
+PART 2 — FIX ADMIN UPLOAD FLOW
+==================================================
+
+Make the upload flow work for all 3 file types:
+1. cover image
+2. preview image
+3. downloadable file
+
+Requirements:
+- admin selects file
+- upload succeeds
+- product save succeeds
+- saved URLs/paths are stored correctly in DB
+- editing existing product also works if already implemented
+
+==================================================
+PART 3 — VERIFY STORAGE SETUP
+==================================================
+
+Audit and fix the storage implementation.
+
+If using Supabase Storage:
+- verify correct bucket(s)
+- verify bucket names used in code
+- verify storage policies
+- verify signed upload or signed access flow
+- verify service role usage stays server-side only
+
+If bucket creation/setup is missing:
+- add the code/migration/manual setup guidance needed
+
+If automatic bucket creation is possible in current setup, implement it safely.
+If not, clearly tell me the exact manual bucket name/settings needed at the end.
+
+==================================================
+PART 4 — PRODUCT SAVE FLOW
+==================================================
+
+After upload succeeds:
+- save product record correctly
+- include:
+  - title
+  - category
+  - description
+  - cover image path/url
+  - preview image path/url
+  - downloadable file path/url
+  - premium flag
+  - published flag
+  - sort order
+  - download filename
+
+Ensure save does not happen with broken/null upload state unless intended.
+
+==================================================
+PART 5 — CHINESE THEMES PAGE INTEGRATION
+==================================================
+
+After fixing uploads, make sure:
+- published products appear on Chinese Themes page
+- premium-only products are gated properly
+- premium users can use View and Download
+- non-premium users cannot access downloads
+
+==================================================
+PART 6 — SECURITY
+==================================================
+
+Verify:
+- only admin can upload/manage products
+- upload endpoints are admin-protected
+- storage access is handled safely
+- downloads for premium assets are not publicly exposed in an unsafe way
+- no secrets are leaked to frontend
+
+==================================================
+PART 7 — ERROR HANDLING
+==================================================
+
+Improve error feedback in admin UI.
+
+Instead of generic:
+- “Failed to create upload URL”
+
+Show clearer useful errors where possible, for example:
+- storage bucket missing
+- unauthorized admin request
+- invalid file upload
+- upload failed
+- product save failed
+
+Keep messages simple but actionable.
+
+==================================================
+PART 8 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. root cause of the upload bug
+2. files changed
+3. routes/endpoints changed
+4. storage setup used
+5. whether any manual Supabase storage setup is still required
+6. how upload works now
+7. how products appear on Chinese Themes page now
+8. how premium download protection works now
+
+IMPORTANT:
+Do not stop at explaining.
+Fix the upload flow fully and make it functional.

@@ -1,13 +1,10 @@
 import { Router } from "express";
 import { supabaseAdmin } from "../lib/supabase.js";
 import { requireAuth, requirePremium, requireAdmin } from "../middleware/auth.js";
+import { logger } from "../lib/logger.js";
+import { COVERS_BUCKET, FILES_BUCKET } from "../lib/storage.js";
 
 const router = Router();
-
-// theme-covers is a PUBLIC bucket — safe to embed directly in <img> tags
-const COVERS_BUCKET = "theme-covers";
-// theme-assets is a PRIVATE bucket — files accessed via signed URLs only
-const FILES_BUCKET = "theme-assets";
 
 // ─── PREMIUM USER ENDPOINTS ────────────────────────────────────────────────
 
@@ -21,13 +18,13 @@ router.get("/themes", requireAuth, requirePremium, async (_req, res) => {
     .order("sort_order");
 
   if (error) {
+    logger.error({ err: error.message }, "Failed to list theme products");
     res.status(500).json({ error: "Failed to load products" });
     return;
   }
 
   const supabaseUrl = process.env.SUPABASE_URL ?? "";
 
-  // Convert storage paths → public URLs for covers/previews
   const products = (data ?? []).map((p) => ({
     ...p,
     cover_image_url: p.cover_image_url
@@ -62,11 +59,10 @@ router.get("/themes/:id/download", requireAuth, requirePremium, async (req, res)
   }
 
   if (!product.file_url) {
-    res.status(404).json({ error: "No file available for this product" });
+    res.status(404).json({ error: "No downloadable file for this product" });
     return;
   }
 
-  // Generate a 1-hour signed URL for private bucket access
   const { data: signed, error: signError } = await supabaseAdmin.storage
     .from(FILES_BUCKET)
     .createSignedUrl(product.file_url, 3600, {
@@ -74,6 +70,7 @@ router.get("/themes/:id/download", requireAuth, requirePremium, async (req, res)
     });
 
   if (signError || !signed?.signedUrl) {
+    logger.error({ err: signError?.message, productId: id }, "Failed to create signed download URL");
     res.status(500).json({ error: "Failed to generate download link" });
     return;
   }
@@ -83,7 +80,7 @@ router.get("/themes/:id/download", requireAuth, requirePremium, async (req, res)
 
 // ─── ADMIN ENDPOINTS ───────────────────────────────────────────────────────
 
-// GET /admin/themes — list all products (published + unpublished), with public cover URLs
+// GET /admin/themes — list all products including unpublished, with display cover URLs
 router.get("/admin/themes", requireAuth, requireAdmin, async (_req, res) => {
   const { data, error } = await supabaseAdmin
     .from("theme_products")
@@ -92,6 +89,7 @@ router.get("/admin/themes", requireAuth, requireAdmin, async (_req, res) => {
     .order("sort_order");
 
   if (error) {
+    logger.error({ err: error.message }, "Failed to list admin theme products");
     res.status(500).json({ error: "Failed to load products" });
     return;
   }
@@ -108,8 +106,8 @@ router.get("/admin/themes", requireAuth, requireAdmin, async (_req, res) => {
   res.json(products);
 });
 
-// POST /admin/themes/upload-url — signed URL for direct file upload to storage
-// type: "cover" | "file" — determines which bucket and path to use
+// POST /admin/themes/upload-url — signed URL for direct file upload
+// type: "cover" → theme-covers (public), "file" → theme-assets (private)
 router.post("/admin/themes/upload-url", requireAuth, requireAdmin, async (req, res) => {
   const { path: filePath, type = "file" } = req.body as {
     path?: string;
@@ -124,12 +122,30 @@ router.post("/admin/themes/upload-url", requireAuth, requireAdmin, async (req, r
   const safe = filePath.replace(/[^a-zA-Z0-9\-_.\/]/g, "_");
   const bucket = type === "cover" ? COVERS_BUCKET : FILES_BUCKET;
 
+  logger.info({ bucket, path: safe }, "Creating signed upload URL");
+
   const { data, error } = await supabaseAdmin.storage
     .from(bucket)
     .createSignedUploadUrl(safe);
 
   if (error || !data) {
-    res.status(500).json({ error: "Failed to create upload URL" });
+    const msg = error?.message ?? "Unknown storage error";
+    logger.error({ err: msg, bucket, path: safe }, "createSignedUploadUrl failed");
+
+    // Surface a clear error to help with diagnosis
+    let clientMsg = "Failed to create upload URL";
+    const lowerMsg = msg.toLowerCase();
+    if (lowerMsg.includes("not found") || lowerMsg.includes("does not exist")) {
+      clientMsg = `Storage bucket "${bucket}" not found — it may need to be created in Supabase`;
+    } else if (lowerMsg.includes("unauthorized") || lowerMsg.includes("policy")) {
+      clientMsg = "Storage permission denied — check service role key";
+    } else if (lowerMsg.includes("mime") || lowerMsg.includes("type")) {
+      clientMsg = "File type not allowed by bucket policy";
+    } else {
+      clientMsg = `Storage error: ${msg}`;
+    }
+
+    res.status(500).json({ error: clientMsg });
     return;
   }
 
@@ -169,12 +185,12 @@ router.post("/admin/themes", requireAuth, requireAdmin, async (req, res) => {
     .from("theme_products")
     .insert({
       title, slug: finalSlug, category,
-      description: description ?? null,
-      cover_image_url: cover_image_url ?? null,
-      preview_image_url: preview_image_url ?? null,
-      file_url: file_url ?? null,
-      file_type: file_type ?? null,
-      download_name: download_name ?? null,
+      description: description || null,
+      cover_image_url: cover_image_url || null,
+      preview_image_url: preview_image_url || null,
+      file_url: file_url || null,
+      file_type: file_type || null,
+      download_name: download_name || null,
       is_premium, is_published, sort_order,
       updated_at: new Date().toISOString(),
     })
@@ -182,6 +198,7 @@ router.post("/admin/themes", requireAuth, requireAdmin, async (req, res) => {
     .single();
 
   if (error) {
+    logger.error({ err: error.message }, "Failed to create theme product");
     res.status(500).json({ error: error.message ?? "Failed to create product" });
     return;
   }
@@ -213,6 +230,7 @@ router.put("/admin/themes/:id", requireAuth, requireAdmin, async (req, res) => {
     .single();
 
   if (error) {
+    logger.error({ err: error.message, productId: id }, "Failed to update theme product");
     res.status(500).json({ error: error.message ?? "Failed to update product" });
     return;
   }
@@ -220,7 +238,7 @@ router.put("/admin/themes/:id", requireAuth, requireAdmin, async (req, res) => {
   res.json(data);
 });
 
-// DELETE /admin/themes/:id — delete a product and its storage files
+// DELETE /admin/themes/:id — delete product and remove its storage files
 router.delete("/admin/themes/:id", requireAuth, requireAdmin, async (req, res) => {
   const { id } = req.params;
 
@@ -236,6 +254,7 @@ router.delete("/admin/themes/:id", requireAuth, requireAdmin, async (req, res) =
     .eq("id", id);
 
   if (error) {
+    logger.error({ err: error.message, productId: id }, "Failed to delete theme product");
     res.status(500).json({ error: "Failed to delete product" });
     return;
   }
@@ -246,10 +265,14 @@ router.delete("/admin/themes/:id", requireAuth, requireAdmin, async (req, res) =
     const filePaths = [product.file_url].filter((p): p is string => Boolean(p));
 
     if (coverPaths.length > 0) {
-      await supabaseAdmin.storage.from(COVERS_BUCKET).remove(coverPaths).catch(() => {});
+      await supabaseAdmin.storage.from(COVERS_BUCKET).remove(coverPaths).catch((e) => {
+        logger.warn({ err: e }, "Failed to remove cover files from storage");
+      });
     }
     if (filePaths.length > 0) {
-      await supabaseAdmin.storage.from(FILES_BUCKET).remove(filePaths).catch(() => {});
+      await supabaseAdmin.storage.from(FILES_BUCKET).remove(filePaths).catch((e) => {
+        logger.warn({ err: e }, "Failed to remove download files from storage");
+      });
     }
   }
 
