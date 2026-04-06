@@ -44,20 +44,23 @@ function getCardState(
   isPremium: boolean,
   progressMap: LevelProgressMap
 ): CardState {
-  // A level counts as passed if exam_passed is true OR completed_at is set
-  // (the second check is a safety net for rows corrupted by the old retry bug)
+  // FREE users: all levels locked — premium access required.
+  // This must override any saved progression state so stale DB data
+  // (e.g. from a prior premium period) never leaks into the free-user UI.
+  if (!isPremium) return "locked";
+
+  // PREMIUM users: normal progression logic below.
   const everPassed = (e: LevelProgressEntry) =>
     e.exam_passed === true || e.completed_at !== null;
 
-  // Level 1 is always accessible regardless of premium status
   if (levelId === 1) {
     const entry = progressMap[1];
     if (!entry) return "fresh";
     if (everPassed(entry)) return "passed";
     return "in_progress";
   }
-  // Levels 2–6: require premium + exam-based unlock
-  if (!isPremium || !isLevelUnlocked(levelId, progressMap)) return "locked";
+  // Levels 2–6: require exam-based unlock on top of premium
+  if (!isLevelUnlocked(levelId, progressMap)) return "locked";
   const entry = progressMap[levelId];
   if (!entry) return "fresh";
   if (everPassed(entry)) return "passed";
@@ -90,6 +93,7 @@ function LevelCard({
   level,
   state,
   examScore,
+  isPremium,
   onGo,
   onNextLevel,
   onPhrases,
@@ -98,6 +102,7 @@ function LevelCard({
   level: { id: number; count: number; title: string };
   state: CardState;
   examScore: number | null;
+  isPremium: boolean;
   onGo: () => void;
   onNextLevel: () => void;
   onPhrases: () => void;
@@ -156,6 +161,15 @@ function LevelCard({
 
   const LockNote = () => {
     if (!isLocked) return null;
+    // Free user: all levels are premium-gated — never imply progression can unlock them
+    if (!isPremium) {
+      return (
+        <p className="text-xs text-muted-foreground/60 mt-1.5 flex items-center gap-1">
+          <Lock className="w-3 h-3" /> Premium required
+        </p>
+      );
+    }
+    // Premium user, progression lock (level 2+ not yet reached via exam)
     return (
       <p className="text-xs text-muted-foreground/60 mt-1.5 flex items-center gap-1">
         <Lock className="w-3 h-3" /> Complete HSK {level.id - 1} exam to unlock
@@ -335,14 +349,16 @@ export default function DashboardPage() {
       .catch(() => {/* non-fatal */});
   }, [profile?.id]);
 
-  // Use DB-backed last position if available; fall back to localStorage pref
+  // Use DB-backed last position if available; fall back to localStorage pref.
+  // For FREE users: always cap to level 1 — stale DB positions from a prior premium
+  // period must never drive the active level or continue CTA for a free user.
   const dbLastLevel = latestPosition?.level ?? null;
-  const activeLevelId = dbLastLevel ?? lastLevel;
+  const activeLevelId = isPremium ? (dbLastLevel ?? lastLevel) : 1;
   const activeLevel = LEVELS.find((l) => l.id === activeLevelId) ?? LEVELS[0];
   const savedInLevel = savedWords.filter((w) => w.word_id.startsWith(`hsk${activeLevel.id}-`)).length;
 
-  // Position hint for the Continue CTA (category + card index from DB)
-  const positionHint = latestPosition
+  // Position hint for the Continue CTA (only meaningful for premium users)
+  const positionHint = isPremium && latestPosition
     ? latestPosition.category
       ? `${latestPosition.category} · card ${latestPosition.last_index + 1}`
       : `Card ${latestPosition.last_index + 1}`
@@ -379,12 +395,21 @@ export default function DashboardPage() {
     }
   };
 
-  // Primary CTA based on what the user should do next
-  const continueCta = dueCount > 0
-    ? { label: "Review Due Cards", sub: `${dueCount} card${dueCount !== 1 ? "s" : ""} waiting`, hint: null, action: () => setLocation("/review") }
-    : savedCount > 0 || latestPosition
-    ? { label: `Continue HSK ${activeLevel.id}`, sub: activeLevel.title, hint: positionHint, action: () => setLocation(`/flashcards/${activeLevel.id}`) }
-    : { label: `Start HSK ${activeLevel.id}`, sub: activeLevel.title, hint: null, action: () => setLocation(`/flashcards/${activeLevel.id}`) };
+  // Primary CTA — completely separate logic for free vs premium users.
+  // Free users must NEVER see a real level CTA derived from progression state.
+  const continueCta = !isPremium
+    // ── FREE USER ────────────────────────────────────────────────────────────
+    ? dueCount > 0
+      // They may have saved words from before — let them review, that's fine
+      ? { label: "Review Due Cards", sub: `${dueCount} card${dueCount !== 1 ? "s" : ""} waiting`, hint: null, isUpgrade: false, action: () => setLocation("/review") }
+      // No activity → steer toward upgrade; never reference a premium level
+      : { label: "Unlock Full Access", sub: "All 6 HSK levels + premium features", hint: null, isUpgrade: true, action: () => window.open(buildGumroadUrl(getStoredReferralCode()), "_blank") }
+    // ── PREMIUM USER ─────────────────────────────────────────────────────────
+    : dueCount > 0
+      ? { label: "Review Due Cards", sub: `${dueCount} card${dueCount !== 1 ? "s" : ""} waiting`, hint: null, isUpgrade: false, action: () => setLocation("/review") }
+      : savedCount > 0 || latestPosition
+      ? { label: `Continue HSK ${activeLevel.id}`, sub: activeLevel.title, hint: positionHint, isUpgrade: false, action: () => setLocation(`/flashcards/${activeLevel.id}`) }
+      : { label: `Start HSK ${activeLevel.id}`, sub: activeLevel.title, hint: null, isUpgrade: false, action: () => setLocation(`/flashcards/${activeLevel.id}`) };
 
   return (
     <PageShell maxWidth="xl">
@@ -430,28 +455,35 @@ export default function DashboardPage() {
       <motion.div custom={1} variants={fade} initial="hidden" animate="show" className="mb-5">
         <button
           onClick={continueCta.action}
-          className="w-full group flex items-center gap-4 p-5 rounded-2xl bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:bg-primary/90 transition-all duration-200 hover:shadow-lg hover:shadow-primary/25 text-left"
+          className={cn(
+            "w-full group flex items-center gap-4 p-5 rounded-2xl shadow-md transition-all duration-200 hover:shadow-lg text-left",
+            continueCta.isUpgrade
+              ? "bg-amber-500 text-white shadow-amber-500/20 hover:bg-amber-600 hover:shadow-amber-500/25"
+              : "bg-primary text-primary-foreground shadow-primary/20 hover:bg-primary/90 hover:shadow-primary/25"
+          )}
         >
           <div className="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
-            {dueCount > 0
+            {continueCta.isUpgrade
+              ? <Sparkles className="w-6 h-6" />
+              : dueCount > 0
               ? <RotateCcw className="w-6 h-6" />
               : <Play className="w-6 h-6 fill-current" />}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-base font-bold leading-tight">{continueCta.label}</p>
-            <p className="text-sm text-primary-foreground/70 mt-0.5">{continueCta.sub}</p>
+            <p className="text-sm text-white/70 mt-0.5">{continueCta.sub}</p>
             {continueCta.hint && (
-              <p className="text-xs text-primary-foreground/60 mt-1 font-medium">
+              <p className="text-xs text-white/60 mt-1 font-medium">
                 ↩ {continueCta.hint}
               </p>
             )}
-            {!continueCta.hint && savedInLevel > 0 && dueCount === 0 && (
-              <p className="text-xs text-primary-foreground/60 mt-1">
+            {!continueCta.isUpgrade && !continueCta.hint && savedInLevel > 0 && dueCount === 0 && (
+              <p className="text-xs text-white/60 mt-1">
                 {savedInLevel} word{savedInLevel !== 1 ? "s" : ""} saved in this level
               </p>
             )}
           </div>
-          <ChevronRight className="w-5 h-5 text-primary-foreground/60 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+          <ChevronRight className="w-5 h-5 text-white/60 shrink-0 group-hover:translate-x-0.5 transition-transform" />
         </button>
       </motion.div>
 
@@ -586,7 +618,9 @@ export default function DashboardPage() {
             Your Levels
           </h2>
           <p className="text-muted-foreground text-sm max-w-md">
-            Pass each level's exam to unlock the next. Progress is saved automatically.
+            {isPremium
+              ? "Pass each level's exam to unlock the next. Progress is saved automatically."
+              : "Upgrade to Premium to unlock all 6 HSK levels and full study features."}
           </p>
         </div>
 
@@ -666,6 +700,7 @@ export default function DashboardPage() {
                 level={level}
                 state={state}
                 examScore={examScore}
+                isPremium={isPremium}
                 onGo={() => setLocation(`/flashcards/${level.id}`)}
                 onNextLevel={() => setLocation(`/flashcards/${level.id + 1}`)}
                 onPhrases={() => setLocation(`/phrases/${level.id}`)}

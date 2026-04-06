@@ -65,6 +65,7 @@ function LevelCard({
   level,
   state,
   examScore,
+  isPremium,
   onGo,
   onNextLevel,
   onPhrases,
@@ -73,6 +74,7 @@ function LevelCard({
   level: { id: number; count: number; title: string };
   state: CardState;
   examScore: number | null;
+  isPremium: boolean;
   onGo: () => void;
   onNextLevel: () => void;
   onPhrases: () => void;
@@ -136,13 +138,15 @@ function LevelCard({
   // ── Lock reason ───────────────────────────────────────────────────────────
   const LockNote = () => {
     if (!isLocked) return null;
-    if (level.id === 1) {
+    // Free user: every level is premium-gated — never suggest exam progression can unlock them
+    if (!isPremium) {
       return (
         <p className="text-xs text-muted-foreground/60 mt-1.5 flex items-center gap-1">
-          <Lock className="w-3 h-3" /> Premium required to access
+          <Lock className="w-3 h-3" /> Premium required
         </p>
       );
     }
+    // Premium user, progression lock (hasn't passed the previous level's exam yet)
     return (
       <p className="text-xs text-muted-foreground/60 mt-1.5 flex items-center gap-1">
         <Lock className="w-3 h-3" /> Complete HSK {level.id - 1} exam to unlock
@@ -332,7 +336,9 @@ export default function LevelSelection() {
             Your Levels
           </h1>
           <p className="text-muted-foreground text-base max-w-md">
-            Pass each level's exam to unlock the next. Progress is saved automatically.
+            {isPremium
+              ? "Pass each level's exam to unlock the next. Progress is saved automatically."
+              : "Upgrade to Premium to unlock all 6 HSK levels and full study features."}
           </p>
         </div>
 
@@ -412,6 +418,7 @@ export default function LevelSelection() {
                 level={level}
                 state={state}
                 examScore={examScore}
+                isPremium={isPremium}
                 onGo={() => setLocation(`/flashcards/${level.id}`)}
                 onNextLevel={() => setLocation(`/flashcards/${level.id + 1}`)}
                 onPhrases={() => setLocation(`/phrases?level=${level.id}`)}

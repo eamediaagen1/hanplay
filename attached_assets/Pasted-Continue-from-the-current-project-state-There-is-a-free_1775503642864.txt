@@ -1,0 +1,160 @@
+Continue from the current project state.
+
+There is a free-user access logic bug on the Dashboard / Levels cards.
+
+Current issues:
+1. For free users, the big top card/continue card shows the wrong HSK level
+2. Free users should NOT have any level unlocked
+3. All HSK levels must be locked for free users
+4. The UI/state logic should be independent from passed level progression when the user is not premium
+5. I want you to audit the whole access logic and fix all related issues carefully
+
+GOAL
+Make free-user behavior correct and fully separated from premium progression logic.
+
+==================================================
+PART 1 — FIX FREE USER ACCESS LOGIC
+==================================================
+
+For FREE users:
+- all HSK levels must be locked
+- they should not see any unlocked level cards
+- they should not see “Start HSK X” for real levels
+- they should not see a wrong “Continue HSK4” or any other continue state from premium/progression logic
+- they should only see upgrade/demo-appropriate UX
+
+This must apply to:
+- top continue card
+- level cards
+- quick actions
+- review/quiz shortcuts
+- any dashboard metric tied to level access
+
+==================================================
+PART 2 — MAKE PREMIUM VS FREE LOGIC INDEPENDENT
+==================================================
+
+Right now it looks like level progression state is leaking into the free-user dashboard.
+
+I want the logic clearly separated:
+
+A. Free user:
+- no full HSK levels unlocked
+- no real continue-level CTA
+- no progression-based resume into premium levels
+- should see locked levels and upgrade messaging only
+
+B. Premium user:
+- real progression logic applies
+- passed/unlocked/current level logic works normally
+- continue card should reflect actual saved progress
+
+Implement this cleanly so free-user UI does NOT depend on individual level progression state.
+
+==================================================
+PART 3 — FIX THE TOP CONTINUE CARD
+==================================================
+
+Current issue:
+- for free users it shows the wrong HSK level (example: “Start HSK4”)
+
+Fix it so:
+
+If user is FREE:
+- do not show a real level continue/start card for premium levels
+- instead show something appropriate, such as:
+  - “Unlock Full Access”
+  - “Upgrade to Premium”
+  - or “Try Demo” if demo flow exists
+
+If user is PREMIUM:
+- show the real continue card based on actual saved progress
+
+==================================================
+PART 4 — FIX LEVEL CARDS FOR FREE USERS
+==================================================
+
+For free users:
+- all level cards HSK1–HSK6 should appear locked
+- no “Unlocked” badge
+- no active level start button
+- no phrases / take exam actions for locked premium levels
+- lock reason should be premium-related, not progression-related
+
+Example:
+Instead of:
+- “Complete HSK1 exam to unlock”
+
+For free users use:
+- “Premium required”
+or similar premium-gated message
+
+This is important:
+Free-user lock state should not pretend they can unlock levels through exams without premium access.
+
+==================================================
+PART 5 — AUDIT ALL RELATED COMPONENTS
+==================================================
+
+Please inspect and fix all places where this bad state may appear, including:
+- dashboard top card
+- levels cards
+- CTA buttons
+- phrases shortcuts
+- exam buttons
+- review section
+- metrics cards
+- routing guards if needed
+
+I want you to check the full dashboard/levels experience for free users and remove inconsistent states.
+
+==================================================
+PART 6 — CORRECT STATE PRIORITY
+==================================================
+
+Use this priority logic:
+
+1. If user is not premium:
+   - premium lock state overrides progression state
+   - all premium levels locked
+   - no progression-based continue card
+
+2. If user is premium:
+   - use actual progression state
+   - passed/unlocked/current level logic applies normally
+
+This priority must be enforced consistently in UI and routing.
+
+==================================================
+PART 7 — CHECK EDGE CASES
+==================================================
+
+Please verify these cases:
+
+1. Free user with old saved progress data
+- still should see levels locked
+- should not get access from stale progress
+
+2. User downgraded from premium to free
+- dashboard should switch to fully locked level state
+- no lingering continue card into premium levels
+
+3. Premium user
+- should still work normally
+
+==================================================
+PART 8 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. root cause of the wrong free-user HSK card state
+2. what logic was changed
+3. files changed
+4. how free-user dashboard now behaves
+5. how premium-user dashboard still behaves
+6. confirmation that all levels are now locked for free users
+7. confirmation that wrong HSK continue card is fixed
+
+IMPORTANT:
+Do not just patch one card.
+Audit and fix the whole free-user access state across the dashboard/levels experience.
