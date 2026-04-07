@@ -1,5 +1,7 @@
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
+import { useBranding, pickLogo } from "@/hooks/use-branding";
+import { useTheme } from "@/hooks/use-theme";
 import {
   BookOpen,
   Layers,
@@ -64,6 +66,10 @@ export default function MarketingPage() {
   const [, setLocation] = useLocation();
   const go = () => setLocation("/app");
   const goDemo = () => setLocation("/demo");
+  const { data: brandAssets } = useBranding();
+  const { theme } = useTheme();
+  const logoContext = theme === "dark" ? "light" : "dark";
+  const logoUrl = pickLogo(brandAssets, logoContext) ?? pickLogo(brandAssets, "default");
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans overflow-x-hidden">
@@ -79,8 +85,11 @@ export default function MarketingPage() {
       <nav className="relative z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl sticky top-0">
         <div className="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <span className="text-2xl font-serif text-primary leading-none">汉</span>
-            <span className="font-bold text-foreground tracking-tight">Hanplay</span>
+            {logoUrl
+              ? <img src={logoUrl} alt="Hanplay" className="h-7 w-auto object-contain" />
+              : <span className="text-2xl font-serif text-primary leading-none">汉</span>
+            }
+            {!logoUrl && <span className="font-bold text-foreground tracking-tight">Hanplay</span>}
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -614,8 +623,11 @@ export default function MarketingPage() {
       <footer className="relative z-10 border-t border-border/40 px-5 py-8 bg-background/60">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2.5">
-            <span className="text-xl font-serif text-primary leading-none">汉</span>
-            <span className="font-semibold text-foreground">Hanplay</span>
+            {logoUrl
+              ? <img src={logoUrl} alt="Hanplay" className="h-6 w-auto object-contain" />
+              : <span className="text-xl font-serif text-primary leading-none">汉</span>
+            }
+            {!logoUrl && <span className="font-semibold text-foreground">Hanplay</span>}
             <span className="hidden sm:inline text-border">·</span>
             <span className="hidden sm:inline">Learn Chinese, one level at a time.</span>
           </div>

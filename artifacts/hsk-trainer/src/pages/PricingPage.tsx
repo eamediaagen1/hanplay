@@ -2,6 +2,8 @@ import { useLocation } from "wouter";
 import { CheckCircle2, ArrowLeft, Zap, HelpCircle } from "lucide-react";
 import { buildGumroadUrl } from "@/lib/gumroad";
 import { getStoredReferralCode } from "@/hooks/use-referral-capture";
+import { useBranding, pickLogo } from "@/hooks/use-branding";
+import { useTheme } from "@/hooks/use-theme";
 
 const BENEFITS = [
   "Access to all HSK levels — HSK 1 through HSK 6",
@@ -33,6 +35,10 @@ const FAQS = [
 
 export default function PricingPage() {
   const [, navigate] = useLocation();
+  const { data: brandAssets } = useBranding();
+  const { theme } = useTheme();
+  const logoContext = theme === "dark" ? "light" : "dark";
+  const logoUrl = pickLogo(brandAssets, logoContext) ?? pickLogo(brandAssets, "default");
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -49,10 +55,11 @@ export default function PricingPage() {
           </button>
           <div className="flex-1" />
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-primary text-primary-foreground flex items-center justify-center font-serif font-bold text-sm">
-              汉
-            </div>
-            <span className="font-bold text-sm hidden sm:block">Hanplay</span>
+            {logoUrl
+              ? <img src={logoUrl} alt="Hanplay" className="h-6 w-auto object-contain" />
+              : <div className="w-6 h-6 rounded-md bg-primary text-primary-foreground flex items-center justify-center font-serif font-bold text-sm">汉</div>
+            }
+            {!logoUrl && <span className="font-bold text-sm hidden sm:block">Hanplay</span>}
           </div>
           <button
             onClick={() => navigate("/app")}
