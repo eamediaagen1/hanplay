@@ -1,0 +1,155 @@
+Continue from the current project state.
+
+This is a security issue and must be fixed carefully before deployment.
+
+Current problem:
+Some learning routes expose the HSK level directly in the URL, for example:
+- /quiz/3
+- /quiz/4
+and similar patterns for:
+- phrases
+- quizzes
+- flashcards
+
+Because of this, a user can manually change the level number in the URL and try to access higher levels without proper unlock/premium permission.
+
+GOAL
+Audit and fully secure all level-based routes so users cannot bypass progression or premium gating by editing the URL.
+
+==================================================
+PART 1 — AUDIT ALL EXPOSED ROUTES
+==================================================
+
+Please inspect the full app and identify all routes/endpoints where a user can manipulate level access by changing URL params.
+
+Check at least:
+- quiz routes
+- phrases routes
+- flashcards routes
+- level pages
+- exam routes
+- review routes
+- any API endpoints using level params
+- any direct product/content fetch based on level number
+
+I want a full audit of all similar leaks, not just one route.
+
+==================================================
+PART 2 — BLOCK URL PARAMETER BYPASS
+==================================================
+
+Fix the security issue so manual URL edits do NOT grant access.
+
+Required behavior:
+- if user tries to access a level they are not allowed to access, block it
+- do not trust URL params alone
+- validate access using real user state:
+  - premium status
+  - unlocked/current level
+  - progression state
+
+Examples:
+- free user changing /quiz/1 to /quiz/4 → must be blocked
+- premium user who only unlocked up to HSK2 changing /flashcards/2 to /flashcards/5 → must be blocked
+- user should only access levels that are both:
+  1. allowed by premium status
+  2. unlocked by progression
+
+==================================================
+PART 3 — ENFORCE ACCESS IN UI + ROUTING + DATA LAYER
+==================================================
+
+Do NOT fix this only at the UI level.
+
+I want layered protection:
+
+1. Frontend route guard
+- prevent navigation/render for unauthorized level
+
+2. Page/component-level validation
+- if route param level is unauthorized, redirect or show blocked state
+
+3. Data/API-level validation
+- if API fetches content by level, validate current user access before returning data
+- do not send protected data just because the frontend requested it
+
+If backend/API routes exist for content fetching, secure them too.
+
+==================================================
+PART 4 — DEFINE ACCESS RULES CLEARLY
+==================================================
+
+Use these rules consistently:
+
+A. Free users:
+- no access to premium HSK levels
+- no ability to open premium flashcards/phrases/quizzes by URL editing
+- only demo-safe content if applicable
+
+B. Premium users:
+- may access only levels that are unlocked by progression
+- cannot jump ahead to future locked levels by editing URL
+- can access passed/current/unlocked levels according to current business rules
+
+The app must enforce:
+premium check + progression check
+
+==================================================
+PART 5 — APPLY TO ALL LEARNING MODES
+==================================================
+
+Please verify and secure all of these:
+
+- flashcards
+- phrases
+- quizzes
+- exams
+- review
+- dashboard continue links
+- any deep links to categories
+- any routes using level ids/numbers/slugs
+
+I want no route-level shortcuts that allow unauthorized access.
+
+==================================================
+PART 6 — SAFE FAILURE BEHAVIOR
+==================================================
+
+When access is invalid:
+- do not crash
+- do not leak protected content
+- redirect safely OR show clean “locked / unauthorized” state
+
+For example:
+- redirect back to dashboard
+- or show a locked message / upgrade message depending on reason
+
+==================================================
+PART 7 — CHECK FOR SIMILAR LEAKS
+==================================================
+
+Please go beyond the obvious URL number edit issue and inspect for similar access leaks, such as:
+- category param manipulation
+- exam route manipulation
+- review route manipulation
+- API query param manipulation
+- stale client state granting access
+- unlocked state inferred only from frontend
+
+If anything similar exists, fix it too.
+
+==================================================
+PART 8 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. all routes/components/endpoints audited
+2. what leaks were found
+3. what logic was added to prevent URL bypass
+4. how premium + progression checks are now enforced
+5. files changed
+6. confirmation that flashcards, phrases, quizzes, and related routes are now protected
+
+IMPORTANT:
+This is a security fix.
+Do a full access-control audit and prevent all URL-manipulation bypasses across the app.

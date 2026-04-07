@@ -10,6 +10,7 @@ import { VocabWord } from "@/data/hskData";
 import { apiFetch } from "@/lib/api";
 import { useStudyPrefs } from "@/hooks/use-study-prefs";
 import { useLevelProgress } from "@/hooks/use-level-progress";
+import { useLevelAccess } from "@/hooks/use-level-access";
 import { cn } from "@/lib/utils";
 import { buildGumroadUrl } from "@/lib/gumroad";
 import { getStoredReferralCode } from "@/hooks/use-referral-capture";
@@ -111,18 +112,25 @@ export default function QuizPage() {
   const [, setLocation] = useLocation();
   const params = useParams();
   const level = parseInt(params.level || "1");
+
+  // ── Access guard: premium + progression check ─────────────────────────────
+  // Called unconditionally at the top so hook order is stable.
+  const access = useLevelAccess(level);
+
   const { set: setPref } = useStudyPrefs();
   const { submitExam } = useLevelProgress();
   const examSubmitted = useRef(false);
   const [nextLevelUnlocked, setNextLevelUnlocked] = useState(false);
 
-  // All levels (1-6) are fetched from the authenticated API — premium required
+  // Fetch words only after access is confirmed — blocks the API call entirely
+  // when the user tries to manipulate the URL to an inaccessible level.
   const { data: apiLevel, isLoading: wordsLoading, error: wordsError } = useQuery({
     queryKey: ["lessons", level],
     queryFn: () =>
       apiFetch<{ level: number; words: VocabWord[] }>(`/api/lessons?level=${level}`).then(
         (r) => r.words
       ),
+    enabled: access.allowed,
     staleTime: 30 * 60 * 1000,
   });
 
@@ -225,6 +233,46 @@ export default function QuizPage() {
     setWrongIds([]);
     setPhase("quiz");
   }, [levelWords, level]);
+
+  // ── Access guard renders ───────────────────────────────────────────────────
+  if (access.isLoading) {
+    return (
+      <div className="min-h-full flex items-center justify-center">
+        <div className="text-center p-8 flex flex-col items-center gap-4">
+          <Loader2 className="w-10 h-10 text-primary animate-spin" />
+          <p className="text-muted-foreground">Checking access…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!access.allowed) {
+    const isPremiumGate = access.reason === "premium";
+    return (
+      <div className="min-h-full flex items-center justify-center p-6">
+        <div className="max-w-sm w-full bg-card border border-border rounded-2xl shadow-lg p-8 text-center flex flex-col items-center gap-4">
+          <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+            <Lock className="w-7 h-7 text-primary" />
+          </div>
+          <h2 className="text-xl font-bold text-foreground">
+            {isPremiumGate ? "Premium Required" : "Level Locked"}
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            {isPremiumGate
+              ? "HSK levels 2–6 require a premium subscription."
+              : "Complete the previous level's exam to unlock this one."}
+          </p>
+          <button
+            onClick={() => setLocation("/dashboard")}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors"
+          >
+            <LayoutDashboard className="w-4 h-4" />
+            Back to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // ── Loading state ──────────────────────────────────────────────────────────
   if (wordsLoading) {

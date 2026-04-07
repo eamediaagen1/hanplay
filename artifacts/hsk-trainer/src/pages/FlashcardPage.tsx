@@ -7,6 +7,7 @@ import { useSavedWords } from "@/hooks/use-saved-words";
 import { useStudyPrefs } from "@/hooks/use-study-prefs";
 import { useFlashcardPosition } from "@/hooks/use-flashcard-position";
 import { useStreak } from "@/hooks/use-streak";
+import { useLevelAccess } from "@/hooks/use-level-access";
 import { apiFetch } from "@/lib/api";
 import { Flashcard } from "@/components/Flashcard";
 import { cn } from "@/lib/utils";
@@ -26,6 +27,10 @@ export default function FlashcardPage() {
   const params = useParams();
   const level = parseInt(params.level || "1");
 
+  // ── Access guard: premium + progression check ─────────────────────────────
+  // Must be called unconditionally (hooks rules) before any early returns.
+  const access = useLevelAccess(level);
+
   const { toggleSaveCard, isCardSaved } = useSavedWords();
   const { prefs, set: setPref } = useStudyPrefs();
   const { savedPosition, isLoading: positionLoading, savePosition } = useFlashcardPosition(level);
@@ -34,18 +39,22 @@ export default function FlashcardPage() {
 
   // Track the last studied level for Dashboard quick-action + ping streak
   useEffect(() => {
+    if (!access.allowed) return;
     setPref("lastLevel", level);
     pingStreak();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [level]);
+  }, [level, access.allowed]);
 
-  // All levels (1-6) are fetched from the authenticated API — premium required
+  // Fetch words only when the access guard has confirmed the user is allowed.
+  // This prevents the API call (and its 403 response) from even being made
+  // when the user manipulated the URL to a level they can't access.
   const { data: apiLevel, isLoading: wordsLoading, error: wordsError } = useQuery({
     queryKey: ["lessons", level],
     queryFn: () =>
       apiFetch<{ level: number; words: VocabWord[] }>(`/api/lessons?level=${level}`).then(
         (r) => r.words
       ),
+    enabled: access.allowed,
     staleTime: 30 * 60 * 1000,
   });
 
@@ -123,6 +132,45 @@ export default function FlashcardPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [safeIndex, prefs.autoPlay, wordsLoading]);
+
+  // ── Access guard renders (must come before any content rendering) ────────
+  if (access.isLoading) {
+    return (
+      <div className="min-h-full flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto" />
+          <p className="text-sm text-muted-foreground">Checking access…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!access.allowed) {
+    const isPremiumGate = access.reason === "premium";
+    return (
+      <div className="min-h-full flex items-center justify-center p-4">
+        <div className="text-center max-w-sm space-y-4">
+          <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+            <Lock className="w-6 h-6 text-primary" />
+          </div>
+          <h2 className="text-2xl font-bold text-foreground">
+            {isPremiumGate ? "Premium Required" : "Level Locked"}
+          </h2>
+          <p className="text-muted-foreground text-sm">
+            {isPremiumGate
+              ? "HSK levels 2–6 require a premium subscription."
+              : "Complete the previous level's exam to unlock this one."}
+          </p>
+          <button
+            onClick={() => setLocation("/dashboard")}
+            className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors"
+          >
+            Back to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Show loading state while fetching words
   if (wordsLoading) {

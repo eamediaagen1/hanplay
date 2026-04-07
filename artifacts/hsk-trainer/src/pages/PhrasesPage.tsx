@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useParams } from "wouter";
-import { MessageSquare, ChevronLeft, Volume2 } from "lucide-react";
+import { MessageSquare, ChevronLeft, Volume2, Lock, Loader2 } from "lucide-react";
 import { useLocation } from "wouter";
 import { getPhrasesByLevel, getCategoriesByLevel, type Phrase } from "@/data/phraseData";
+import { useLevelAccess } from "@/hooks/use-level-access";
 import { cn } from "@/lib/utils";
 
 const LEVEL_META: Record<number, { title: string; color: string }> = {
@@ -88,6 +89,13 @@ export default function PhrasesPage() {
   const [, setLocation] = useLocation();
 
   const level = parseInt(params.level ?? "1", 10) || 1;
+
+  // ── Access guard: premium + progression check ─────────────────────────────
+  // CRITICAL: phrase data is served from local static files — there is no API
+  // call to enforce access. This hook is the ONLY gate for phrases. It must be
+  // called unconditionally (hooks rules) before any early returns.
+  const access = useLevelAccess(level);
+
   const meta  = LEVEL_META[level] ?? LEVEL_META[1];
 
   const phrases    = getPhrasesByLevel(level);
@@ -100,6 +108,50 @@ export default function PhrasesPage() {
     : phrases.filter((p) => p.category === activeCategory);
 
   const allCategories = ["All", ...categories];
+
+  // ── Access guard renders (before any content is exposed) ─────────────────
+  if (access.isLoading) {
+    return (
+      <div className="min-h-full flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto" />
+          <p className="text-sm text-muted-foreground">Checking access…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!access.allowed) {
+    const isPremiumGate = access.reason === "premium";
+    return (
+      <div className="min-h-full flex flex-col items-center justify-center p-8">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-md text-center space-y-4"
+        >
+          <div className="mx-auto mb-4 w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+            <Lock className="w-8 h-8 text-primary" />
+          </div>
+          <h1 className="text-2xl font-serif font-bold text-foreground">
+            {isPremiumGate ? "Premium Required" : "Level Locked"}
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            {isPremiumGate
+              ? "HSK phrases require a premium subscription. Upgrade to unlock all levels."
+              : "Complete the previous level's exam to unlock these phrases."}
+          </p>
+          <button
+            onClick={() => setLocation("/dashboard")}
+            className="mt-2 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Back to Dashboard
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
 
   if (phrases.length === 0) {
     return (

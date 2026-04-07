@@ -2,6 +2,7 @@ import { Router } from "express";
 import { supabaseAdmin } from "../lib/supabase.js";
 import { requireAuth, requirePremium } from "../middleware/auth.js";
 import { hskData } from "../data/hskData.js";
+import { checkProgression } from "../lib/levelAccess.js";
 
 const router = Router();
 
@@ -157,6 +158,13 @@ router.post("/progress/exam", requireAuth, requirePremium, async (req, res) => {
   }
   if (typeof correct !== "number" || typeof total !== "number" || total <= 0) {
     res.status(400).json({ error: "correct and total are required numbers" });
+    return;
+  }
+
+  // Progression gate: user must have passed all prior levels to sit this exam
+  const progression = await checkProgression(req.user!.id, level);
+  if (!progression.allowed) {
+    res.status(403).json({ error: progression.reason });
     return;
   }
 
