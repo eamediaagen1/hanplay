@@ -1,6 +1,6 @@
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { useBranding, pickLogo } from "@/hooks/use-branding";
+import { useBranding, pickLogoLanding } from "@/hooks/use-branding";
 import { useTheme } from "@/hooks/use-theme";
 import {
   BookOpen,
@@ -69,7 +69,7 @@ export default function MarketingPage() {
   const { data: brandAssets } = useBranding();
   const { theme } = useTheme();
   const logoContext = theme === "dark" ? "light" : "dark";
-  const logoUrl = pickLogo(brandAssets, logoContext) ?? pickLogo(brandAssets, "default");
+  const logoUrl = pickLogoLanding(brandAssets, logoContext) ?? pickLogoLanding(brandAssets, "default");
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans overflow-x-hidden">

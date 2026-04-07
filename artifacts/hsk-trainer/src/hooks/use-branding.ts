@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export interface BrandAsset {
   id: string;
-  asset_type: "logo" | "favicon";
+  asset_type: "logo" | "logo_landing" | "favicon";
   variant: "default" | "light" | "dark";
   file_url: string;
   width: number | null;
@@ -40,6 +40,26 @@ export function pickLogo(
   if (preferred) return preferred.file_url;
   const fallback = logos.find((a) => a.variant === "default");
   return fallback?.file_url ?? null;
+}
+
+/**
+ * Pick the best landing-page logo URL (wide/landscape format).
+ * Falls back to the regular logo if no landing-specific logo is uploaded.
+ */
+export function pickLogoLanding(
+  assets: BrandAsset[] | undefined,
+  context: "dark" | "light" | "default" = "default"
+): string | null {
+  if (!assets || assets.length === 0) return null;
+  const landing = assets.filter((a) => a.asset_type === "logo_landing");
+  if (landing.length > 0) {
+    const preferred = landing.find((a) => a.variant === context);
+    if (preferred) return preferred.file_url;
+    const fallback = landing.find((a) => a.variant === "default");
+    if (fallback) return fallback.file_url;
+  }
+  // Fall back to regular app logo if no landing-specific logo exists
+  return pickLogo(assets, context);
 }
 
 export function pickFavicon(

@@ -5,7 +5,7 @@ import { apiFetch } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 import type { BrandAsset } from "@/hooks/use-branding";
 
-type AssetType = "logo" | "favicon";
+type AssetType = "logo" | "logo_landing" | "favicon";
 type Variant   = "default" | "light" | "dark";
 
 const VARIANTS: Variant[] = ["default", "light", "dark"];
@@ -22,13 +22,11 @@ async function uploadAsset(
   asset_type: AssetType,
   variant: Variant
 ): Promise<BrandAsset> {
-  // 1. Get signed upload URL from API
   const params = new URLSearchParams({ asset_type, variant, filename: file.name });
   const { signedUrl, storagePath } = await apiFetch<{ signedUrl: string; storagePath: string; token: string }>(
     `/api/admin/branding/upload-url?${params}`
   );
 
-  // 2. PUT the file directly to Supabase storage
   const uploadRes = await fetch(signedUrl, {
     method: "PUT",
     headers: { "Content-Type": file.type || "application/octet-stream" },
@@ -36,10 +34,8 @@ async function uploadAsset(
   });
   if (!uploadRes.ok) throw new Error("File upload to storage failed");
 
-  // 3. Measure image dimensions
   const { width, height } = await getImageDimensions(file);
 
-  // 4. Persist the record in the database
   return apiFetch<BrandAsset>("/api/admin/branding", {
     method: "POST",
     body: JSON.stringify({ asset_type, variant, storage_path: storagePath, width, height }),
@@ -71,6 +67,7 @@ function AssetCard({
   onUpload,
   onDelete,
   uploading,
+  wide,
 }: {
   asset_type: AssetType;
   variant: Variant;
@@ -78,6 +75,7 @@ function AssetCard({
   onUpload: (file: File) => void;
   onDelete: (id: string) => void;
   uploading: boolean;
+  wide?: boolean;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -98,9 +96,11 @@ function AssetCard({
         )}
       </div>
 
-      {/* Preview area */}
+      {/* Preview area — taller/wider for landing logo */}
       <div
-        className={`h-28 rounded-lg border border-dashed border-border flex items-center justify-center overflow-hidden ${
+        className={`rounded-lg border border-dashed border-border flex items-center justify-center overflow-hidden ${
+          wide ? "h-36" : "h-28"
+        } ${
           variant === "dark"  ? "bg-gray-900" :
           variant === "light" ? "bg-white" :
           "bg-muted/40"
@@ -110,7 +110,7 @@ function AssetCard({
           <img
             src={asset.file_url}
             alt={`${asset_type} ${variant}`}
-            className="max-h-24 max-w-full object-contain"
+            className={`object-contain ${wide ? "max-h-32 max-w-full w-full px-3" : "max-h-24 max-w-full"}`}
           />
         ) : (
           <div className="flex flex-col items-center gap-1 text-muted-foreground/60">
@@ -126,7 +126,6 @@ function AssetCard({
         </p>
       )}
 
-      {/* Upload button */}
       <button
         onClick={() => fileRef.current?.click()}
         disabled={uploading}
@@ -164,6 +163,7 @@ function AssetSection({
   uploadingKey,
   onUpload,
   onDelete,
+  wide,
 }: {
   asset_type: AssetType;
   label: string;
@@ -172,6 +172,7 @@ function AssetSection({
   uploadingKey: string | null;
   onUpload: (file: File, asset_type: AssetType, variant: Variant) => void;
   onDelete: (id: string) => void;
+  wide?: boolean;
 }) {
   const byVariant = (v: Variant) => assets.find((a) => a.asset_type === asset_type && a.variant === v);
 
@@ -188,6 +189,7 @@ function AssetSection({
             asset_type={asset_type}
             variant={v}
             asset={byVariant(v)}
+            wide={wide}
             uploading={uploadingKey === `${asset_type}-${v}`}
             onUpload={(file) => onUpload(file, asset_type, v)}
             onDelete={onDelete}
@@ -228,7 +230,7 @@ export default function BrandingTab() {
       await uploadAsset(file, asset_type, variant);
       queryClient.invalidateQueries({ queryKey: ["admin-branding"] });
       queryClient.invalidateQueries({ queryKey: ["branding"] });
-      toast({ title: `${asset_type} (${variant}) updated` });
+      toast({ title: `${asset_type === "logo_landing" ? "Landing logo" : asset_type} (${variant}) updated` });
     } catch (e) {
       toast({
         title: "Upload failed",
@@ -253,19 +255,34 @@ export default function BrandingTab() {
       <div>
         <h2 className="text-xl font-bold text-foreground">Brand Assets</h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Upload logo and favicon for light, dark, and default backgrounds. Changes apply immediately across the app.
+          Upload logos and favicon for light, dark, and default backgrounds. Changes apply immediately across the app.
         </p>
       </div>
 
       <AssetSection
         asset_type="logo"
-        label="Logo"
-        description="Used in the sidebar, header, and public pages. Recommended: 500×500px or wider SVG/PNG with transparent background."
+        label="App Logo"
+        description="Used in the sidebar and mobile header. Square or portrait format recommended — e.g. 500×500px PNG/SVG with transparent background."
         assets={assets}
         uploadingKey={uploadingKey}
         onUpload={handleUpload}
         onDelete={(id) => deleteMutation.mutate(id)}
       />
+
+      <div className="border-t border-border/40" />
+
+      <AssetSection
+        asset_type="logo_landing"
+        label="Landing Page Logo"
+        description="Displayed in the navbar and footer of the public landing page. Wide/landscape format — e.g. 800×500px PNG/SVG with transparent background."
+        assets={assets}
+        uploadingKey={uploadingKey}
+        onUpload={handleUpload}
+        onDelete={(id) => deleteMutation.mutate(id)}
+        wide
+      />
+
+      <div className="border-t border-border/40" />
 
       <AssetSection
         asset_type="favicon"
