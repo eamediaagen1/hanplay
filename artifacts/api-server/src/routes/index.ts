@@ -18,11 +18,13 @@ router.use(meRouter);
 router.use(lessonsRouter);
 router.use(progressRouter);
 router.use(webhookRouter);
-router.use(adminRouter);
 router.use(streakRouter);
 router.use(flashcardPositionRouter);
 router.use(referralRouter);
 router.use(themesRouter);
+// branding must come before adminRouter — admin router has a blanket requireAuth
+// middleware that intercepts all requests passing through it, including public ones
 router.use(brandingRouter);
+router.use(adminRouter);
 
 export default router;
