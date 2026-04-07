@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
@@ -56,6 +56,32 @@ function Redirect({ to }: { to: string }) {
 function ReferralCaptureEffect() {
   const [location] = useLocation();
   useEffect(() => { captureReferralCode(); }, [location]);
+  return null;
+}
+
+/**
+ * Clears the entire React Query cache whenever the authenticated user changes
+ * (sign-out, or switching accounts). This ensures stale user-specific data
+ * from a previous session never leaks into the next user's view.
+ */
+function CacheClearEffect() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  const prevUserIdRef = useRef<string | null | undefined>(undefined);
+
+  useEffect(() => {
+    // Skip the initial render (undefined → null/id is not a "switch")
+    if (prevUserIdRef.current === undefined) {
+      prevUserIdRef.current = user?.id ?? null;
+      return;
+    }
+    // Clear cache whenever the user identity changes (logout or account switch)
+    if (prevUserIdRef.current !== (user?.id ?? null)) {
+      qc.clear();
+    }
+    prevUserIdRef.current = user?.id ?? null;
+  }, [user?.id, qc]);
+
   return null;
 }
 
@@ -133,6 +159,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <DynamicFavicon />
       <AuthProvider>
+        <CacheClearEffect />
         <TooltipProvider>
           <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
             <ReferralCaptureEffect />

@@ -431,16 +431,19 @@ export default function DashboardPage() {
   const currentLevel   = LEVELS.find((l) => l.id === currentLevelId) ?? LEVELS[0];
 
   // ── Resume position for the Continue bar ─────────────────────────────────────
-  // Uses the DB-backed flashcard position (where they last left off in the deck).
-  // Falls back to currentLevelId (frontier) instead of stale localStorage pref.
-  // For free users: locked — always 1, irrelevant.
-  const dbLastLevel  = latestPosition?.level ?? null;
-  const activeLevelId = isPremium ? (dbLastLevel ?? currentLevelId) : 1;
-  const activeLevel   = LEVELS.find((l) => l.id === activeLevelId) ?? LEVELS[0];
+  // activeLevelId is ALWAYS the frontier (currentLevelId). We must never let
+  // latestPosition.level override the frontier — it may be from a level the user
+  // has already passed (e.g. they studied HSK2, passed it, unlocked HSK3, but
+  // their last saved position is still HSK2). Using dbLastLevel directly would
+  // make the continue bar show "Continue HSK 2" when they should be on HSK 3.
+  const activeLevelId = isPremium ? currentLevelId : 1;
+  const activeLevel   = currentLevel;
   const savedInLevel  = savedWords.filter((w) => w.word_id.startsWith(`hsk${activeLevel.id}-`)).length;
 
-  // Position hint for the Continue CTA (only meaningful for premium users)
-  const positionHint = isPremium && latestPosition
+  // Resume hint: ONLY valid when the saved position is for the current frontier
+  // level. A position from a passed level is irrelevant to the current target.
+  const positionIsForCurrentLevel = latestPosition?.level === currentLevelId;
+  const positionHint = isPremium && positionIsForCurrentLevel && latestPosition
     ? latestPosition.category
       ? `${latestPosition.category} · card ${latestPosition.last_index + 1}`
       : `Card ${latestPosition.last_index + 1}`
@@ -489,7 +492,10 @@ export default function DashboardPage() {
     // ── PREMIUM USER ─────────────────────────────────────────────────────────
     : dueCount > 0
       ? { label: "Review Due Cards", sub: `${dueCount} card${dueCount !== 1 ? "s" : ""} waiting`, hint: null, isUpgrade: false, action: () => setLocation("/review") }
-      : savedCount > 0 || latestPosition
+      // "Continue" only when there is real history for the CURRENT frontier level —
+      // a saved position in that level, or saved words from that level specifically.
+      // savedCount alone is not enough: those words could be from an older passed level.
+      : positionIsForCurrentLevel || savedInLevel > 0
       ? { label: `Continue HSK ${activeLevel.id}`, sub: activeLevel.title, hint: positionHint, isUpgrade: false, action: () => setLocation(`/flashcards/${activeLevel.id}`) }
       : { label: `Start HSK ${activeLevel.id}`, sub: activeLevel.title, hint: null, isUpgrade: false, action: () => setLocation(`/flashcards/${activeLevel.id}`) };
 

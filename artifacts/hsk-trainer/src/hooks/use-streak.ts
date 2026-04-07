@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
+import { useAuth } from "@/contexts/auth-context";
 
 interface StreakData {
   current_streak: number;
@@ -8,11 +9,13 @@ interface StreakData {
 }
 
 export function useStreak() {
+  const { user } = useAuth();
   const qc = useQueryClient();
 
   const query = useQuery<StreakData>({
-    queryKey: ["streak"],
+    queryKey: ["streak", user?.id],
     queryFn: () => apiFetch<StreakData>("/api/streak"),
+    enabled: !!user,
     staleTime: 5 * 60 * 1000,
   });
 
@@ -22,7 +25,7 @@ export function useStreak() {
         method: "POST",
       }),
     onSuccess: (data) => {
-      qc.setQueryData(["streak"], (old: StreakData | undefined) => ({
+      qc.setQueryData(["streak", user?.id], (old: StreakData | undefined) => ({
         ...(old ?? { last_active_date: null }),
         current_streak: data.current_streak,
         longest_streak: data.longest_streak,

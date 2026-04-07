@@ -1,5 +1,6 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
+import { useAuth } from "@/contexts/auth-context";
 import { useCallback, useRef } from "react";
 
 export interface FlashcardPosition {
@@ -20,12 +21,16 @@ interface SavePositionPayload {
   last_word_id?: string | null;
 }
 
-// Hook for FlashcardPage — fetch + save position for a specific level
+// Hook for FlashcardPage — fetch + save position for a specific level.
+// Query key includes user.id so data never leaks between accounts.
 export function useFlashcardPosition(level: number) {
+  const { user } = useAuth();
+
   const query = useQuery<FlashcardPosition | null>({
-    queryKey: ["flashcard-position", level],
+    queryKey: ["flashcard-position", user?.id, level],
     queryFn: () =>
       apiFetch<FlashcardPosition | null>(`/api/flashcard-position?level=${level}`).catch(() => null),
+    enabled: !!user,
     staleTime: 10 * 60 * 1000,
   });
 
@@ -54,13 +59,19 @@ export function useFlashcardPosition(level: number) {
   };
 }
 
-// Hook for Dashboard — fetch the most recently updated position across all levels
+// Hook for Dashboard — fetch the most recently updated position across all levels.
+// Query key includes user.id so data never leaks between accounts.
 export function useLatestFlashcardPosition() {
+  const { user } = useAuth();
+
   const query = useQuery<LatestFlashcardPosition | null>({
-    queryKey: ["flashcard-position-latest"],
+    queryKey: ["flashcard-position-latest", user?.id],
     queryFn: () =>
       apiFetch<LatestFlashcardPosition | null>("/api/flashcard-position/latest").catch(() => null),
+    enabled: !!user,
     staleTime: 2 * 60 * 1000,
+    // Always fetch fresh on mount so the dashboard reflects the latest session
+    refetchOnMount: true,
   });
 
   return {

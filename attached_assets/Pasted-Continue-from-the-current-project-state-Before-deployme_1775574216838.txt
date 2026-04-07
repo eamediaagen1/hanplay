@@ -1,0 +1,145 @@
+Continue from the current project state.
+
+Before deployment, I need one more important fix on the dashboard.
+
+Current issue:
+The big top dashboard bar (“Continue HSK X”) is not always correct.
+It must be based on the user’s own real data and recent unlocked/current level, and it must be fully independent per client/user.
+
+GOAL
+Make the big dashboard continue bar always show the correct level and correct resume state for each authenticated user, based only on that user’s own saved progression and resume data.
+
+==================================================
+PART 1 — SOURCE OF TRUTH PER USER
+==================================================
+
+The continue bar must be fully user-specific.
+
+Requirements:
+- each authenticated user sees only their own data
+- no shared state between users
+- no stale state from another account/session
+- no hardcoded/default HSK level leaking into the UI
+- data must come from DB-backed user progress/resume state
+
+Audit all current sources used by the continue bar and remove any unreliable source such as:
+- stale client state
+- global state not reset on auth change
+- localStorage values not scoped correctly per user
+- fallback values overriding real DB state
+
+==================================================
+PART 2 — CONTINUE BAR LOGIC
+==================================================
+
+The big dashboard bar should be based on the user’s actual current level using this priority:
+
+1. If user is NOT premium:
+- do not show a real HSK continue bar for premium levels
+- show locked/upgrade/demo-appropriate CTA instead
+
+2. If user IS premium:
+- determine the user’s current actionable level correctly
+
+Use this logic for premium users:
+- current level should be the most recent unlocked level that is not yet completed
+OR
+- if resume data exists within that unlocked/current level, use that resume state
+- do not show older passed levels unless that is truly the latest actionable state
+
+Examples:
+- if HSK1 passed and HSK2 unlocked, continue bar should show HSK2
+- if HSK2 passed and HSK3 unlocked, continue bar should show HSK3
+- if HSK3 unlocked and user stopped on card 12 in a category, continue bar should point there
+- if HSK3 later gets completed and HSK4 unlocks, continue bar should show HSK4
+
+==================================================
+PART 3 — RESUME DATA INTEGRATION
+==================================================
+
+The continue bar should combine:
+- current unlocked level
+- user’s saved flashcard/learning resume state
+
+If resume data exists for the current actionable level:
+- show the correct level
+- show the correct category/card context if appropriate
+- clicking the bar should take the user directly back to where they stopped
+
+If resume data does not exist:
+- continue bar should still point to the correct unlocked level start
+
+==================================================
+PART 4 — INDEPENDENT PER CLIENT / USER
+==================================================
+
+I specifically want this fixed so every client/user sees their own correct state.
+
+Please verify:
+- user A progress does not affect user B
+- auth changes refresh dashboard state correctly
+- switching accounts does not keep previous user’s continue bar state
+- dashboard refetches correct data for current auth session
+- cached/dashboard data is properly scoped by user id
+
+==================================================
+PART 5 — AUDIT RELATED DASHBOARD ACTIONS TOO
+==================================================
+
+While fixing the big continue bar, please also verify the related dashboard actions still use the same correct user-specific current level logic:
+- phrases button
+- quiz button
+- review button
+- any current-level CTA on dashboard
+
+I want consistent behavior across all dashboard actions.
+
+==================================================
+PART 6 — FREE VS PREMIUM CHECK
+==================================================
+
+Make sure the continue bar follows access rules correctly:
+
+FREE user:
+- no real premium level continue bar
+- no leaked HSK progress card
+- show locked/upgrade/demo-safe state only
+
+PREMIUM user:
+- show real current unlocked/resume level
+- use user-specific data only
+
+==================================================
+PART 7 — ROOT CAUSE + FULL CHECK
+==================================================
+
+Please audit the full flow and fix the real cause.
+
+Check:
+- progression fetch
+- resume fetch
+- dashboard state derivation
+- auth/session change handling
+- cache invalidation if relevant
+- stale state after login/logout
+- any global store/context issues
+
+Also do a broader check to make sure all dashboard state is consistent and user-specific before deployment.
+
+==================================================
+PART 8 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. root cause of the continue bar issue
+2. what logic was changed
+3. how current level is now determined
+4. how resume data is now integrated
+5. how user-specific isolation is ensured
+6. files changed
+7. confirmation that free/premium behavior still works
+8. confirmation that dashboard actions now follow the correct per-user current level
+
+IMPORTANT:
+Do not patch only the label.
+Fix the underlying per-user dashboard logic so the continue bar is always correct and independent for each client/user.

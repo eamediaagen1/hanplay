@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
+import { useAuth } from "@/contexts/auth-context";
 
 interface ReferralData {
   referral_code: string;
@@ -7,9 +8,12 @@ interface ReferralData {
 }
 
 export function useReferral() {
+  const { user } = useAuth();
+
   const query = useQuery<ReferralData>({
-    queryKey: ["referral"],
+    queryKey: ["referral", user?.id],
     queryFn: () => apiFetch<ReferralData>("/api/referral"),
+    enabled: !!user,
     staleTime: 5 * 60 * 1000,
   });
 
