@@ -83,10 +83,10 @@ export default function MarketingPage() {
 
       {/* ─── NAV ──────────────────────────────────────────────────────────── */}
       <nav className="relative z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl sticky top-0">
-        <div className="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-5 py-1 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             {logoUrl
-              ? <img src={logoUrl} alt="Hanplay" className="h-14 w-auto object-contain" />
+              ? <img src={logoUrl} alt="Hanplay" className="h-20 w-auto object-contain" />
               : <span className="text-2xl font-serif text-primary leading-none">汉</span>
             }
             {!logoUrl && <span className="font-bold text-foreground tracking-tight">Hanplay</span>}
