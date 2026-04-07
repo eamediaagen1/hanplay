@@ -52,7 +52,7 @@ export default function PricingPage() {
             <div className="w-6 h-6 rounded-md bg-primary text-primary-foreground flex items-center justify-center font-serif font-bold text-sm">
               汉
             </div>
-            <span className="font-bold text-sm hidden sm:block">HSK Trainer</span>
+            <span className="font-bold text-sm hidden sm:block">Hanplay</span>
           </div>
           <button
             onClick={() => navigate("/app")}

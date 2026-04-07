@@ -49,6 +49,32 @@ CREATE INDEX IF NOT EXISTS flashcard_positions_updated_at_idx
   ON flashcard_positions (user_id, updated_at DESC);
 `;
 
+const MIGRATION_013_SQL = `
+CREATE TABLE IF NOT EXISTS brand_assets (
+  id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  asset_type   TEXT        NOT NULL,
+  variant      TEXT        NOT NULL DEFAULT 'default',
+  storage_path TEXT        NOT NULL,
+  file_url     TEXT        NOT NULL,
+  width        INTEGER,
+  height       INTEGER,
+  is_active    BOOLEAN     NOT NULL DEFAULT true,
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (asset_type, variant)
+);
+
+ALTER TABLE brand_assets ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "public_read_brand_assets" ON brand_assets;
+CREATE POLICY "public_read_brand_assets" ON brand_assets
+  FOR SELECT USING (is_active = true);
+
+DROP POLICY IF EXISTS "service_role_write_brand_assets" ON brand_assets;
+CREATE POLICY "service_role_write_brand_assets" ON brand_assets
+  FOR ALL USING (auth.role() = 'service_role');
+`;
+
 const MIGRATION_012_SQL = `
 CREATE TABLE IF NOT EXISTS theme_products (
   id                UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -227,5 +253,49 @@ export async function runMigration012IfNeeded(): Promise<{ ran: boolean; note: s
   return {
     ran: false,
     note: "Auto-migration failed. Run migrations/012_theme_products.sql manually in Supabase SQL Editor.",
+  };
+}
+
+export async function runMigration013IfNeeded(): Promise<{ ran: boolean; note: string }> {
+  const { error } = await supabaseAdmin
+    .from("brand_assets")
+    .select("id")
+    .limit(0);
+
+  if (!error) {
+    return { ran: false, note: "brand_assets table already exists" };
+  }
+
+  const isMissing =
+    error.code === "42P01" ||
+    error.code === "PGRST205" ||
+    (error.message ?? "").toLowerCase().includes("does not exist") ||
+    (error.message ?? "").toLowerCase().includes("schema cache");
+
+  if (!isMissing) {
+    logger.warn(
+      { code: error.code, msg: error.message },
+      "Unexpected error checking brand_assets table — treating as missing"
+    );
+  }
+
+  logger.warn("brand_assets table missing — attempting auto-migration 013...");
+
+  const supabaseUrl = process.env.SUPABASE_URL ?? "";
+  const serviceKey  = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+
+  const ok = await tryPgQuery(supabaseUrl, serviceKey, MIGRATION_013_SQL);
+
+  if (ok) {
+    logger.info("Migration 013 applied automatically ✓");
+    return { ran: true, note: "Migration 013 applied via pg/query" };
+  }
+
+  logger.warn(
+    "Auto-migration 013 failed — please run migrations/013_brand_assets.sql in Supabase SQL Editor"
+  );
+  return {
+    ran: false,
+    note: "Auto-migration failed. Run migrations/013_brand_assets.sql manually in Supabase SQL Editor.",
   };
 }

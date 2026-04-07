@@ -1,0 +1,190 @@
+Use this prompt:
+
+```text
+Continue from the current project state.
+
+Before deployment, I want to rebrand the SaaS.
+
+OLD NAME:
+- HSK Trainer
+
+NEW NAME:
+- Hanplay
+
+I also want brand asset management to be functional from the admin side.
+
+GOAL
+Rebrand the app from HSK Trainer to Hanplay and add a working admin-managed branding system for logo + favicon.
+
+IMPORTANT
+- Do not break existing functionality
+- Keep auth, premium logic, dashboard, admin, Chinese Themes, and deployment setup intact
+- Make the branding system functional, not static only
+
+==================================================
+PART 1 — RENAME THE APP
+==================================================
+
+Replace the SaaS/app name from “HSK Trainer” to “Hanplay” across the product where appropriate.
+
+Check and update:
+- app title
+- landing page copy where brand name appears
+- dashboard/app header
+- sidebar branding
+- pricing page branding
+- footer
+- metadata/title tags if present
+- public-facing references
+- admin-facing references if they show old brand name
+
+Be careful:
+- update only product branding text
+- do not rename internal technical identifiers unless necessary
+- avoid breaking imports or package names unless clearly needed
+
+==================================================
+PART 2 — BRAND ASSET MANAGEMENT IN ADMIN PANEL
+==================================================
+
+Add a branding section in the admin panel to manage:
+
+1. Main logo upload
+2. Favicon upload
+3. Variants for white and dark backgrounds if needed
+
+I want this to be functional.
+
+Admin should be able to upload:
+
+A. Logo
+- recommended size: 500x500
+- support light/dark usage if applicable
+
+B. Favicon
+- support favicon upload
+- allow variants if needed for white and dark backgrounds
+
+Suggested admin section:
+- /admin/branding
+or integrated into current admin structure
+
+==================================================
+PART 3 — BRANDING DATA MODEL
+==================================================
+
+Create the required DB structure and/or storage handling if needed.
+
+Support fields such as:
+- id
+- asset_type (logo / favicon)
+- theme_variant (default / light / dark)
+- file_url or storage_path
+- width
+- height
+- created_at
+- updated_at
+- is_active
+
+If the current app already has a suitable settings/config table, adapt it instead of duplicating.
+
+Keep it simple and practical.
+
+==================================================
+PART 4 — STORAGE / FILE HANDLING
+==================================================
+
+Use the current storage approach (likely Supabase Storage if already used).
+
+Requirements:
+- admin can upload logo file
+- admin can upload favicon file
+- files are stored safely
+- latest active assets can be read by the app
+
+If needed, create a separate branding bucket/folder structure.
+
+==================================================
+PART 5 — APPLY BRANDING IN THE APP
+==================================================
+
+Make the uploaded branding functional in the UI.
+
+Requirements:
+- app should use the uploaded logo in visible branding areas if available
+- app should use uploaded favicon if available
+- fallback gracefully if no uploaded brand asset exists yet
+
+Important:
+- support logo visibility on dark UI backgrounds
+- support logo visibility on light backgrounds if needed
+- if using separate variants, choose the correct asset based on context
+
+At minimum:
+- sidebar / app header should use the uploaded logo
+- browser favicon should use uploaded favicon if technically feasible in current app structure
+- landing/public pages should use Hanplay branding
+
+==================================================
+PART 6 — WHITE / DARK BACKGROUND SUPPORT
+==================================================
+
+I specifically want support for branding on:
+- white background
+- dark background
+
+Implement a practical system for this.
+
+Example:
+- logo_light for dark background
+- logo_dark for light background
+
+Same idea if needed for favicon variants.
+
+Do not overengineer, but make it usable.
+
+==================================================
+PART 7 — ADMIN UX
+==================================================
+
+Admin branding UI should be simple and clean.
+
+Include:
+- current logo preview
+- current favicon preview
+- upload field for logo
+- upload field for favicon
+- variant selector if needed
+- activate / replace behavior
+- clear save/update flow
+
+If only one active asset per type/variant should exist, enforce that cleanly.
+
+==================================================
+PART 8 — SECURITY
+==================================================
+
+Verify:
+- only admins can upload/change branding assets
+- asset upload endpoints are protected
+- storage access is handled safely
+- branding changes do not break app loading
+
+==================================================
+PART 9 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. where the name was changed from HSK Trainer to Hanplay
+2. what branding/admin pages were added
+3. DB/storage changes added
+4. how logo upload works
+5. how favicon upload works
+6. how dark/light variants work
+7. what files changed
+8. any manual steps still required
+
+IMPORTANT:
+Do not make this static only.
+Make branding manageable from admin and actually applied in the app.
+```

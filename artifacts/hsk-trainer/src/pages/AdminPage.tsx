@@ -10,6 +10,7 @@ import PurchasesTab  from "./admin/PurchasesTab";
 import LogsTab       from "./admin/LogsTab";
 import ConfigTab     from "./admin/ConfigTab";
 import ThemesTab     from "./admin/ThemesTab";
+import BrandingTab   from "./admin/BrandingTab";
 
 // ── Tab definitions ───────────────────────────────────────────────────────────
 
@@ -18,6 +19,7 @@ const TABS = [
   { id: "users",      label: "Users",      path: "/admin/users" },
   { id: "purchases",  label: "Purchases",  path: "/admin/purchases" },
   { id: "themes",     label: "Themes",     path: "/admin/themes" },
+  { id: "branding",   label: "Branding",   path: "/admin/branding" },
   { id: "logs",       label: "Logs",       path: "/admin/logs" },
   { id: "settings",   label: "Config",     path: "/admin/settings" },
 ] as const;
@@ -28,6 +30,7 @@ function pathToTab(pathname: string): TabId {
   if (pathname.startsWith("/admin/users"))     return "users";
   if (pathname.startsWith("/admin/purchases")) return "purchases";
   if (pathname.startsWith("/admin/themes"))    return "themes";
+  if (pathname.startsWith("/admin/branding"))  return "branding";
   if (pathname.startsWith("/admin/logs"))      return "logs";
   if (pathname.startsWith("/admin/settings"))  return "settings";
   return "dashboard";
@@ -146,6 +149,7 @@ export default function AdminPage() {
         {activeTab === "users"      && <UsersTab />}
         {activeTab === "purchases"  && <PurchasesTab />}
         {activeTab === "themes"     && <ThemesTab />}
+        {activeTab === "branding"   && <BrandingTab />}
         {activeTab === "logs"       && <LogsTab />}
         {activeTab === "settings"   && <ConfigTab />}
       </main>

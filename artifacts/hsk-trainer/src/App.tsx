@@ -24,6 +24,7 @@ import AdminPage        from "@/pages/AdminPage";
 import AdminLoginPage   from "@/pages/AdminLoginPage";
 import { AppShell }     from "@/components/AppShell";
 import { AuthProvider, useAuth } from "@/contexts/auth-context";
+import { DynamicFavicon } from "@/components/DynamicFavicon";
 
 const queryClient = new QueryClient();
 
@@ -130,6 +131,7 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <DynamicFavicon />
       <AuthProvider>
         <TooltipProvider>
           <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>

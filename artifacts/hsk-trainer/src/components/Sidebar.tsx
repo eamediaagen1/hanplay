@@ -23,6 +23,8 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { cn } from "@/lib/utils";
 import { buildGumroadUrl } from "@/lib/gumroad";
 import { getStoredReferralCode } from "@/hooks/use-referral-capture";
+import { useBranding, pickLogo } from "@/hooks/use-branding";
+import { useTheme } from "@/hooks/use-theme";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -184,6 +186,11 @@ function SidebarContent({
   onToggleExpanded?: () => void;
   showCollapseToggle?: boolean;
 }) {
+  const { data: brandAssets } = useBranding();
+  const { theme } = useTheme();
+  const logoContext = theme === "dark" ? "light" : "dark";
+  const logoUrl = pickLogo(brandAssets, logoContext) ?? pickLogo(brandAssets, "default");
+
   return (
     <div className="flex flex-col h-full relative">
 
@@ -194,9 +201,17 @@ function SidebarContent({
           isExpanded ? "gap-3" : "justify-center"
         )}
       >
-        <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-serif font-bold text-[18px] shrink-0 shadow-sm shadow-primary/25">
-          汉
-        </div>
+        {logoUrl ? (
+          <img
+            src={logoUrl}
+            alt="Hanplay"
+            className="w-8 h-8 object-contain rounded-lg shrink-0"
+          />
+        ) : (
+          <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-serif font-bold text-[18px] shrink-0 shadow-sm shadow-primary/25">
+            汉
+          </div>
+        )}
         <AnimatePresence initial={false}>
           {isExpanded && (
             <motion.span
@@ -206,7 +221,7 @@ function SidebarContent({
               transition={{ duration: 0.16 }}
               className="font-bold text-foreground text-[15px] whitespace-nowrap"
             >
-              HSK Trainer
+              Hanplay
             </motion.span>
           )}
         </AnimatePresence>

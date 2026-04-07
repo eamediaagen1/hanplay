@@ -1,8 +1,9 @@
 import { supabaseAdmin } from "./supabase.js";
 import { logger } from "./logger.js";
 
-export const COVERS_BUCKET = "theme-covers";
-export const FILES_BUCKET  = "theme-assets";
+export const COVERS_BUCKET  = "theme-covers";
+export const FILES_BUCKET   = "theme-assets";
+export const BRAND_BUCKET   = "brand-assets";
 
 /**
  * Ensures both storage buckets exist, creating them if they don't.
@@ -12,6 +13,7 @@ export async function ensureStorageBuckets(): Promise<void> {
   await Promise.all([
     ensureBucket(COVERS_BUCKET, { public: true }),
     ensureBucket(FILES_BUCKET,  { public: false }),
+    ensureBucket(BRAND_BUCKET,  { public: true }),
   ]);
 }
 

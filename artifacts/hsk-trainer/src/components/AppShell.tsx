@@ -7,11 +7,17 @@ import { DecorativeBackground } from "@/components/Decorations";
 import { SidebarProvider, useSidebar } from "@/contexts/sidebar-context";
 import { useInactivityLogout } from "@/hooks/use-inactivity-logout";
 import { cn } from "@/lib/utils";
+import { useBranding, pickLogo } from "@/hooks/use-branding";
+import { useTheme } from "@/hooks/use-theme";
 
 // ─── Mobile topbar (visible below md breakpoint) ──────────────────────────────
 
 function MobileTopbar() {
   const { toggleMobile } = useSidebar();
+  const { data: brandAssets } = useBranding();
+  const { theme } = useTheme();
+  const logoUrl = pickLogo(brandAssets, theme === "dark" ? "light" : "dark") ?? pickLogo(brandAssets, "default");
+
   return (
     <header className="md:hidden fixed top-0 left-0 right-0 z-30 h-[52px] bg-background/95 backdrop-blur-xl border-b border-border/60 flex items-center px-3 gap-3 shadow-sm">
       <button
@@ -21,10 +27,14 @@ function MobileTopbar() {
       >
         <Menu className="w-5 h-5" />
       </button>
-      <div className="w-6 h-6 rounded-md bg-primary text-primary-foreground flex items-center justify-center font-serif font-bold text-sm">
-        汉
-      </div>
-      <span className="font-bold text-foreground text-sm">HSK Trainer</span>
+      {logoUrl ? (
+        <img src={logoUrl} alt="Hanplay" className="w-6 h-6 object-contain rounded" />
+      ) : (
+        <div className="w-6 h-6 rounded-md bg-primary text-primary-foreground flex items-center justify-center font-serif font-bold text-sm">
+          汉
+        </div>
+      )}
+      <span className="font-bold text-foreground text-sm">Hanplay</span>
       <div className="ml-auto">
         <ThemeToggle />
       </div>

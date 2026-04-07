@@ -80,7 +80,7 @@ export default function MarketingPage() {
         <div className="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <span className="text-2xl font-serif text-primary leading-none">汉</span>
-            <span className="font-bold text-foreground tracking-tight">HSK Trainer</span>
+            <span className="font-bold text-foreground tracking-tight">Hanplay</span>
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -615,7 +615,7 @@ export default function MarketingPage() {
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2.5">
             <span className="text-xl font-serif text-primary leading-none">汉</span>
-            <span className="font-semibold text-foreground">HSK Trainer</span>
+            <span className="font-semibold text-foreground">Hanplay</span>
             <span className="hidden sm:inline text-border">·</span>
             <span className="hidden sm:inline">Learn Chinese, one level at a time.</span>
           </div>
@@ -628,7 +628,7 @@ export default function MarketingPage() {
               Sign in
             </button>
             <span className="text-border">·</span>
-            <span className="text-xs text-muted-foreground/60">© {new Date().getFullYear()} HSK Trainer</span>
+            <span className="text-xs text-muted-foreground/60">© {new Date().getFullYear()} Hanplay</span>
           </div>
         </div>
       </footer>
