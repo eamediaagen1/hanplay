@@ -86,7 +86,7 @@ export default function MarketingPage() {
         <div className="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             {logoUrl
-              ? <img src={logoUrl} alt="Hanplay" className="h-7 w-auto object-contain" />
+              ? <img src={logoUrl} alt="Hanplay" className="h-14 w-auto object-contain" />
               : <span className="text-2xl font-serif text-primary leading-none">汉</span>
             }
             {!logoUrl && <span className="font-bold text-foreground tracking-tight">Hanplay</span>}
@@ -624,7 +624,7 @@ export default function MarketingPage() {
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2.5">
             {logoUrl
-              ? <img src={logoUrl} alt="Hanplay" className="h-6 w-auto object-contain" />
+              ? <img src={logoUrl} alt="Hanplay" className="h-10 w-auto object-contain" />
               : <span className="text-xl font-serif text-primary leading-none">汉</span>
             }
             {!logoUrl && <span className="font-semibold text-foreground">Hanplay</span>}
