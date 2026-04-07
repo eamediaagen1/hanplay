@@ -51,8 +51,8 @@ router.get(
       res.status(400).json({ error: "asset_type and filename are required" });
       return;
     }
-    if (!["logo", "favicon"].includes(asset_type)) {
-      res.status(400).json({ error: "asset_type must be logo or favicon" });
+    if (!["logo", "logo_landing", "favicon"].includes(asset_type)) {
+      res.status(400).json({ error: "asset_type must be logo, logo_landing, or favicon" });
       return;
     }
     if (!["default", "light", "dark"].includes(variant)) {
