@@ -1,0 +1,167 @@
+I have a pnpm monorepo project for my SaaS (HSK learning platform).
+
+Structure:
+- artifacts/api-server → backend (Node.js + Supabase)
+- artifacts/mockup-sandbox → frontend (React + Vite)
+
+This SaaS includes:
+- HSK learning system (flashcards, phrases, quizzes, exams)
+- user auth (Supabase)
+- premium access logic (Gumroad-based)
+- admin panel
+- Chinese Themes (premium downloads)
+
+I want to prepare this project for REAL production deployment.
+
+IMPORTANT:
+- Do NOT break any existing functionality
+- Keep all current features working (auth, premium, dashboard, admin, storage)
+
+==================================================
+PART 1 — RENAME FRONTEND
+==================================================
+
+Rename:
+artifacts/mockup-sandbox → artifacts/web
+
+Then update EVERYTHING that depends on it:
+- pnpm-workspace.yaml
+- root package.json
+- imports if needed
+- scripts referencing old path
+
+==================================================
+PART 2 — FRONTEND (WEB) PRODUCTION SETUP
+==================================================
+
+Prepare the frontend (Vite + React) for Vercel deployment.
+
+Requirements:
+- correct build script:
+  "build": "vite build"
+- output directory:
+  dist
+- preview script (optional but clean):
+  "preview": "vite preview"
+
+Environment variables:
+- support .env files
+- ensure usage of VITE_ prefix for frontend vars
+- include:
+  VITE_SUPABASE_URL
+  VITE_SUPABASE_ANON_KEY
+
+Remove anything Replit-specific:
+- no Replit env assumptions
+- no hardcoded localhost URLs
+- no Replit plugins/configs
+
+Ensure:
+- routing works on Vercel (SPA fallback)
+- no broken imports
+
+==================================================
+PART 3 — BACKEND (API SERVER) PRODUCTION SETUP
+==================================================
+
+Prepare api-server for production (Railway / Render).
+
+Requirements:
+- clean start script:
+  "start": "node dist/index.js"
+
+- build script:
+  compile TS if used OR ensure JS runs cleanly
+
+Environment variables:
+- PORT
+- SUPABASE_URL
+- SUPABASE_SERVICE_ROLE_KEY
+
+Rules:
+- no hardcoded values
+- no Replit-specific environment usage
+- server should run independently
+
+Ensure:
+- backend builds to /dist
+- API routes work correctly
+- admin endpoints still protected
+- Gumroad / premium logic still works
+
+==================================================
+PART 4 — REMOVE REPLIT DEPENDENCIES
+==================================================
+
+Remove unnecessary files:
+- .replit
+- replit.nix
+- any Replit-only configs
+
+Ensure nothing breaks after removal.
+
+==================================================
+PART 5 — .GITIGNORE SETUP
+==================================================
+
+Add proper .gitignore for:
+
+Frontend (web):
+- node_modules
+- dist
+- .env
+- .DS_Store
+
+Backend (api-server):
+- node_modules
+- dist
+- .env
+
+Root:
+- node_modules
+- pnpm-lock.yaml (keep or remove based on strategy)
+
+==================================================
+PART 6 — VERIFY PNPM WORKSPACE
+==================================================
+
+Make sure workspace still works:
+
+- pnpm install runs without errors
+- all packages are linked correctly
+- no broken dependencies
+- scripts work from root and per package
+
+==================================================
+PART 7 — DEPLOYMENT INSTRUCTIONS
+==================================================
+
+Provide clear steps for deployment:
+
+A. FRONTEND → Vercel
+- which folder to deploy (artifacts/web)
+- build command
+- output directory
+- env vars to set
+
+B. BACKEND → Railway or Render
+- which folder to deploy (artifacts/api-server)
+- start command
+- env vars to set
+- port handling
+
+==================================================
+PART 8 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. files renamed/updated
+2. config changes made
+3. env variables required
+4. scripts updated
+5. deployment steps (Vercel + Railway/Render)
+6. confirmation everything still works
+
+IMPORTANT:
+This is a real SaaS deployment setup.
+Keep it clean, production-ready, and scalable.
