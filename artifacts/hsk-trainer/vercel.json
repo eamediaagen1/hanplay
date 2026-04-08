@@ -1,6 +1,6 @@
 {
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "https://hanplay.onrender.com/" },
+    { "source": "/api/(.*)", "destination": "https://hanplay.onrender.com/api/:path*" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
