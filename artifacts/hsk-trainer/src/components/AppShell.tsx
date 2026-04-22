@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { Menu } from "lucide-react";
 import { Sidebar } from "@/components/Sidebar";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { NotificationBell } from "@/components/NotificationBell";
+import { DesktopTopbar } from "@/components/DesktopTopbar";
 import { DecorativeBackground } from "@/components/Decorations";
 import { SidebarProvider, useSidebar } from "@/contexts/sidebar-context";
 import { useInactivityLogout } from "@/hooks/use-inactivity-logout";
@@ -35,7 +37,8 @@ function MobileTopbar() {
         </div>
       )}
       <span className="font-bold text-foreground text-sm">Hanplay</span>
-      <div className="ml-auto">
+      <div className="ml-auto flex items-center gap-1">
+        <NotificationBell />
         <ThemeToggle />
       </div>
     </header>
@@ -51,9 +54,8 @@ function AppContent({ children }: { children: ReactNode }) {
     <motion.main
       className={cn(
         "min-h-screen w-full flex flex-col",
-        "pt-[52px] md:pt-0",
+        "pt-[52px] md:pt-[60px]",
         "transition-[padding-left] duration-200 ease-in-out",
-        "md:pl-[64px]",
         isExpanded ? "md:pl-[240px]" : "md:pl-[64px]"
       )}
     >
@@ -71,6 +73,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <DecorativeBackground />
         <Sidebar />
         <MobileTopbar />
+        <DesktopTopbar />
         <AppContent>{children}</AppContent>
       </div>
     </SidebarProvider>

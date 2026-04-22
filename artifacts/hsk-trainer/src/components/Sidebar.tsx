@@ -13,6 +13,8 @@ import {
   ExternalLink,
   Sparkles,
   Palette,
+  Users,
+  CreditCard,
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useSidebar } from "@/contexts/sidebar-context";
@@ -53,6 +55,8 @@ function getNavSections(isPremium: boolean): NavSection[] {
     {
       title: "Account",
       items: [
+        { label: "Membership",      icon: CreditCard,      href: "/membership" },
+        { label: "Affiliate",       icon: Users,           href: "/affiliate" },
         { label: "Settings",        icon: Settings,        href: "/settings" },
         ...(isPremium
           ? [{ label: "Chinese Themes", icon: Palette, href: "/chinese-themes" }]
@@ -320,25 +324,6 @@ function SidebarContent({
               <TooltipContent side="right" sideOffset={8}>Upgrade to Premium</TooltipContent>
             </Tooltip>
           )
-        )}
-      </div>
-
-      {/* Theme toggle */}
-      <div className="px-2 pb-1 shrink-0">
-        {isExpanded ? (
-          <div className="flex items-center gap-3 px-3 py-1.5 rounded-xl">
-            <span className="text-sm text-muted-foreground flex-1">Theme</span>
-            <ThemeToggle />
-          </div>
-        ) : (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="flex justify-center py-1.5">
-                <ThemeToggle />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="right" sideOffset={8}>Toggle theme</TooltipContent>
-          </Tooltip>
         )}
       </div>
 

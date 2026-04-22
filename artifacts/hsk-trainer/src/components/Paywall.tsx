@@ -7,10 +7,10 @@ import { buildGumroadUrl } from "@/lib/gumroad";
 import { getStoredReferralCode } from "@/hooks/use-referral-capture";
 
 const FEATURES = [
-  { icon: BookOpen, text: "All 6 HSK levels — 5,000+ vocabulary words" },
-  { icon: Brain,    text: "Full quiz mode with 20-question sessions" },
-  { icon: Star,     text: "Spaced-repetition review for every word you save" },
-  { icon: BarChart3, text: "Progress tracking across all levels" },
+  { icon: BookOpen,  text: "All 6 HSK levels — 5,000+ vocabulary words" },
+  { icon: Brain,     text: "Full quiz mode and spaced repetition review" },
+  { icon: Star,      text: "Flashcard decks and phrase practice, every level" },
+  { icon: BarChart3, text: "Exam-based progression and progress tracking" },
 ];
 
 interface PaywallProps {
@@ -21,7 +21,7 @@ interface PaywallProps {
 
 export function Paywall({
   heading = "Unlock Full Access",
-  subheading = "All HSK levels, full quizzes, and progress tracking — with a single one-time purchase.",
+  subheading = "All 6 HSK levels, full quizzes, and spaced repetition — $9.99/year.",
   showDemo = true,
 }: PaywallProps) {
   const [, navigate] = useLocation();
@@ -41,7 +41,7 @@ export function Paywall({
         qc.invalidateQueries({ queryKey: ["profile"] });
       }
     } catch {
-      setSyncMsg("Sync failed. Please try again.");
+      setSyncMsg("Couldn't connect. Please try again.");
     } finally {
       setSyncing(false);
     }
@@ -71,12 +71,12 @@ export function Paywall({
           </ul>
 
           <a
-            href={buildGumroadUrl(getStoredReferralCode())}
+            href={buildGumroadUrl(null, getStoredReferralCode())}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-bold text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-md shadow-primary/20 mb-3"
           >
-            Upgrade to Premium
+            Get full access — $9.99/year
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
 
@@ -86,7 +86,7 @@ export function Paywall({
             className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-medium border border-border hover:bg-muted transition-colors disabled:opacity-60 mb-2"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin" : ""}`} />
-            {syncing ? "Syncing…" : "I already purchased — sync access"}
+            {syncing ? "Checking your purchase…" : "Already purchased? Restore my access"}
           </button>
 
           {syncMsg && (
@@ -98,7 +98,7 @@ export function Paywall({
               onClick={() => navigate("/demo")}
               className="w-full text-xs text-center text-muted-foreground hover:text-foreground transition-colors mt-3"
             >
-              Not ready? Try the free demo →
+              Want to try first? Explore the demo →
             </button>
           )}
         </div>

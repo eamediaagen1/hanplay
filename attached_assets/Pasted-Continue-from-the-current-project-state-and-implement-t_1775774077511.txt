@@ -1,0 +1,208 @@
+Continue from the current project state and implement these auth/account UX fixes carefully without breaking existing auth, premium logic, dashboard routing, onboarding flow, or admin features.
+
+GOAL
+Improve the full auth/account experience by fixing:
+- reset password
+- change password
+- forgot password
+- magic link
+- signup UX
+- onboarding form success flow
+- support email replacement
+- smoother sign-in UI
+
+IMPORTANT
+- Do not break current login/signup/session flow
+- Keep Supabase auth working
+- Keep onboarding-before-dashboard logic working
+- Make the experience cleaner and more user-friendly
+- If DB/schema changes are needed, add proper migration(s)
+
+==================================================
+PART 1 — FIX MAGIC LINK
+==================================================
+
+Audit and fix the magic link flow.
+
+Current requirement:
+- magic link should work correctly end to end
+- callback/redirect should not break
+- no white screen / broken redirect
+- verified user should land in the correct next step
+
+Desired routing logic:
+- if user is authenticated but onboarding is incomplete → onboarding form
+- if user is authenticated and onboarding is complete → dashboard
+- if auth state is invalid/expired → sign in page
+
+Please audit:
+- magic link callback handling
+- redirect URLs
+- Supabase session restoration
+- route guards
+- auth state timing
+- dashboard/onboarding redirect logic
+
+==================================================
+PART 2 — ADD FORGOT PASSWORD
+==================================================
+
+Add “Forgot password?” to the sign-in page.
+
+Requirements:
+- visible and easy to find
+- opens a reset password flow using Supabase
+- user enters email
+- user receives reset password email
+- smooth success/error feedback
+- use existing app branding
+
+Suggested routes:
+- /forgot-password
+- /reset-password
+
+If a better structure already exists in the app, adapt to it.
+
+==================================================
+PART 3 — ADD RESET PASSWORD FLOW
+==================================================
+
+Implement full reset-password flow.
+
+Requirements:
+- user clicks email link
+- returns to app properly
+- can set a new password
+- sees clear success/error state
+- is redirected safely afterward
+
+Fix any callback/auth issues that would break this flow.
+
+==================================================
+PART 4 — ADD CHANGE PASSWORD IN SETTINGS
+==================================================
+
+Inside Settings, add a section to change password.
+
+Requirements:
+- current password field if needed by current auth flow
+- new password
+- confirm new password
+- clear save/update button
+- success/error feedback
+- simple clean UI
+
+If Supabase supports direct secure password update for current session, use that cleanly.
+
+==================================================
+PART 5 — SIGN UP UX FIXES
+==================================================
+
+Improve the signup form.
+
+Requirements:
+- fields:
+  - name
+  - email
+  - password
+  - re-enter password
+- better validation
+- passwords must match
+- clear errors
+- better loading state
+- polished submit behavior
+
+Also fix the form after signup / before dashboard:
+- the onboarding form submit / success button currently needs fixing
+- make sure the success/continue button works correctly
+- after form submit, user should proceed cleanly to dashboard
+- no blank page / stuck state
+
+==================================================
+PART 6 — SIGN IN PAGE UI SMOOTHNESS
+==================================================
+
+Improve the sign-in page UI.
+
+Requirements:
+- do not use big field titles/labels above inputs if not needed
+- use placeholders inside inputs instead
+- make it feel smoother, cleaner, more modern
+- still keep accessibility reasonable
+- improve spacing and visual hierarchy
+
+Apply similar polish to signup/forgot/reset forms if it fits naturally.
+
+==================================================
+PART 7 — SUPPORT EMAIL UPDATE
+==================================================
+
+Replace the contact/support email everywhere in the app with:
+
+contact@hanplay.online
+
+Audit and update all occurrences across the SaaS, including:
+- landing page
+- footer
+- contact section
+- membership/help/support text
+- auth pages if shown
+- settings/help if shown
+- any mailto links
+
+Important:
+Replace all old support emails consistently.
+
+==================================================
+PART 8 — SETTINGS / ACCOUNT IMPROVEMENT
+==================================================
+
+In Settings, make the account/security area more complete.
+
+Include:
+- change password section
+- current email display
+- support/contact text using contact@hanplay.online
+- clear account/security grouping
+
+Keep it simple and clean.
+
+==================================================
+PART 9 — ROUTING / AUTH SAFETY
+==================================================
+
+Make sure these flows all work safely:
+- sign in
+- sign up
+- magic link
+- forgot password
+- reset password
+- onboarding form
+- dashboard redirect
+- settings password change
+
+No:
+- white screens
+- broken redirects
+- dead-end routes
+- invalid session loops
+
+==================================================
+PART 10 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. what auth/account flows were fixed
+2. what pages/routes were added or updated
+3. whether magic link is now working correctly
+4. how forgot/reset password flow works now
+5. how change password works in settings
+6. where support email was updated
+7. any migration(s) added
+8. files changed
+9. any manual setup steps I still need to do in Supabase
+
+IMPORTANT
+- Implement the changes, not just describe them
+- Keep the auth UX polished and launch-ready
+- Do not break the rest of the app

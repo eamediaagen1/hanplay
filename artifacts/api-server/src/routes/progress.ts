@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { supabaseAdmin } from "../lib/supabase.js";
 import { requireAuth, requirePremium } from "../middleware/auth.js";
-import { hskData } from "../data/hskData.js";
 import { checkProgression } from "../lib/levelAccess.js";
+import { buildAllVocabMap } from "../lib/vocabularyService.js";
 
 const router = Router();
 
@@ -25,9 +25,11 @@ router.get("/progress", requireAuth, async (req, res) => {
     return;
   }
 
-  // Enrich each row with the word details from the local data source
+  // Build a Map for O(1) lookups (prefers Supabase vocabulary table, falls back to static)
+  const vocabMap = await buildAllVocabMap();
+
   const enriched = (data as SavedWordRow[]).map((row) => {
-    const word = hskData.find((w) => w.id === row.word_id);
+    const word = vocabMap.get(row.word_id);
     return { ...row, ...(word ?? {}) };
   });
 
@@ -130,7 +132,6 @@ router.get("/progress/levels", requireAuth, async (req, res) => {
     .order("level", { ascending: true });
 
   if (error) {
-    // Table may not exist yet (migration pending) — return empty array so UI degrades gracefully
     res.json([]);
     return;
   }
@@ -139,12 +140,6 @@ router.get("/progress/levels", requireAuth, async (req, res) => {
 });
 
 // POST /api/progress/exam — record a quiz/exam result and unlock next level
-// Body: { level: 1-6, correct: number, total: number }
-//
-// Sticky-pass rule:
-//   - exam_passed and completed_at are NEVER downgraded once set to true/non-null.
-//   - exam_score records the best (highest) score ever achieved.
-//   - Retrying and failing does NOT re-lock the next level.
 router.post("/progress/exam", requireAuth, requirePremium, async (req, res) => {
   const { level, correct, total } = req.body as {
     level?: number;
@@ -161,7 +156,6 @@ router.post("/progress/exam", requireAuth, requirePremium, async (req, res) => {
     return;
   }
 
-  // Progression gate: user must have passed all prior levels to sit this exam
   const progression = await checkProgression(req.user!.id, level);
   if (!progression.allowed) {
     res.status(403).json({ error: progression.reason });
@@ -172,7 +166,6 @@ router.post("/progress/exam", requireAuth, requirePremium, async (req, res) => {
   const passed = scorePct >= 70;
   const now = new Date().toISOString();
 
-  // Fetch the existing record so we can apply sticky-pass logic
   const { data: existing } = await supabaseAdmin
     .from("level_progress")
     .select("exam_passed, exam_score, completed_at")
@@ -180,13 +173,11 @@ router.post("/progress/exam", requireAuth, requirePremium, async (req, res) => {
     .eq("level", level)
     .maybeSingle();
 
-  // Sticky: once passed, always passed — retrying and failing must not roll back
   const wasAlreadyPassed = existing?.exam_passed === true;
   const stickyPassed     = wasAlreadyPassed || passed;
   const stickyCompleted  = wasAlreadyPassed
-    ? existing!.completed_at               // keep the original completion timestamp
+    ? existing!.completed_at
     : (passed ? now : null);
-  // Always record the best score ever achieved
   const bestScore = Math.max(scorePct, existing?.exam_score ?? 0);
 
   const { error } = await supabaseAdmin

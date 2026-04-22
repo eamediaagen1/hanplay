@@ -1,0 +1,322 @@
+Continue from the current project state.
+
+I need you to implement and fix the COMPLETE signup + premium activation/payment flow for my SaaS in a production-ready way.
+
+IMPORTANT:
+Do NOT break existing auth, premium logic, dashboard, admin, Chinese Themes, or current routes.
+Keep everything working while improving the full flow.
+
+My stack:
+- Frontend: Vercel
+- Backend API: Render
+- Database/Auth: Supabase
+- Payments/Product Sales: Gumroad
+
+==================================================
+PART 1 — FIX SIGNUP / WHITE SCREEN / ONBOARDING BUG
+==================================================
+
+Current issue:
+- After signup, user enters:
+  - name
+  - email
+  - password
+- Redirect URL goes to dashboard
+- But page becomes white / blank
+- Onboarding form is broken / not appearing correctly
+
+GOAL:
+Fix signup → verification → onboarding → dashboard flow completely.
+
+Please:
+- audit full signup/auth flow
+- find the REAL root cause
+- fix white screen bug properly
+- do NOT guess
+
+Check:
+- signup form logic
+- auth redirect logic
+- profile creation timing
+- onboarding form routing
+- dashboard guards
+- missing/null profile row
+- async fetch/loading issue
+- route loops
+- auth callback timing
+
+Desired flow:
+1. User signs up
+2. Email verification handled properly
+3. If onboarding incomplete → go to onboarding form
+4. After onboarding complete → go dashboard
+5. No white screen / blank page
+
+==================================================
+PART 2 — IMPROVE SIGNUP UX
+==================================================
+
+Make signup more polished/user-friendly.
+
+Improve:
+- form layout
+- spacing
+- labels
+- placeholders
+- validation
+- loading states
+- success/error messaging
+- responsiveness
+
+Expected signup fields:
+- name
+- email
+- password
+
+If DB/profile schema needs updates:
+- add migrations cleanly
+- preserve old users/data
+
+==================================================
+PART 3 — PREMIUM PAYMENT SYSTEM
+==================================================
+
+Build the COMPLETE premium Gumroad payment + activation system.
+
+Business rules:
+- Premium = $9.99/year
+- Gumroad generates a license key per purchase
+- 1 license = 1 premium account
+- 1 user = 1 premium row
+- Premium lasts 1 year
+- Repurchase extends:
+  max(current expiry, now) + 1 year
+
+GOAL UX:
+1. User signs in
+2. Clicks Upgrade
+3. Goes to Gumroad
+4. Pays
+5. Returns
+6. Premium auto activates
+
+IMPORTANT:
+Buy flow must begin from INSIDE logged-in app.
+
+Pass logged-in Supabase user ID to Gumroad in:
+- member field
+
+==================================================
+PART 4 — SUPABASE PREMIUM DATABASE
+==================================================
+
+Create SQL migration for:
+
+Table:
+premium_access
+
+Fields:
+- id
+- user_id
+- license_key
+- gumroad_product_id
+- gumroad_sale_id
+- buyer_email
+- status
+- starts_at
+- expires_at
+- created_at
+- updated_at
+
+Rules:
+- unique license_key
+- unique user_id
+- statuses:
+  - active
+  - expired
+  - revoked
+- indexes where needed
+- updated_at trigger
+- RLS policies:
+  - users read only own row
+  - only service role writes
+
+==================================================
+PART 5 — GUMROAD WEBHOOK
+==================================================
+
+Create backend endpoint:
+
+POST /api/webhooks/gumroad
+
+Must:
+- accept Gumroad webhook payload
+- support form encoded payload
+- extract:
+  - license_key
+  - product_id
+  - sale_id
+  - email
+  - member
+- member = Supabase user id
+- verify Gumroad license with Gumroad verify API
+- use increment_uses_count=false
+- reject invalid verification
+- reject missing fields
+
+Logic:
+- if no premium row → create
+- if premium row exists → extend expiry
+- ensure one license cannot belong to multiple users
+- make webhook idempotent
+- duplicate webhooks must not break anything
+
+==================================================
+PART 6 — RESTORE PREMIUM / LICENSE KEY ACTIVATION
+==================================================
+
+Build backup restore-premium flow.
+
+Purpose:
+If auto activation fails, user can manually paste Gumroad license key.
+
+Create backend endpoint:
+
+POST /api/premium/restore
+
+Must:
+- require authenticated user
+- accept pasted license key
+- verify with Gumroad API
+- attach to logged in user
+- reject if key belongs to another user
+- activate/extend premium
+
+==================================================
+PART 7 — FRONTEND BUY BUTTON
+==================================================
+
+Create Upgrade button logic.
+
+Requirements:
+- require logged-in user
+- fetch current user from Supabase
+- redirect to Gumroad
+- pass user.id in member param
+- loading state
+- error if not logged in
+
+==================================================
+PART 8 — PURCHASE SUCCESS PAGE
+==================================================
+
+Create:
+/billing/success
+
+Flow:
+- “We’re confirming your purchase…”
+- poll for premium activation briefly
+- if active → success message
+- if delayed → helpful fallback message
+- dashboard button
+- Restore Premium fallback button
+
+==================================================
+PART 9 — RESTORE PREMIUM PAGE
+==================================================
+
+Create:
+/billing/restore
+
+Requirements:
+- paste license key input
+- activate button
+- clear success/error messages
+- clean UX
+- mobile responsive
+
+==================================================
+PART 10 — MEMBERSHIP / LICENSE UI
+==================================================
+
+Update Membership page to show:
+- plan
+- activation date
+- expiry date
+- premium status
+- premium source
+- restore premium button if needed
+
+For FREE users:
+Show:
+- “Purchased on Gumroad? Activate your license.”
+- input + activate button
+
+For PREMIUM users:
+Hide activation input unless useful.
+
+==================================================
+PART 11 — PREMIUM STATUS CHECK
+==================================================
+
+Create reusable frontend helper/hook:
+
+Must:
+- query premium_access table
+- determine isPremium
+
+Conditions:
+- row exists
+- status=active
+- expires_at > now
+
+==================================================
+PART 12 — SECURITY
+==================================================
+
+Implement securely.
+
+Must:
+- never trust frontend premium state
+- no frontend DB writes to premium_access
+- service role only on backend
+- validate all inputs
+- reject invalid/reused licenses
+- protect against duplicate webhook retries
+- protect against account/license stealing
+
+==================================================
+PART 13 — ENV VARIABLES
+==================================================
+
+Provide .env examples for:
+
+- SUPABASE_URL
+- SUPABASE_ANON_KEY
+- SUPABASE_SERVICE_ROLE_KEY
+- GUMROAD_PRODUCT_ID
+- GUMROAD_VERIFY_URL
+- GUMROAD_PRODUCT_URL
+- APP_BASE_URL
+
+==================================================
+PART 14 — OUTPUT REQUIRED
+==================================================
+
+At the end provide:
+
+1. Root cause of white screen
+2. Signup flow changes
+3. Onboarding routing changes
+4. SQL migrations added
+5. Backend/API files created
+6. Frontend files/pages created
+7. Env vars needed
+8. Setup instructions
+9. Test checklist
+10. Common failure cases/fixes
+
+IMPORTANT:
+Do NOT only explain.
+Generate/implement the real code/files needed.
+Keep it production-ready, secure, and launch-ready.

@@ -29,6 +29,15 @@ export const syncLimiter = rateLimit({
   message: message("Too many sync requests. Please wait."),
 });
 
+/** License key activation – 5 req per 10 min per IP */
+export const activateLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: message("Too many activation attempts. Please wait before trying again."),
+});
+
 /** Gumroad webhook – 30 req per 1 min per IP */
 export const webhookLimiter = rateLimit({
   windowMs: 60 * 1000,

@@ -374,7 +374,7 @@ export default function QuizPage() {
         {phase !== "quiz" && <div className="w-16" />}
       </header>
 
-      <main className="flex-1 flex flex-col items-center justify-center p-4 md:p-8 w-full max-w-2xl mx-auto">
+      <main className="flex-1 flex flex-col items-center sm:justify-center p-4 md:p-8 pt-4 pb-24 sm:pb-8 w-full max-w-2xl mx-auto">
         <AnimatePresence mode="wait">
 
           {/* ── Quiz phase ─────────────────────────────────────── */}
@@ -388,7 +388,7 @@ export default function QuizPage() {
               className="w-full"
             >
               {/* Progress bar + counter */}
-              <div className="mb-5">
+              <div className="mb-3 sm:mb-5">
                 <div className="flex justify-between text-sm font-medium text-muted-foreground mb-2">
                   <span className="text-xs">{QUESTION_LABELS[currentQuestion.type]}</span>
                   <span className="tabular-nums text-xs font-semibold">
@@ -405,19 +405,19 @@ export default function QuizPage() {
               </div>
 
               {/* Prompt card */}
-              <div className="bg-card border border-border/50 rounded-2xl p-8 md:p-10 shadow-lg mb-5 text-center relative overflow-hidden">
+              <div className="bg-card border border-border/50 rounded-2xl p-5 sm:p-8 md:p-10 shadow-lg mb-3 sm:mb-5 text-center relative overflow-hidden">
                 <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary via-gold to-primary" />
                 {currentQuestion.type === "char-to-meaning" ? (
-                  <p className="text-8xl font-serif text-foreground leading-none">{currentQuestion.prompt}</p>
+                  <p className="text-5xl sm:text-8xl font-serif text-foreground leading-none">{currentQuestion.prompt}</p>
                 ) : currentQuestion.type === "pinyin-to-char" ? (
-                  <p className="text-3xl font-medium text-primary tracking-widest">{currentQuestion.prompt}</p>
+                  <p className="text-xl sm:text-3xl font-medium text-primary tracking-widest">{currentQuestion.prompt}</p>
                 ) : (
-                  <p className="text-3xl font-bold text-foreground">{currentQuestion.prompt}</p>
+                  <p className="text-xl sm:text-3xl font-bold text-foreground">{currentQuestion.prompt}</p>
                 )}
               </div>
 
               {/* Choices */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                 {currentQuestion.choices.map((choice, i) => {
                   const isThisSelected = selected === choice;
                   const isThisCorrect = choice === currentQuestion.correctAnswer;
@@ -439,7 +439,7 @@ export default function QuizPage() {
                       onClick={() => handleSelect(choice)}
                       disabled={isAnswered}
                       className={cn(
-                        "relative flex items-center gap-3 px-4 py-3.5 rounded-xl border-2 font-medium text-left transition-all duration-200",
+                        "relative flex items-center gap-3 px-3 py-3 sm:px-4 sm:py-3.5 rounded-xl border-2 font-medium text-left transition-all duration-200",
                         choiceStyle,
                         !isAnswered && "cursor-pointer"
                       )}
@@ -457,13 +457,13 @@ export default function QuizPage() {
                 })}
               </div>
 
-              {/* Feedback + Next */}
+              {/* Feedback + Next (desktop only — mobile uses sticky bottom bar) */}
               <AnimatePresence>
                 {isAnswered && (
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mt-5 flex flex-col items-center gap-3"
+                    className="mt-5 hidden sm:flex flex-col items-center gap-3"
                   >
                     <p className={cn("text-sm font-semibold", isCorrect ? "text-green-600 dark:text-green-400" : "text-destructive")}>
                       {isCorrect
@@ -645,6 +645,32 @@ export default function QuizPage() {
           )}
         </AnimatePresence>
       </main>
+
+      {/* ── Mobile sticky Next button (sm:hidden) ──────────────── */}
+      <AnimatePresence>
+        {phase === "quiz" && isAnswered && currentQuestion && (
+          <motion.div
+            initial={{ y: 80, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 80, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="fixed bottom-0 inset-x-0 z-50 sm:hidden bg-background/95 backdrop-blur-xl border-t border-border shadow-xl px-4 pt-3 pb-6"
+          >
+            <p className={cn(
+              "text-sm font-semibold text-center mb-2.5",
+              isCorrect ? "text-green-600 dark:text-green-400" : "text-destructive"
+            )}>
+              {isCorrect ? "✓ Correct!" : `✗ Correct: ${currentQuestion.correctAnswer}`}
+            </p>
+            <button
+              onClick={handleNext}
+              className="w-full py-3.5 rounded-xl font-bold bg-primary text-primary-foreground shadow-md shadow-primary/25 active:scale-[0.98] transition-all"
+            >
+              {currentIndex + 1 < questions.length ? "Next →" : "See Results"}
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -1,0 +1,99 @@
+Continue from the current Hanplay project state.
+
+Before making any vocabulary/content changes, I want a FULL AUDIT of the current old vocabulary system only.
+
+Do NOT implement migrations or refactors yet.
+
+GOAL:
+Understand exactly how the current content/data system works today so we can upgrade it safely later.
+
+==================================================
+AUDIT SCOPE
+==================================================
+
+Please inspect the entire project and map how vocabulary/content currently works.
+
+Check all current systems related to:
+
+- HSK1 to HSK6 word data
+- flashcards
+- quizzes
+- phrases
+- exams
+- level pages
+- progress/resume logic tied to vocabulary
+- dashboard continue links tied to learning data
+
+==================================================
+SPECIFIC THINGS TO FIND
+==================================================
+
+1. Where vocabulary data is stored now:
+- static files
+- JSON
+- TS arrays
+- constants
+- database tables
+- mixed sources
+
+2. How levels are structured:
+- separate file per level?
+- grouped by feature?
+- duplicated data across flashcards/quizzes?
+
+3. Flashcards:
+- what files/components load flashcard data
+- how next/prev card logic works
+- how progress is saved
+- how resume works
+
+4. Quizzes / Exams:
+- where quiz questions come from
+- whether they reuse vocabulary or separate data
+- how level-specific quizzes are built
+
+5. Phrases:
+- where phrases data lives
+- if separate from vocabulary
+
+6. Dashboard:
+- how current level / continue bar determines next route
+- whether tied to static data or DB state
+
+7. Performance / Maintainability:
+- duplicated content sources
+- hardcoded level logic
+- repeated arrays/files
+- scalability problems for HSK5/HSK6 large datasets
+
+8. Risks for migration:
+- what could break if we move to Supabase
+- dependencies on old static structure
+- components tightly coupled to old data shape
+
+==================================================
+OUTPUT FORMAT
+==================================================
+
+Provide a clean report with:
+
+1. Current vocabulary architecture overview
+2. Exact files/folders involved
+3. How flashcards currently work
+4. How quizzes currently work
+5. How phrases currently work
+6. How progress/resume currently works
+7. Biggest technical debt/problems
+8. Best migration path with LOWEST risk
+9. Which parts should migrate first
+10. Which parts should stay unchanged initially
+
+==================================================
+IMPORTANT
+==================================================
+
+- This is AUDIT ONLY
+- Do not refactor yet
+- Do not create migrations yet
+- Understand the current Hanplay codebase first
+- I want a professional technical assessment before changing the vocabulary system

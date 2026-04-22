@@ -1,0 +1,292 @@
+Continue from the current project state and implement the following carefully without breaking existing auth, premium logic, dashboard progression, admin, Chinese Themes, or deployment setup.
+
+GOAL
+Add missing product/business pages and improve UX so the app feels more complete and launch-ready.
+
+IMPORTANT
+- Do not break current functionality
+- Reuse existing components and patterns where possible
+- Keep the app clean and production-oriented
+- Update all old “HSK free” messaging to match the current business model
+- Use the new Gumroad link everywhere:
+  https://hanplay.gumroad.com/l/hanplay-premium
+
+==================================================
+PART 1 — MAINTENANCE PAGE
+==================================================
+
+Create a Maintenance page.
+
+Purpose:
+- a clean page to show when the app is under maintenance
+- usable later if I want to temporarily disable the app
+
+Suggested route:
+- /maintenance
+
+Requirements:
+- simple polished design
+- message like:
+  - “We’re improving Hanplay”
+  - “We’ll be back soon”
+- optional support/contact note
+- consistent with app branding
+
+Do not wire full maintenance-mode switching unless the current app already supports a global flag.
+For now, create the page and structure cleanly.
+
+==================================================
+PART 2 — AFFILIATE PAGE IN SIDEBAR
+==================================================
+
+Create an Affiliate page and add it to the authenticated sidebar.
+
+Suggested route:
+- /affiliate
+
+Purpose:
+- explain the affiliate/referral program
+- show user’s affiliate/referral info if available
+- if referral system already exists, surface it here more cleanly
+
+Minimum content:
+- page header
+- short explanation of the affiliate program
+- referral code/link if available
+- referral count if available
+- copy button
+- simple clean layout
+
+If referral data already exists, wire it in.
+If not fully implemented, still create the page structure and connect whatever already exists.
+
+==================================================
+PART 3 — NOTIFICATIONS BUTTON
+==================================================
+
+Add a notifications button to the app UI.
+
+Requirements:
+- place it in a sensible global location (top bar/header area)
+- use a clean icon/button
+- if notifications data does not fully exist yet, create a placeholder dropdown/panel with a polished empty state:
+  - “No notifications yet”
+- keep it launch-ready and clean
+
+Do not overbuild a full notification system unless current backend/data already supports it.
+
+==================================================
+PART 4 — MEMBERSHIP PAGE
+==================================================
+
+Create a Membership page where users can see their subscription/access info.
+
+Suggested route:
+- /membership
+
+Requirements:
+Show useful account access details such as:
+- current plan: Free / Premium
+- activation/access date
+- premium source if available
+- status
+- optional license activation status if implemented
+- button to upgrade if free
+- confirmation message if premium
+
+Use real data where available:
+- premium_granted_at
+- premium_source
+- is_premium
+- other existing membership fields
+
+Keep it clean and clear.
+
+==================================================
+PART 5 — DASHBOARD UI/UX IMPROVEMENT
+==================================================
+
+Improve the Dashboard layout and overall structure.
+
+Current goal:
+- make layout better
+- more balanced
+- more polished
+- better hierarchy
+- cleaner sections
+- avoid awkward spacing or weak alignment
+
+Focus on:
+- header/greeting area
+- continue bar
+- streak card
+- level cards
+- quick actions
+- overall vertical rhythm
+- desktop + mobile balance
+
+Do not redesign the business logic.
+Improve UI/UX and layout polish.
+
+==================================================
+PART 6 — LANDING PAGE: SHORTER + MORE ATTRACTIVE
+==================================================
+
+Update the landing page so it becomes:
+- shorter
+- more attractive
+- more focused
+- less verbose
+- more conversion-friendly
+
+Requirements:
+- improve hero
+- simplify copy
+- reduce unnecessary length
+- keep it visually strong
+- keep it modern and premium
+- make value proposition clear quickly
+
+==================================================
+PART 7 — LANDING PAGE NAVBAR / SECTIONS
+==================================================
+
+On the landing page:
+
+1. Add:
+- Contact Us
+- About
+
+2. Center the menu items in the navbar
+
+Make navbar feel cleaner and more polished.
+
+If Contact and About are section anchors on the landing page, that is acceptable.
+If separate pages fit the current structure better, that is also acceptable.
+
+==================================================
+PART 8 — REMOVE OLD “HSK FREE” MESSAGING
+==================================================
+
+Important:
+Change all outdated messaging that says HSK is free.
+
+I want you to audit the app and landing page and remove/replace any messaging that still suggests:
+- HSK1 is free
+- levels are free
+- old freemium wording that no longer matches the product
+
+Update messaging to match the current business model:
+- premium unlocks full access
+- free users use limited/demo or activation flow
+- no outdated “HSK1 free” language
+
+Check especially:
+- landing page
+- pricing page
+- dashboard banners
+- upgrade/paywall text
+- old feature descriptions
+- any public marketing copy
+
+==================================================
+PART 9 — UNIQUE CODE ACTIVATION / LICENSE KEY
+==================================================
+
+Add a license key activation section for free users only.
+
+Goal:
+Users who bought through Gumroad can enter the license key they received and get premium access automatically.
+
+Requirements:
+- show this activation section only for FREE users
+- allow user to paste a Gumroad license key
+- validate/activate access using the current backend/payment setup
+- if valid, grant premium automatically
+- update user membership state immediately
+- show success/error feedback cleanly
+
+Suggested placement:
+- Membership page
+OR
+- Dashboard banner/card for free users
+
+Preferred UX:
+- simple input
+- “Activate License” button
+- short explanation:
+  - “Purchased on Gumroad? Enter your license key to unlock access.”
+
+Important:
+- implement securely
+- do not trust frontend alone
+- use backend verification
+- integrate with existing Gumroad/premium logic where possible
+
+If Gumroad verification requires a specific API or endpoint not yet implemented, add the backend route/logic needed.
+
+==================================================
+PART 10 — UPDATE ALL PREMIUM/BUY LINKS
+==================================================
+
+Replace all old Gumroad links with this new one:
+
+https://hanplay.gumroad.com/l/hanplay-premium
+
+Audit and update all relevant places:
+- landing page
+- pricing page
+- upgrade buttons
+- paywalls
+- dashboard upgrade banners
+- membership page
+- anywhere else “Get Premium” appears
+
+Make sure all premium CTAs now point to the new link.
+
+==================================================
+PART 11 — SIDEBAR / NAVIGATION
+==================================================
+
+Update the authenticated sidebar cleanly.
+
+Add:
+- Affiliate
+- Membership
+- Notifications button in appropriate header/top area
+
+Keep navigation organized and avoid clutter.
+
+==================================================
+PART 12 — SECURITY / DATA RULES
+==================================================
+
+Verify:
+- license activation only grants access after secure validation
+- free users only see activation input
+- premium users do not see unnecessary activation UI
+- membership page uses real user data
+- affiliate page only shows the current user’s own referral/affiliate data
+- no broken routing or dead links
+
+==================================================
+PART 13 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. pages added
+2. sidebar/navbar changes
+3. dashboard UI/UX changes
+4. landing page changes
+5. old free messaging removed/updated
+6. license activation flow added
+7. backend/API changes for activation if any
+8. all places where Gumroad link was updated
+9. files changed
+10. any manual steps still needed
+
+IMPORTANT
+- Keep it polished
+- Keep it production-ready
+- Do not overengineer
+- Implement the changes, not just describe them

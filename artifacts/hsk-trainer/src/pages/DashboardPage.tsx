@@ -128,11 +128,11 @@ function QuickAction({
     return (
       <div
         aria-disabled="true"
-        className="relative flex items-center gap-3 rounded-2xl border border-border/40 bg-muted/30 p-4 text-left opacity-50 cursor-not-allowed select-none"
+        className="relative flex items-center gap-3 lg:gap-4 rounded-2xl border border-border/40 bg-muted/30 p-4 lg:p-5 text-left opacity-50 cursor-not-allowed select-none"
       >
         <Lock className="w-5 h-5 text-muted-foreground/60 shrink-0" />
         <div>
-          <p className="text-sm font-semibold text-foreground/60 leading-tight">{label}</p>
+          <p className="text-sm lg:text-base font-semibold text-foreground/60 leading-tight">{label}</p>
           <p className="text-xs text-muted-foreground mt-0.5">{sub}</p>
         </div>
       </div>
@@ -143,7 +143,7 @@ function QuickAction({
       onClick={onClick}
       disabled={!onClick}
       className={cn(
-        "relative flex items-center gap-3 rounded-2xl border p-4 text-left shadow-sm transition-all duration-200",
+        "relative flex items-center gap-3 lg:gap-4 rounded-2xl border p-4 lg:p-5 text-left shadow-sm transition-all duration-200",
         onClick
           ? "border-border/60 bg-card hover:border-primary/30 hover:shadow-md cursor-pointer"
           : "border-border/40 bg-muted/30 opacity-50 cursor-not-allowed",
@@ -154,9 +154,9 @@ function QuickAction({
           {badge > 9 ? "9+" : badge}
         </span>
       )}
-      <Icon className={cn("w-5 h-5 shrink-0", onClick ? "text-primary" : "text-muted-foreground")} />
+      <Icon className={cn("w-5 h-5 lg:w-6 lg:h-6 shrink-0", onClick ? "text-primary" : "text-muted-foreground")} />
       <div>
-        <p className="text-sm font-semibold text-foreground leading-tight">{label}</p>
+        <p className="text-sm lg:text-base font-semibold text-foreground leading-tight">{label}</p>
         <p className="text-xs text-muted-foreground mt-0.5">{sub}</p>
       </div>
     </button>
@@ -191,7 +191,7 @@ function LevelCard({
   const isLastLevel  = level.id === 6;
 
   const cardClass = cn(
-    "relative rounded-2xl border bg-card p-6 flex flex-col transition-all duration-200",
+    "relative rounded-2xl border bg-card p-4 sm:p-6 lg:p-8 flex flex-col transition-all duration-200",
     isLocked      && "opacity-55 border-border/40 cursor-default",
     isPassed      && "border-green-200/70 dark:border-green-800/50 bg-green-50/20 dark:bg-green-950/10 cursor-pointer hover:border-green-300/70 hover:shadow-md hover:shadow-green-500/5",
     isFresh       && "border-primary/40 ring-1 ring-primary/15 cursor-pointer hover:border-primary/50 hover:shadow-lg hover:shadow-primary/8",
@@ -260,14 +260,14 @@ function LevelCard({
           <StatusBadge />
         </div>
 
-        <div className="mb-5 pr-20">
+        <div className="mb-4 sm:mb-5 pr-14 sm:pr-20">
           <div className="flex items-center gap-1.5 mb-1">
             <Book className={cn("w-3.5 h-3.5 shrink-0", isLocked ? "text-muted-foreground/40" : "text-primary")} />
             <span className={cn("text-[11px] font-bold uppercase tracking-wider", isLocked ? "text-muted-foreground/40" : "text-primary")}>
               HSK {level.id}
             </span>
           </div>
-          <h3 className="text-lg font-serif text-foreground leading-snug">{level.title}</h3>
+          <h3 className="text-base sm:text-lg lg:text-xl font-serif text-foreground leading-snug">{level.title}</h3>
           <p className="text-xs text-muted-foreground mt-0.5">{level.count.toLocaleString()} words</p>
           <SubNote />
           <LockNote />
@@ -488,7 +488,7 @@ export default function DashboardPage() {
       // They may have saved words from before — let them review, that's fine
       ? { label: "Review Due Cards", sub: `${dueCount} card${dueCount !== 1 ? "s" : ""} waiting`, hint: null, isUpgrade: false, action: () => setLocation("/review") }
       // No activity → steer toward upgrade; never reference a premium level
-      : { label: "Unlock Full Access", sub: "All 6 HSK levels + premium features", hint: null, isUpgrade: true, action: () => window.open(buildGumroadUrl(getStoredReferralCode()), "_blank") }
+      : { label: "Unlock Full Access", sub: "All 6 HSK levels + premium features", hint: null, isUpgrade: true, action: () => window.open(buildGumroadUrl(user?.id, getStoredReferralCode()), "_blank") }
     // ── PREMIUM USER ─────────────────────────────────────────────────────────
     : dueCount > 0
       ? { label: "Review Due Cards", sub: `${dueCount} card${dueCount !== 1 ? "s" : ""} waiting`, hint: null, isUpgrade: false, action: () => setLocation("/review") }
@@ -508,13 +508,13 @@ export default function DashboardPage() {
         className="flex items-center justify-between gap-3 mb-6"
       >
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
-            <span className="text-base font-bold text-primary">
+          <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+            <span className="text-base lg:text-lg font-bold text-primary">
               {firstName[0]?.toUpperCase() ?? "?"}
             </span>
           </div>
           <div className="min-w-0">
-            <h1 className="text-lg md:text-xl font-serif font-bold text-foreground leading-tight truncate">
+            <h1 className="text-lg md:text-xl lg:text-2xl font-serif font-bold text-foreground leading-tight truncate">
               Hi, {firstName}
             </h1>
             <p className="text-xs text-muted-foreground mt-0.5">
@@ -544,13 +544,13 @@ export default function DashboardPage() {
         <button
           onClick={continueCta.action}
           className={cn(
-            "w-full group flex items-center gap-4 p-5 rounded-2xl shadow-md transition-all duration-200 hover:shadow-lg text-left",
+            "w-full group flex items-center gap-3 sm:gap-4 lg:gap-5 p-4 sm:p-5 lg:p-7 rounded-2xl shadow-md transition-all duration-200 hover:shadow-lg text-left",
             continueCta.isUpgrade
               ? "bg-amber-500 text-white shadow-amber-500/20 hover:bg-amber-600 hover:shadow-amber-500/25"
               : "bg-primary text-primary-foreground shadow-primary/20 hover:bg-primary/90 hover:shadow-primary/25"
           )}
         >
-          <div className="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
             {continueCta.isUpgrade
               ? <Sparkles className="w-6 h-6" />
               : dueCount > 0
@@ -558,8 +558,8 @@ export default function DashboardPage() {
               : <Play className="w-6 h-6 fill-current" />}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-base font-bold leading-tight">{continueCta.label}</p>
-            <p className="text-sm text-white/70 mt-0.5">{continueCta.sub}</p>
+            <p className="text-base lg:text-lg font-bold leading-tight">{continueCta.label}</p>
+            <p className="text-sm lg:text-base text-white/70 mt-0.5">{continueCta.sub}</p>
             {continueCta.hint && (
               <p className="text-xs text-white/60 mt-1 font-medium">
                 ↩ {continueCta.hint}
@@ -608,20 +608,20 @@ export default function DashboardPage() {
       {!wordsLoading && savedCount > 0 && (
         <motion.div
           custom={3} variants={fade} initial="hidden" animate="show"
-          className="grid grid-cols-3 gap-3 mb-5"
+          className="grid grid-cols-3 gap-2 sm:gap-3 lg:gap-4 mb-5"
         >
-          <div className="bg-card rounded-2xl border border-border/60 p-4 flex items-center gap-3 shadow-sm">
-            <div className="w-9 h-9 rounded-xl bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-              <BookOpen className="w-4 h-4" />
+          <div className="bg-card rounded-2xl border border-border/60 p-3 sm:p-4 lg:p-5 flex items-center gap-2 sm:gap-3 lg:gap-4 shadow-sm">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 lg:w-11 lg:h-11 rounded-lg sm:rounded-xl bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+              <BookOpen className="w-4 h-4 lg:w-5 lg:h-5" />
             </div>
             <div>
-              <p className="text-xl font-bold text-foreground tabular-nums leading-none">{savedCount}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Words saved</p>
+              <p className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground tabular-nums leading-none">{savedCount}</p>
+              <p className="text-xs lg:text-sm text-muted-foreground mt-0.5">Words saved</p>
             </div>
           </div>
-          <div className="bg-card rounded-2xl border border-border/60 p-4 flex items-center gap-3 shadow-sm">
+          <div className="bg-card rounded-2xl border border-border/60 p-3 sm:p-4 lg:p-5 flex items-center gap-2 sm:gap-3 lg:gap-4 shadow-sm">
             <div className={cn(
-              "w-9 h-9 rounded-xl flex items-center justify-center shrink-0",
+              "w-8 h-8 sm:w-9 sm:h-9 lg:w-11 lg:h-11 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0",
               dueCount > 0
                 ? "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"
                 : "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400",
@@ -629,10 +629,10 @@ export default function DashboardPage() {
               {dueCount > 0 ? <Star className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
             </div>
             <div>
-              <p className="text-xl font-bold text-foreground tabular-nums leading-none">
+              <p className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground tabular-nums leading-none">
                 {dueCount > 0 ? dueCount : "✓"}
               </p>
-              <p className="text-xs text-muted-foreground mt-0.5">
+              <p className="text-xs lg:text-sm text-muted-foreground mt-0.5">
                 {dueCount > 0 ? "Due for review" : "All reviewed"}
               </p>
             </div>
@@ -641,14 +641,14 @@ export default function DashboardPage() {
             onClick={isPremium ? () => setLocation(`/quiz/${currentLevel.id}`) : undefined}
             disabled={!isPremium}
             className={cn(
-              "bg-card rounded-2xl border p-4 flex items-center gap-3 shadow-sm transition-all text-left",
+              "bg-card rounded-2xl border p-3 sm:p-4 lg:p-5 flex items-center gap-2 sm:gap-3 lg:gap-4 shadow-sm transition-all text-left",
               isPremium
                 ? "border-border/60 hover:border-primary/30 hover:shadow-md cursor-pointer"
                 : "border-border/40 opacity-50 cursor-not-allowed",
             )}
           >
             <div className={cn(
-              "w-9 h-9 rounded-xl flex items-center justify-center shrink-0",
+              "w-8 h-8 sm:w-9 sm:h-9 lg:w-11 lg:h-11 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0",
               isPremium
                 ? "bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400"
                 : "bg-muted text-muted-foreground/40",
@@ -715,7 +715,7 @@ export default function DashboardPage() {
       {/* Levels page header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
         <div>
-          <h2 className="text-3xl md:text-4xl font-serif text-foreground mb-1 leading-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif text-foreground mb-1 leading-tight">
             Your Levels
           </h2>
           <p className="text-muted-foreground text-sm max-w-md">
@@ -759,7 +759,7 @@ export default function DashboardPage() {
               {syncing ? "Syncing…" : "Sync"}
             </button>
             <a
-              href={buildGumroadUrl(getStoredReferralCode())}
+              href={buildGumroadUrl(user?.id, getStoredReferralCode())}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
@@ -789,7 +789,7 @@ export default function DashboardPage() {
           variants={container}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 mb-8"
+          className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-5 mb-8"
         >
           {LEVELS.map((level) => {
             const state     = getCardState(level.id, isPremium, progressMap);
@@ -814,7 +814,7 @@ export default function DashboardPage() {
 
       {/* ── Quick practice strip ──────────────────────────────────── */}
       {/* Free users see all four locked; premium users see actions pointing to currentLevel */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 lg:gap-4 mb-8">
         <QuickAction
           icon={PenLine}
           label="Strokes"

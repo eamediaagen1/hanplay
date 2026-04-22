@@ -312,8 +312,8 @@ export default function FlashcardPage() {
         )}
 
         {/* Flashcard main area */}
-        <main className="flex-1 flex flex-col py-6 px-4 md:px-8 overflow-y-auto">
-          <div className="mx-auto w-full max-w-sm flex flex-col gap-5">
+        <main className="flex-1 flex flex-col py-3 sm:py-6 px-3 sm:px-4 md:px-8 overflow-y-auto">
+          <div className="mx-auto w-full max-w-sm flex flex-col gap-3 sm:gap-5">
 
             {/* Progress */}
             <div>
@@ -343,14 +343,14 @@ export default function FlashcardPage() {
             />
 
             {/* Controls */}
-            <div className="flex flex-col gap-3 pb-6">
+            <div className="flex flex-col gap-2 sm:gap-3 pb-4 sm:pb-6">
               {/* Voice + Save */}
-              <div className="flex gap-3">
+              <div className="flex gap-2 sm:gap-3">
                 <button
                   onClick={() => handleSpeak()}
                   disabled={!speechSupported}
                   className={cn(
-                    "flex-1 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-200 border text-sm",
+                    "flex-1 py-2.5 sm:py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-200 border text-sm",
                     speechSupported
                       ? isSpeaking
                         ? "bg-blue-500/15 border-blue-400/50 text-blue-600 dark:text-blue-400"
@@ -365,7 +365,7 @@ export default function FlashcardPage() {
                 <button
                   onClick={(e) => { e.stopPropagation(); toggleSaveCard(currentWord.id); }}
                   className={cn(
-                    "flex-1 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 border-2 text-sm",
+                    "flex-1 py-2.5 sm:py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 border-2 text-sm",
                     saved
                       ? "bg-gold/20 text-gold-foreground border-gold/50 hover:bg-gold/30 shadow-[0_0_15px_rgba(253,185,19,0.2)]"
                       : "bg-card text-foreground border-border hover:border-border/80 hover:bg-muted"
@@ -377,11 +377,11 @@ export default function FlashcardPage() {
               </div>
 
               {/* Prev / Next */}
-              <div className="flex gap-3">
+              <div className="flex gap-2 sm:gap-3">
                 <button
                   onClick={handlePrev}
                   disabled={currentIndex === 0}
-                  className="flex-1 py-3.5 rounded-xl font-semibold bg-card border border-border text-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 py-3 sm:py-3.5 rounded-xl font-semibold bg-card border border-border text-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   Prev
@@ -389,7 +389,7 @@ export default function FlashcardPage() {
                 <button
                   onClick={handleNext}
                   disabled={currentIndex === levelWords.length - 1}
-                  className="flex-1 py-3.5 rounded-xl font-semibold bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none transition-all flex items-center justify-center gap-2"
+                  className="flex-1 py-3 sm:py-3.5 rounded-xl font-semibold bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none transition-all flex items-center justify-center gap-2"
                 >
                   Next
                   <ArrowRight className="w-4 h-4" />

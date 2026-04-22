@@ -1,0 +1,191 @@
+I am uploading a CSV file that contains the full vocabulary dataset for my SaaS app called Hanplay.
+
+I want you to analyze the CSV and transform it into a production-ready, homogeneous vocabulary system for a real SaaS.
+
+IMPORTANT:
+This is not a school project or toy example.
+Design it for a live product.
+
+==================================================
+ABOUT MY SAAS
+==================================================
+
+Hanplay is a Chinese learning SaaS with:
+
+- Flashcards
+- Quizzes
+- Exams
+- Progress tracking
+- Review / spaced repetition
+- Premium membership
+- Dashboard metrics
+- User progression through HSK levels
+
+Tech stack:
+
+- Frontend: React / Vite
+- Backend API
+- Supabase database
+
+==================================================
+CURRENT CSV
+==================================================
+
+The CSV contains vocabulary rows with columns such as:
+
+- Character
+- Pinyin
+- Translation
+- Category
+- Level
+
+(Use the real uploaded CSV structure if slightly different.)
+
+IMPORTANT:
+In my current dataset, "Category" may actually represent grammar type such as:
+
+- noun
+- verb
+- adjective
+- phrase
+- number
+
+So inspect the real data and classify intelligently.
+
+==================================================
+GOAL
+==================================================
+
+I want you to inspect the CSV and redesign it into a scalable professional content system.
+
+I need this dataset to become the source of truth for:
+
+- flashcards
+- quizzes
+- review system
+- search
+- future analytics
+- future admin editing
+
+==================================================
+WHAT I NEED YOU TO DO
+==================================================
+
+1. Analyze the CSV quality
+
+Check for:
+- duplicate rows
+- missing values
+- inconsistent levels
+- inconsistent category/type naming
+- encoding issues
+- repeated translations
+- malformed pinyin
+- empty rows
+
+2. Normalize the dataset
+
+Create a clean standardized schema.
+
+Recommended fields:
+
+- id
+- slug
+- hsk_level
+- hanzi
+- simplified
+- traditional (if possible)
+- pinyin
+- english
+- english_short
+- word_type
+- topic_category
+- tags
+- sort_order
+- is_active
+
+3. Determine if current "Category" column is:
+
+- grammar type
+OR
+- semantic topic
+OR
+- mixed values
+
+Then recommend the best split into:
+
+- word_type
+- topic_category
+
+4. Generate stable IDs
+
+I need migration-safe IDs suitable for my app.
+
+IDs must be:
+- stable
+- readable
+- scalable
+- safe for progress tracking
+
+5. Make it search-ready
+
+Recommend fields for:
+- hanzi search
+- pinyin search
+- english search
+- aliases / keywords
+
+6. Make it flashcard / quiz ready
+
+Recommend how rows should support:
+- flashcards
+- quizzes
+- category filters
+- type filters
+- level filters
+
+7. Make it review-system ready
+
+Recommend related tables for:
+- saved words
+- spaced repetition
+- user progress
+
+8. Output production-ready SQL schema for Supabase
+
+Use PostgreSQL style.
+
+9. Output cleaned CSV format
+
+Show what the final ideal CSV should look like.
+
+10. Migration plan for Hanplay
+
+How to move from current static system to this CSV-driven DB system safely.
+
+==================================================
+OUTPUT FORMAT
+==================================================
+
+Give me:
+
+1. CSV audit report
+2. Data quality issues found
+3. Recommended normalized schema
+4. Final SQL tables
+5. ID strategy
+6. Search strategy
+7. Filter strategy
+8. Flashcard/quiz compatibility
+9. Migration strategy
+10. What to implement now vs later
+
+==================================================
+IMPORTANT
+==================================================
+
+Think like a senior SaaS data architect.
+
+Do not give generic beginner advice.
+
+Use the uploaded CSV as the real source and build the best long-term structure for Hanplay.

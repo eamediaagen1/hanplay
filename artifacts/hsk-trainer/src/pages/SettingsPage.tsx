@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   Settings, Moon, Sun, Globe, Shield, Check, ExternalLink,
-  LogOut, ChevronRight, Loader2,
+  LogOut, ChevronRight, Loader2, Lock, Eye, EyeOff, KeyRound,
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { useProfile } from "@/hooks/use-profile";
@@ -70,6 +70,136 @@ function SettingRow({
 type ThemeMode = "light" | "dark" | "system";
 const sectionDelay = (n: number) => ({ duration: 0.3, delay: n * 0.06 });
 
+// ── ChangePasswordSection ──────────────────────────────────────────────────────
+
+function ChangePasswordSection() {
+  const { updatePassword } = useAuth();
+  const [newPw, setNewPw] = useState("");
+  const [confirmPw, setConfirmPw] = useState("");
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<{ ok: boolean; msg: string } | null>(null);
+
+  const inputBase = cn(
+    "w-full pl-10 pr-10 py-3 rounded-xl text-sm",
+    "bg-background border-2 border-border",
+    "text-foreground placeholder:text-muted-foreground/50",
+    "focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10",
+    "transition-all duration-200"
+  );
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResult(null);
+
+    if (newPw.length < 6) {
+      setResult({ ok: false, msg: "Password must be at least 6 characters." });
+      return;
+    }
+    if (newPw !== confirmPw) {
+      setResult({ ok: false, msg: "Passwords don't match. Please try again." });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await updatePassword(newPw);
+      setResult({ ok: true, msg: "Password updated successfully." });
+      setNewPw("");
+      setConfirmPw("");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Something went wrong. Please try again.";
+      setResult({ ok: false, msg });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="px-5 py-4 space-y-3">
+      <div className="flex items-center gap-3 mb-1">
+        <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
+          <KeyRound className="w-4 h-4 text-muted-foreground" />
+        </div>
+        <div>
+          <p className="text-sm font-medium text-foreground">Change password</p>
+          <p className="text-xs text-muted-foreground">Set a new password for your account</p>
+        </div>
+      </div>
+
+      <div className="relative">
+        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+        <input
+          type={showNew ? "text" : "password"}
+          placeholder="New password"
+          value={newPw}
+          onChange={(e) => setNewPw(e.target.value)}
+          autoComplete="new-password"
+          className={inputBase}
+        />
+        <button
+          type="button"
+          onClick={() => setShowNew((v) => !v)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+          tabIndex={-1}
+        >
+          {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+        </button>
+      </div>
+
+      <div className="relative">
+        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+        <input
+          type={showConfirm ? "text" : "password"}
+          placeholder="Confirm new password"
+          value={confirmPw}
+          onChange={(e) => setConfirmPw(e.target.value)}
+          autoComplete="new-password"
+          className={inputBase}
+        />
+        <button
+          type="button"
+          onClick={() => setShowConfirm((v) => !v)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+          tabIndex={-1}
+        >
+          {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+        </button>
+      </div>
+
+      {result && (
+        <p className={cn(
+          "text-xs px-3 py-2 rounded-lg",
+          result.ok
+            ? "text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20"
+            : "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/20"
+        )}>
+          {result.msg}
+        </p>
+      )}
+
+      <button
+        type="submit"
+        disabled={loading || !newPw || !confirmPw}
+        className={cn(
+          "flex items-center justify-center gap-2 w-full py-2.5 rounded-xl",
+          "text-sm font-semibold bg-primary text-primary-foreground",
+          "shadow-sm shadow-primary/20 hover:bg-primary/90",
+          "disabled:opacity-60 disabled:cursor-not-allowed",
+          "transition-all duration-200"
+        )}
+      >
+        {loading ? (
+          <><Loader2 className="w-4 h-4 animate-spin" /> Updating…</>
+        ) : (
+          "Update password"
+        )}
+      </button>
+    </form>
+  );
+}
+
 // ── SettingsPage ──────────────────────────────────────────────────────────────
 
 export default function SettingsPage() {
@@ -104,11 +234,9 @@ export default function SettingsPage() {
     }
     setClearing(true);
     try {
-      // Clears the saved-words progress via API
       await fetch("/api/progress/clear", { method: "DELETE", headers: { "Content-Type": "application/json" } });
       setClearMsg("Study data cleared.");
     } catch {
-      // If endpoint doesn't exist, clear localStorage fallback silently
       localStorage.removeItem("hsk_saved_cards");
       setClearMsg("Local study data cleared.");
     } finally {
@@ -127,7 +255,7 @@ export default function SettingsPage() {
         </div>
         <div>
           <h1 className="text-2xl md:text-3xl font-serif font-bold text-foreground">Settings</h1>
-          <p className="text-sm text-muted-foreground">Manage your preferences</p>
+          <p className="text-sm text-muted-foreground">Manage your account and preferences</p>
         </div>
       </div>
 
@@ -168,7 +296,7 @@ export default function SettingsPage() {
             <button
               onClick={handleLogout}
               disabled={isLoggingOut}
-              className="flex items-center justify-between w-full px-5 py-3.5 text-sm hover:bg-muted/50 transition-colors border-b border-border/40 disabled:opacity-60"
+              className="flex items-center justify-between w-full px-5 py-3.5 text-sm hover:bg-muted/50 transition-colors disabled:opacity-60"
             >
               <div className="flex items-center gap-3 text-muted-foreground hover:text-foreground">
                 {isLoggingOut ? (
@@ -183,11 +311,28 @@ export default function SettingsPage() {
           </div>
         </motion.section>
 
-        {/* ── Subscription ───────────────────────────────────── */}
+        {/* ── Security ────────────────────────────────────────── */}
         <motion.section
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={sectionDelay(1)}
+        >
+          <h2 className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-1 mb-2">
+            Security
+          </h2>
+          <div className="bg-card rounded-2xl border border-border/60 overflow-hidden shadow-sm divide-y divide-border/40">
+            <ChangePasswordSection />
+          </div>
+          <p className="text-xs text-muted-foreground px-1 mt-1.5">
+            If you signed in with a magic link and haven't set a password yet, use Forgot Password from the sign-in page.
+          </p>
+        </motion.section>
+
+        {/* ── Subscription ───────────────────────────────────── */}
+        <motion.section
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={sectionDelay(2)}
         >
           <h2 className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-1 mb-2">
             Subscription
@@ -199,7 +344,7 @@ export default function SettingsPage() {
                   <Check className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-foreground">Premium · Lifetime</p>
+                  <p className="text-sm font-semibold text-foreground">Premium · Active</p>
                   <p className="text-xs text-muted-foreground mt-px">All HSK 1–6 levels unlocked</p>
                 </div>
               </div>
@@ -211,16 +356,16 @@ export default function SettingsPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground">Free plan</p>
-                    <p className="text-xs text-muted-foreground mt-px">Demo access · try the free preview</p>
+                    <p className="text-xs text-muted-foreground mt-px">Demo access only</p>
                   </div>
                 </div>
                 <a
-                  href={buildGumroadUrl(getStoredReferralCode())}
+                  href={buildGumroadUrl(user?.id, getStoredReferralCode())}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-between w-full px-5 py-3.5 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors"
                 >
-                  <span>Upgrade to Premium — Unlock all levels</span>
+                  <span>Get full access — $9.99/year</span>
                   <ExternalLink className="w-4 h-4 shrink-0" />
                 </a>
               </>
@@ -232,7 +377,7 @@ export default function SettingsPage() {
         <motion.section
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={sectionDelay(2)}
+          transition={sectionDelay(3)}
         >
           <h2 className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-1 mb-2">
             Appearance
@@ -274,7 +419,7 @@ export default function SettingsPage() {
         <motion.section
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={sectionDelay(3)}
+          transition={sectionDelay(4)}
         >
           <h2 className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-1 mb-2">
             Study
@@ -304,7 +449,7 @@ export default function SettingsPage() {
         <motion.section
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={sectionDelay(4)}
+          transition={sectionDelay(5)}
         >
           <h2 className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-1 mb-2">
             Data
@@ -344,6 +489,31 @@ export default function SettingsPage() {
           <p className="text-xs text-muted-foreground px-1 mt-1.5">
             Clears your saved words and spaced-repetition progress. This cannot be undone.
           </p>
+        </motion.section>
+
+        {/* ── Help ───────────────────────────────────────────── */}
+        <motion.section
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={sectionDelay(6)}
+        >
+          <h2 className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-1 mb-2">
+            Help
+          </h2>
+          <div className="bg-card rounded-2xl border border-border/60 overflow-hidden shadow-sm">
+            <div className="px-5 py-4">
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Questions or issues? Email us at{" "}
+                <a
+                  href="mailto:contact@hanplay.online"
+                  className="text-primary underline underline-offset-2 font-medium"
+                >
+                  contact@hanplay.online
+                </a>
+                {" "}and we'll get back to you.
+              </p>
+            </div>
+          </div>
         </motion.section>
 
       </div>

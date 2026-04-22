@@ -2,6 +2,11 @@ import { Router } from "express";
 import { supabaseAdmin } from "../lib/supabase.js";
 import { requireAuth, requireAdmin } from "../middleware/auth.js";
 import { runMigration006IfNeeded, MIGRATION_006_SQL_EXPORT } from "../lib/migrate.js";
+import {
+  seedVocabularyFromJSON,
+  invalidateVocabularyCache,
+  type SeedRow,
+} from "../lib/vocabularyService.js";
 
 const router = Router();
 
@@ -670,6 +675,148 @@ router.post("/admin/run-migration-006", async (req, res) => {
     manual_sql: MIGRATION_006_SQL_EXPORT.trim(),
     instructions: "Run the manual_sql above in Supabase Dashboard → SQL Editor",
   });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// POST /api/admin/seed-vocabulary
+//
+// Primary seed: upserts all 5,427 words from the pre-generated
+// scripts/vocabulary_seed.json into the `vocabulary` table.
+// Falls back to the legacy 151-word hskData.ts if the seed file is missing.
+//
+// Query params:
+//   ?dry=1   preview counts only, nothing written
+//   ?legacy=1  use hskData.ts (151 HSK1 words) instead of full CSV seed
+//
+// Idempotent — safe to call multiple times.
+// ─────────────────────────────────────────────────────────────────────────────
+router.post("/admin/seed-vocabulary", async (req, res) => {
+  const dryRun  = req.query.dry    === "1";
+  const legacy  = req.query.legacy === "1";
+
+  // ── Resolve seed data ──────────────────────────────────────────────────────
+  let seedRows: SeedRow[] = [];
+  let source: string;
+
+  const hskDataToRows = async () => {
+    const { hskData } = await import("../data/hskData.js");
+    return hskData.map((w, i) => ({
+      id:             w.id,
+      hsk_level:      w.hskLevel,
+      sort_order:     i,
+      hanzi:          w.word,
+      pinyin:         w.pinyin,
+      meaning:        w.meaning,
+      meaning_short:  null as string | null,
+      word_type:      "other",
+      word_types:     [] as string[],
+      topic_category: w.category ?? null,
+      image_url:      w.imageUrl,
+      image_alt:      w.imageAlt,
+      is_active:      true,
+    }));
+  };
+
+  if (legacy) {
+    seedRows = await hskDataToRows();
+    source = "hskData.ts (151 words)";
+  } else {
+    try {
+      const { readFileSync } = await import("fs");
+      const { fileURLToPath } = await import("url");
+      const seedPath = fileURLToPath(new URL("../../scripts/vocabulary_seed.json", import.meta.url));
+      seedRows = JSON.parse(readFileSync(seedPath, "utf-8")) as SeedRow[];
+      source = `vocabulary_seed.json (${seedRows.length} words)`;
+    } catch {
+      seedRows = await hskDataToRows();
+      source = "hskData.ts fallback (vocabulary_seed.json not found — run: node scripts/transform-csv.cjs)";
+    }
+  }
+
+  // ── Dry run ────────────────────────────────────────────────────────────────
+  if (dryRun) {
+    const byLevel: Record<number, number> = {};
+    for (const r of seedRows) {
+      byLevel[r.hsk_level] = (byLevel[r.hsk_level] ?? 0) + 1;
+    }
+    res.json({
+      dry_run: true,
+      source,
+      total: seedRows.length,
+      by_level: byLevel,
+      message: "Dry run — no data written. Remove ?dry=1 to seed for real.",
+    });
+    return;
+  }
+
+  // ── Real seed ──────────────────────────────────────────────────────────────
+  try {
+    const result = await seedVocabularyFromJSON(seedRows);
+    res.json({
+      success: result.errors === 0,
+      source,
+      ...result,
+      message: result.errors === 0
+        ? `Seeded ${result.inserted} words from ${source}.`
+        : `Seeding completed with ${result.errors} errors. Check logs.`,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: "Seed failed unexpectedly", detail: String(err) });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// POST /api/admin/import-vocabulary
+//
+// Accepts a JSON array of seed rows in the request body and upserts them.
+// Use this for incremental updates — e.g. adding new words, fixing meanings,
+// or importing a revised CSV (run transform-csv.cjs first to generate the rows).
+//
+// Body: SeedRow[]  (same format as vocabulary_seed.json)
+//
+// Supports partial imports — you can send just the rows you want to update.
+// ─────────────────────────────────────────────────────────────────────────────
+router.post("/admin/import-vocabulary", async (req, res) => {
+  const rows = req.body as unknown;
+
+  if (!Array.isArray(rows) || rows.length === 0) {
+    res.status(400).json({ error: "Body must be a non-empty JSON array of vocabulary rows" });
+    return;
+  }
+
+  // Basic validation: first row must have required fields
+  const sample = rows[0] as Partial<SeedRow>;
+  if (!sample.id || !sample.hanzi || !sample.pinyin || !sample.meaning) {
+    res.status(400).json({
+      error: "Each row must have: id, hanzi, pinyin, meaning",
+      sample_received: sample,
+    });
+    return;
+  }
+
+  try {
+    const result = await seedVocabularyFromJSON(rows as SeedRow[]);
+    res.json({
+      success: result.errors === 0,
+      ...result,
+      message: result.errors === 0
+        ? `Imported ${result.inserted} vocabulary rows.`
+        : `Import completed with ${result.errors} errors. Check logs.`,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: "Import failed unexpectedly", detail: String(err) });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// POST /api/admin/invalidate-vocabulary-cache
+//
+// Forces the in-memory vocabulary cache to be cleared on the next request.
+// Useful after manually editing words in the Supabase dashboard.
+// ─────────────────────────────────────────────────────────────────────────────
+router.post("/admin/invalidate-vocabulary-cache", (_req, res) => {
+  invalidateVocabularyCache();
+  res.json({ success: true, message: "Vocabulary cache cleared — next request will re-fetch from Supabase." });
 });
 
 export default router;

@@ -1,0 +1,104 @@
+Continue from the current project state.
+
+The first responsive pass improved phone usability, but now there are 2 new UX issues:
+
+1. On 16:9 screens / larger desktop screens, the UI now feels too small
+2. On mobile, the flashcard image/visual area feels too small and not visually good
+
+GOAL
+Refine the responsive system so the app feels balanced on both:
+- large 16:9 screens
+- mobile devices
+
+I do NOT want the UI to feel tiny on desktop just because it was compressed for mobile.
+
+==================================================
+PART 1 — FIX LARGE SCREEN / 16:9 SCALING
+==================================================
+
+Current issue:
+- On 16:9 screens, dashboard and main UI elements feel too small
+- cards, headings, and action areas lost too much visual presence
+
+Please improve large-screen responsiveness so the app scales up more naturally on desktop and laptop screens.
+
+Requirements:
+- restore stronger visual presence on larger screens
+- make dashboard cards feel appropriately sized again
+- headings should not feel undersized
+- continue bar should feel substantial again
+- cards should use space better on wide layouts
+- avoid excessive compression from mobile-first reductions
+
+Important:
+Do not break the good mobile behavior.
+I want better scaling, not just larger text everywhere.
+
+==================================================
+PART 2 — FIX FLASHCARD VISUAL AREA ON MOBILE
+==================================================
+
+Current issue:
+- On mobile, the flashcard image/cover/visual area feels too small
+- overall flashcard presentation looks weak
+
+Please improve the flashcard card design on mobile so it feels more visually balanced.
+
+Requirements:
+- make the main flashcard visual area more prominent
+- improve image/card proportions on phone
+- keep it readable and usable without creating too much scroll
+- preserve comfortable tap targets
+- keep reveal/controls usable
+
+Important:
+I do NOT want it tiny.
+I want it visually better while still fitting mobile screens well.
+
+==================================================
+PART 3 — BALANCE MOBILE VS DESKTOP
+==================================================
+
+Please rebalance the responsive design instead of only shrinking things for small screens.
+
+Target result:
+- mobile = comfortable and usable
+- desktop / 16:9 = not small, not underwhelming
+- tablet = balanced middle ground
+
+Audit these especially:
+- dashboard headings
+- continue bar
+- level cards
+- stat cards
+- quick actions
+- flashcard card
+- quiz question block
+
+==================================================
+PART 4 — KEEP THE GOOD PARTS
+==================================================
+
+Keep the improvements that already helped:
+- mobile quiz Next button usability
+- reduced unnecessary scrolling
+- better mobile button sizing
+- tighter but cleaner layout
+
+Do not undo the good UX changes.
+Just improve the current balance.
+
+==================================================
+PART 5 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. what was adjusted for large screens
+2. what was improved for mobile flashcards
+3. how the responsive balance now works across mobile/tablet/desktop
+4. files changed
+
+IMPORTANT:
+This is a refinement pass.
+Do not shrink everything again.
+Make desktop feel properly sized and make mobile flashcards look visually better.

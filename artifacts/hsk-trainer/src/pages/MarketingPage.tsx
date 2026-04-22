@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { useBranding, pickLogoLanding } from "@/hooks/use-branding";
 import { useTheme } from "@/hooks/use-theme";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   BookOpen,
   Layers,
@@ -18,6 +20,9 @@ import {
   Lock,
   Play,
   Trophy,
+  Youtube,
+  Twitter,
+  Send,
 } from "lucide-react";
 
 // ─── Animation helpers ─────────────────────────────────────────────────────────
@@ -62,6 +67,105 @@ function SectionDivider() {
 
 // ─── Main Component ────────────────────────────────────────────────────────────
 
+function ContactSection() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [sent, setSent] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const subject = encodeURIComponent(`Hanplay enquiry from ${name || "a user"}`);
+    const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`);
+    window.open(`mailto:contact@hanplay.online?subject=${subject}&body=${body}`, "_blank");
+    setSent(true);
+  };
+
+  return (
+    <section id="contact" className="relative z-10 px-5 pb-20">
+      <div className="max-w-xl mx-auto">
+        <motion.div {...inView(0)} className="text-center mb-10">
+          <SectionLabel>Contact</SectionLabel>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground leading-tight mb-3">
+            Get in touch.
+          </h2>
+          <p className="text-base text-muted-foreground">
+            Questions, bug reports, feedback — we read every message.
+          </p>
+        </motion.div>
+        <motion.div {...inView(0.06)} className="bg-card border border-border/60 rounded-2xl p-8 shadow-xl shadow-primary/5">
+          {sent ? (
+            <div className="text-center py-6">
+              <p className="text-4xl mb-4">👍</p>
+              <p className="text-lg font-semibold text-foreground mb-2">Opening your email client…</p>
+              <p className="text-sm text-muted-foreground">
+                Or email us directly:{" "}
+                <a href="mailto:contact@hanplay.online" className="text-primary hover:underline font-medium">
+                  contact@hanplay.online
+                </a>
+              </p>
+              <button
+                onClick={() => setSent(false)}
+                className="mt-5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Send another message
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Name</label>
+                  <input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Your name"
+                    className="bg-muted/40 border border-border/60 rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary/40"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Email</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="your@email.com"
+                    className="bg-muted/40 border border-border/60 rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary/40"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Message <span className="text-red-500">*</span></label>
+                <textarea
+                  required
+                  rows={4}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="How can we help?"
+                  className="bg-muted/40 border border-border/60 rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary/40 resize-none"
+                />
+              </div>
+              <button
+                type="submit"
+                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm hover:bg-primary/90 transition-colors shadow-md shadow-primary/20"
+              >
+                <Send className="w-4 h-4" />
+                Send message
+              </button>
+              <p className="text-center text-xs text-muted-foreground">
+                Or email directly:{" "}
+                <a href="mailto:contact@hanplay.online" className="text-primary hover:underline">
+                  contact@hanplay.online
+                </a>
+              </p>
+            </form>
+          )}
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
 export default function MarketingPage() {
   const [, setLocation] = useLocation();
   const go = () => setLocation("/app");
@@ -83,7 +187,8 @@ export default function MarketingPage() {
 
       {/* ─── NAV ──────────────────────────────────────────────────────────── */}
       <nav className="relative z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl sticky top-0">
-        <div className="max-w-6xl mx-auto px-5 py-1 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-5 py-1 grid grid-cols-[auto_1fr_auto] items-center gap-4">
+          {/* Left: Logo */}
           <div className="flex items-center gap-2.5">
             {logoUrl
               ? <img src={logoUrl} alt="Hanplay" className="h-20 w-auto object-contain" />
@@ -91,19 +196,39 @@ export default function MarketingPage() {
             }
             {!logoUrl && <span className="font-bold text-foreground tracking-tight">Hanplay</span>}
           </div>
-          <div className="flex items-center gap-3">
+
+          {/* Center: Nav links */}
+          <div className="hidden md:flex items-center justify-center gap-6">
             <button
               onClick={() => setLocation("/pricing")}
-              className="hidden md:flex text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Pricing
             </button>
             <button
               onClick={goDemo}
-              className="hidden sm:flex text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Try Demo
             </button>
+            <a
+              href="#about"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              About
+            </a>
+            <a
+              href="#contact"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Contact
+            </a>
+          </div>
+          <div className="flex md:hidden" />
+
+          {/* Right: Theme toggle + CTA */}
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
             <button
               onClick={go}
               className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
@@ -389,22 +514,20 @@ export default function MarketingPage() {
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-4">Level Selection</p>
               <div className="space-y-2.5">
                 {[
-                  { level: "HSK 1", words: "150 words", free: true },
-                  { level: "HSK 2", words: "150 words", free: false },
-                  { level: "HSK 3", words: "300 words", free: false },
-                ].map(({ level, words, free }) => (
+                  { level: "HSK 1", words: "150 words" },
+                  { level: "HSK 2", words: "150 words" },
+                  { level: "HSK 3", words: "300 words" },
+                ].map(({ level, words }) => (
                   <div key={level} className="flex items-center justify-between px-4 py-3 rounded-xl border border-border/40 bg-muted/30">
                     <div>
                       <p className="font-bold text-sm text-foreground">{level}</p>
                       <p className="text-xs text-muted-foreground">{words}</p>
                     </div>
-                    {free
-                      ? <span className="text-xs font-semibold px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">Free</span>
-                      : <span className="flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full bg-primary/8 text-primary"><Lock className="w-2.5 h-2.5" /> Premium</span>}
+                    <span className="flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full bg-primary/8 text-primary"><Lock className="w-2.5 h-2.5" /> Premium</span>
                   </div>
                 ))}
               </div>
-              <p className="text-xs text-muted-foreground mt-4">All 6 levels unlocked with a single purchase.</p>
+              <p className="text-xs text-muted-foreground mt-4">All 6 HSK levels · 5,000+ words · Lifetime access.</p>
             </motion.div>
 
             {/* Flashcard mockup */}
@@ -550,7 +673,7 @@ export default function MarketingPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
-              "150 HSK 1 words — fully organized by category",
+              "5,000+ HSK words across all 6 levels — organized by category",
               "Flashcards with character, pinyin, and meaning",
               "Quizzes randomized every session",
               "Spaced repetition — review cards at the right time",
@@ -588,8 +711,7 @@ export default function MarketingPage() {
             Start learning Chinese today.
           </h2>
           <p className="text-base text-muted-foreground mb-8 max-w-md mx-auto leading-relaxed">
-            HSK 1 is completely free. Try the demo without an account.
-            Upgrade once for lifetime access to all 6 HSK levels — 5,000+ words.
+            One purchase. Lifetime access to all 6 HSK levels — 5,000+ vocabulary words, flashcards, quizzes, and guided exam progression.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -619,29 +741,109 @@ export default function MarketingPage() {
         </motion.div>
       </section>
 
+      {/* ─── ABOUT ───────────────────────────────────────────────────────── */}
+      <section id="about" className="relative z-10 px-5 py-16">
+        <div className="max-w-4xl mx-auto">
+          <motion.div {...inView(0)} className="text-center mb-12">
+            <SectionLabel>About</SectionLabel>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground leading-tight mb-4">
+              Built for serious learners.
+            </h2>
+            <p className="text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
+              Hanplay is a structured Chinese vocabulary trainer built around the official HSK standard — the same curriculum used by universities and language exams worldwide.
+            </p>
+          </motion.div>
+
+          {/* Mission statement */}
+          <motion.div {...inView(0.05)} className="bg-gradient-to-br from-primary/8 via-transparent to-transparent border border-primary/20 rounded-2xl p-8 sm:p-10 text-center mb-8 relative overflow-hidden">
+            <div className="absolute top-0 inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent" />
+            <p className="text-5xl font-serif text-primary/15 mb-5 select-none leading-none">加油</p>
+            <blockquote className="text-lg sm:text-xl font-semibold text-foreground leading-relaxed max-w-2xl mx-auto mb-4">
+              "Language learning shouldn't feel like a game. It should feel like progress."
+            </blockquote>
+            <p className="text-sm text-muted-foreground max-w-lg mx-auto leading-relaxed">
+              We built Hanplay because every other app was either too gamified to take seriously, or too complex to stay motivated with. We believe the best tool gets out of the way and lets you learn.
+            </p>
+          </motion.div>
+
+          {/* Value pillars */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {[
+              {
+                label: "Structure first",
+                body: "Every level, every word, every quiz is ordered and intentional. HSK 1 to HSK 6 — clear progression from day one.",
+              },
+              {
+                label: "No filler",
+                body: "No badges, no streaks that punish you, no daily notifications. Just vocabulary, spaced repetition, and real practice.",
+              },
+              {
+                label: "Built to last",
+                body: "One-time payment. No subscription. Your access never expires. Study at your pace, for as long as you need.",
+              },
+            ].map(({ label, body }, i) => (
+              <motion.div key={label} {...inView(0.08 + i * 0.06)} className="bg-card border border-border/60 rounded-2xl p-6">
+                <p className="font-bold text-foreground mb-2">{label}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{body}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── CONTACT ─────────────────────────────────────────────────────── */}
+      <ContactSection />
+
       {/* ─── FOOTER ──────────────────────────────────────────────────────── */}
-      <footer className="relative z-10 border-t border-border/40 px-5 py-8 bg-background/60">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-          <div className="flex items-center gap-2.5">
-            {logoUrl
-              ? <img src={logoUrl} alt="Hanplay" className="h-10 w-auto object-contain" />
-              : <span className="text-xl font-serif text-primary leading-none">汉</span>
-            }
-            {!logoUrl && <span className="font-semibold text-foreground">Hanplay</span>}
-            <span className="hidden sm:inline text-border">·</span>
-            <span className="hidden sm:inline">Learn Chinese, one level at a time.</span>
+      <footer className="relative z-10 border-t border-border/40 px-5 pt-10 pb-8 bg-background/60">
+        <div className="max-w-6xl mx-auto">
+          {/* Top row: logo + social links */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-8">
+            <div className="flex items-center gap-3">
+              {logoUrl
+                ? <img src={logoUrl} alt="Hanplay" className="h-9 w-auto object-contain" />
+                : <span className="text-2xl font-serif text-primary leading-none">汉</span>
+              }
+              {!logoUrl && <span className="font-bold text-foreground">Hanplay</span>}
+            </div>
+
+            {/* Social links */}
+            <div className="flex items-center gap-2">
+              {[
+                { label: "X / Twitter", href: "https://x.com/hanplayapp", icon: <Twitter className="w-4 h-4" /> },
+                { label: "YouTube", href: "https://youtube.com/@hanplay", icon: <Youtube className="w-4 h-4" /> },
+                { label: "Reddit", href: "https://reddit.com/r/ChineseLanguage", icon: <span className="text-xs font-bold leading-none">rdt</span> },
+                { label: "Instagram", href: "https://instagram.com/hanplayapp", icon: <span className="text-xs font-bold leading-none">IG</span> },
+                { label: "TikTok", href: "https://tiktok.com/@hanplayapp", icon: <span className="text-xs font-bold leading-none">TT</span> },
+              ].map(({ label, href, icon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="w-8 h-8 rounded-lg border border-border/60 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/40 hover:bg-primary/5 transition-all"
+                >
+                  {icon}
+                </a>
+              ))}
+            </div>
           </div>
-          <div className="flex items-center gap-5">
-            <button onClick={goDemo} className="hover:text-foreground transition-colors text-xs">
-              Try Demo
-            </button>
-            <span className="text-border">·</span>
-            <button onClick={go} className="hover:text-foreground transition-colors text-xs">
-              Sign in
-            </button>
-            <span className="text-border">·</span>
-            <span className="text-xs text-muted-foreground/60">© {new Date().getFullYear()} Hanplay</span>
+
+          {/* Nav links */}
+          <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-muted-foreground border-t border-border/40 pt-6 pb-2">
+            <button onClick={goDemo} className="hover:text-foreground transition-colors">Try Demo</button>
+            <button onClick={() => setLocation("/pricing")} className="hover:text-foreground transition-colors">Pricing</button>
+            <a href="#about" className="hover:text-foreground transition-colors">About</a>
+            <a href="#contact" className="hover:text-foreground transition-colors">Contact</a>
+            <a href="mailto:contact@hanplay.online" className="hover:text-foreground transition-colors">contact@hanplay.online</a>
+            <button onClick={go} className="hover:text-foreground transition-colors">Sign in</button>
           </div>
+
+          {/* Copyright */}
+          <p className="text-xs text-muted-foreground/40 mt-4">
+            © {new Date().getFullYear()} Hanplay · Learn Chinese, one level at a time.
+          </p>
         </div>
       </footer>
 

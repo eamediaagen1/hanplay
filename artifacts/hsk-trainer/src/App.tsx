@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -6,12 +6,17 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import { captureReferralCode } from "@/hooks/use-referral-capture";
 
+import { useQuery } from "@tanstack/react-query";
+import { apiFetch } from "@/lib/api";
 import MarketingPage    from "@/pages/MarketingPage";
+import OnboardingPage   from "@/pages/OnboardingPage";
 import PricingPage      from "@/pages/PricingPage";
 import ChineseThemesPage         from "@/pages/ChineseThemesPage";
 import ChineseThemesCategoryPage from "@/pages/ChineseThemesCategoryPage";
 import LandingPage      from "@/pages/LandingPage";
 import AuthCallback     from "@/pages/AuthCallback";
+import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
+import ResetPasswordPage  from "@/pages/ResetPasswordPage";
 import DemoPage         from "@/pages/DemoPage";
 import DashboardPage    from "@/pages/DashboardPage";
 import FlashcardPage    from "@/pages/FlashcardPage";
@@ -20,6 +25,11 @@ import QuizPage         from "@/pages/QuizPage";
 import PhrasesPage      from "@/pages/PhrasesPage";
 import StrokesPage      from "@/pages/StrokesPage";
 import SettingsPage     from "@/pages/SettingsPage";
+import MembershipPage   from "@/pages/MembershipPage";
+import BillingSuccessPage from "@/pages/BillingSuccessPage";
+import BillingRestorePage from "@/pages/BillingRestorePage";
+import AffiliatePage    from "@/pages/AffiliatePage";
+import MaintenancePage  from "@/pages/MaintenancePage";
 import AdminPage        from "@/pages/AdminPage";
 import AdminLoginPage   from "@/pages/AdminLoginPage";
 import { AppShell }     from "@/components/AppShell";
@@ -106,12 +116,16 @@ function Router() {
   }
 
   // ── 2. True public pages — no auth needed, always render instantly ─────────
-  if (location === "/" || location === "/demo" || location === "/pricing") {
+  const publicPaths = ["/", "/demo", "/pricing", "/maintenance", "/forgot-password", "/reset-password"];
+  if (publicPaths.includes(location)) {
     return (
       <Switch>
-        <Route path="/"                component={MarketingPage} />
-        <Route path="/demo"            component={DemoPage} />
-        <Route path="/pricing"         component={PricingPage} />
+        <Route path="/"                  component={MarketingPage} />
+        <Route path="/demo"              component={DemoPage} />
+        <Route path="/pricing"           component={PricingPage} />
+        <Route path="/maintenance"       component={MaintenancePage} />
+        <Route path="/forgot-password"   component={ForgotPasswordPage} />
+        <Route path="/reset-password"    component={ResetPasswordPage} />
       </Switch>
     );
   }
@@ -133,6 +147,64 @@ function Router() {
   // ── 6. All other routes are protected ────────────────────────────────────
   if (!user) return <Redirect to="/app" />;
 
+  return <AuthenticatedApp />;
+}
+
+const ONBOARDING_LS_KEY = "hanplay_onboarding_v1";
+
+function AuthenticatedApp() {
+  const qc = useQueryClient();
+  const [, navigate] = useLocation();
+
+  // Use state so changing it re-renders without a full page reload
+  const [localDone, setLocalDone] = useState(
+    () => localStorage.getItem(ONBOARDING_LS_KEY) === "done"
+  );
+
+  const { data: onboardingData, isLoading: onboardingLoading, isError: onboardingError } = useQuery({
+    queryKey: ["onboarding"],
+    queryFn: () => apiFetch<{ completed: boolean }>("/api/onboarding"),
+    enabled: !localDone,
+    staleTime: Infinity,
+    // On any error (table missing, network down), never block the app
+    retry: false,
+  });
+
+  // Derive whether onboarding is needed — must be computed before any hooks
+  const showOnboarding =
+    !localDone &&
+    !onboardingError &&
+    onboardingData !== undefined &&
+    onboardingData.completed === false;
+
+  // Stamp localStorage the first time we pass through without needing onboarding.
+  // ALL hooks must be declared before any conditional returns.
+  useEffect(() => {
+    if (!localDone && !onboardingLoading && !showOnboarding) {
+      localStorage.setItem(ONBOARDING_LS_KEY, "done");
+      setLocalDone(true);
+    }
+  }, [localDone, onboardingLoading, showOnboarding]);
+
+  /** Called by OnboardingPage when the user completes or skips the form.
+   *  NO full-page reload — we update React Query cache + local state so the
+   *  AppShell renders in the same React tree immediately. */
+  const handleOnboardingComplete = useCallback(() => {
+    localStorage.setItem(ONBOARDING_LS_KEY, "done");
+    setLocalDone(true);
+    // Seed the cache so the useQuery above doesn't refetch
+    qc.setQueryData(["onboarding"], { completed: true });
+    // Ensure we land on the dashboard
+    navigate("/dashboard");
+  }, [qc, navigate]);
+
+  // All hooks declared above — now safe to early-return
+  if (!localDone && onboardingLoading) return <FullPageSpinner />;
+
+  if (showOnboarding) {
+    return <OnboardingPage onComplete={handleOnboardingComplete} />;
+  }
+
   return (
     <AppShell>
       <Switch>
@@ -148,6 +220,10 @@ function Router() {
         <Route path="/chinese-themes/:category" component={ChineseThemesCategoryPage} />
         <Route path="/chinese-themes"           component={ChineseThemesPage} />
         <Route path="/settings"          component={SettingsPage} />
+        <Route path="/membership"        component={MembershipPage} />
+        <Route path="/billing/success"   component={BillingSuccessPage} />
+        <Route path="/billing/restore"   component={BillingRestorePage} />
+        <Route path="/affiliate"         component={AffiliatePage} />
         <Route component={NotFound} />
       </Switch>
     </AppShell>

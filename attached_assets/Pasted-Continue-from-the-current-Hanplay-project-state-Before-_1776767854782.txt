@@ -1,0 +1,231 @@
+Continue from the current Hanplay project state.
+
+Before any vocabulary/content migration, I want a FULL LOGIC AUDIT to map the ENTIRE old system so future updates become easy and safe.
+
+IMPORTANT:
+This is AUDIT ONLY.
+Do NOT refactor yet.
+Do NOT migrate to Supabase yet.
+Do NOT rewrite features yet.
+
+GOAL:
+Understand every dependency between flashcards, quizzes, phrases, dashboard, progress, premium gating, and vocabulary data.
+
+I want a complete map of how the old system works so we can modernize it without breaking anything.
+
+==================================================
+MAIN OBJECTIVE
+==================================================
+
+Map the current logic flow from:
+
+- vocabulary data source
+- flashcards
+- quizzes
+- phrases
+- exams
+- review/SRS
+- dashboard continue bar
+- dashboard progress metrics
+- level unlock system
+- premium gating
+- route protection
+- saved progress / resume state
+
+Understand how everything is connected.
+
+==================================================
+PART 1 — CONTENT SOURCE AUDIT
+==================================================
+
+Find exactly where all learning content comes from now.
+
+Audit:
+
+- hskData.ts files
+- phraseData.ts
+- any JSON files
+- any constants
+- API-generated content
+- duplicated sources
+- frontend-only content
+- backend-only content
+
+For each source explain:
+1. what feature uses it
+2. whether it is authoritative
+3. whether it is stale / duplicated
+4. migration risk level
+
+==================================================
+PART 2 — FLASHCARDS FULL LOGIC MAP
+==================================================
+
+Audit flashcards completely.
+
+Explain:
+
+- where flashcard data loads from
+- route structure
+- level selection logic
+- category selection logic
+- next/prev logic
+- save word logic
+- resume logic
+- progress persistence
+- audio logic
+- premium restrictions
+- unlock restrictions
+- mobile-specific behavior
+
+Show all files/hooks/components involved.
+
+==================================================
+PART 3 — QUIZ / EXAM FULL LOGIC MAP
+==================================================
+
+Audit quizzes and exams completely.
+
+Explain:
+
+- where quiz data comes from
+- how questions are generated
+- whether they reuse flashcard vocabulary or separate data
+- answer validation
+- score logic
+- pass/fail logic
+- unlock next level logic
+- sticky-pass logic
+- retry behavior
+- result storage
+- route protection
+
+Show all files/routes/components involved.
+
+==================================================
+PART 4 — PHRASES FULL LOGIC MAP
+==================================================
+
+Audit phrases system completely.
+
+Explain:
+
+- where phrase data comes from
+- level/category structure
+- route structure
+- protection method
+- whether backend/API protects it
+- relationship to vocabulary system
+
+Show risks and migration complexity.
+
+==================================================
+PART 5 — REVIEW / SRS SYSTEM
+==================================================
+
+Audit review mode / spaced repetition.
+
+Explain:
+
+- saved_words usage
+- how words are linked by id
+- review scheduling algorithm
+- where word metadata is enriched from
+- premium gating
+- risk if word IDs change
+
+==================================================
+PART 6 — DASHBOARD DEPENDENCY MAP
+==================================================
+
+Audit dashboard logic fully.
+
+Explain:
+
+- continue bar logic
+- current level logic
+- progress bars
+- word counts
+- streak metrics
+- quick action buttons
+- current level routes
+- membership state effects
+- free vs premium display differences
+
+Show all data sources used.
+
+==================================================
+PART 7 — ACCESS CONTROL / SECURITY MAP
+==================================================
+
+Map current security model.
+
+Explain:
+
+- server-side gates
+- premium checks
+- progression checks
+- route guards
+- client-only checks
+- weak spots
+- content leaks
+- URL manipulation protections
+
+==================================================
+PART 8 — ID SYSTEM / DATA COUPLING
+==================================================
+
+Audit the word ID system carefully.
+
+Explain:
+
+- current ID format
+- where IDs are used
+- saved progress dependencies
+- dashboard dependencies
+- review dependencies
+- what breaks if IDs change
+
+This is critical for migration planning.
+
+==================================================
+PART 9 — UPDATE IMPACT MAP
+==================================================
+
+I want to know exactly what breaks if we replace vocabulary source.
+
+If we move to Supabase:
+- what features need updates?
+- what can remain unchanged?
+- what adapters can be used?
+- what should migrate first?
+- what should be delayed?
+
+==================================================
+PART 10 — OUTPUT FORMAT
+==================================================
+
+Provide a professional report with:
+
+1. Full architecture overview
+2. Exact files/folders involved
+3. Flashcards dependency map
+4. Quiz/exam dependency map
+5. Phrase dependency map
+6. Dashboard dependency map
+7. Review/SRS dependency map
+8. Security model summary
+9. Biggest technical debt areas
+10. Safest migration order
+11. Highest-risk components
+12. Recommended compatibility strategy
+13. Which legacy files can later be removed
+
+==================================================
+IMPORTANT
+==================================================
+
+I need this audit so future updates are easy.
+
+Please think like a senior engineer preparing a live SaaS for a major content-system upgrade.
+No coding yet — map everything first.

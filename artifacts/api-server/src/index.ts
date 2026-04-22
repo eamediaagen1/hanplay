@@ -1,6 +1,6 @@
 import app from "./app";
 import { logger } from "./lib/logger";
-import { runMigration006IfNeeded, runMigration007IfNeeded, runMigration012IfNeeded, runMigration013IfNeeded } from "./lib/migrate.js";
+import { runMigration006IfNeeded, runMigration007IfNeeded, runMigration012IfNeeded, runMigration013IfNeeded, runMigration014IfNeeded, runMigration015IfNeeded, runMigration016IfNeeded } from "./lib/migrate.js";
 import { ensureStorageBuckets } from "./lib/storage.js";
 
 const rawPort = process.env["PORT"];
@@ -38,8 +38,18 @@ app.listen(port, (err) => {
     logger.error({ err: e }, "Migration 012 check failed");
   });
 
+  runMigration014IfNeeded().catch((e) => {
+    logger.warn({ err: e }, "Migration 014 error (non-fatal)");
+  });
+  runMigration015IfNeeded().catch((e) => {
+    logger.warn({ err: e }, "Migration 015 error (non-fatal)");
+  });
   runMigration013IfNeeded().catch((e) => {
     logger.error({ err: e }, "Migration 013 check failed");
+  });
+
+  runMigration016IfNeeded().catch((e) => {
+    logger.warn({ err: e }, "Migration 016 (vocabulary) error (non-fatal)");
   });
 
   // Ensure storage buckets exist for theme product uploads

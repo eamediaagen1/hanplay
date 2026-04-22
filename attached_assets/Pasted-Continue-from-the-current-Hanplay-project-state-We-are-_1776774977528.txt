@@ -1,0 +1,114 @@
+Continue from the current Hanplay project state.
+
+We are now at STEP 2 of the vocabulary migration.
+
+STEP 1 (SQL migration in Supabase) is assumed completed.
+
+Now I need you to complete STEP 2 fully and safely:
+
+==================================================
+GOAL
+==================================================
+
+Run the vocabulary seed process and make Hanplay start using the new Supabase vocabulary dataset.
+
+The seed dataset contains 5,427 records generated from my CSV.
+
+Use the existing endpoint/process already built:
+
+POST /api/admin/seed-vocabulary
+
+==================================================
+TASKS
+==================================================
+
+1. Verify the vocabulary_words table exists and is ready.
+
+2. Run a DRY RUN first:
+
+POST /api/admin/seed-vocabulary?dry=1
+
+Show me:
+- total rows detected
+- counts per HSK level
+- duplicates if any
+- rows to insert
+- rows to update
+
+3. If dry run looks correct, run the REAL seed:
+
+POST /api/admin/seed-vocabulary
+
+4. Insert/upsert in safe batches.
+
+5. Preserve compatibility with current IDs and progress data.
+
+6. After seed completes, invalidate caches if needed.
+
+==================================================
+POST-SEED VERIFICATION
+==================================================
+
+After seeding, verify:
+
+1. total vocabulary rows in database
+2. counts by level
+3. no duplicate IDs
+4. active rows count
+5. legacy fallback no longer required
+
+==================================================
+APP TESTING
+==================================================
+
+Then test the current app behavior using the new DB source:
+
+- /api/lessons?level=1
+- /api/lessons?level=2
+- /api/lessons?level=6
+
+Check:
+
+- response shape unchanged
+- flashcards still compatible
+- quizzes still compatible
+- no missing fields
+- correct counts
+
+==================================================
+UI / PRODUCT TESTS
+==================================================
+
+Verify in the frontend:
+
+- flashcards load
+- quizzes load
+- dashboard counts load correctly
+- no white screens
+- no console errors
+
+==================================================
+OUTPUT REQUIRED
+==================================================
+
+Give me a final report with:
+
+1. Dry run result
+2. Real seed result
+3. Total rows inserted
+4. Rows updated
+5. Final counts by level
+6. Whether the app now uses Supabase vocabulary successfully
+7. Any issues found
+8. Whether old static fallback can now be retired
+9. Next recommended step
+
+==================================================
+IMPORTANT
+==================================================
+
+Do the work, not just explain it.
+
+Use the safest production approach.
+
+If any issue blocks direct execution, tell me the exact manual command or exact endpoint URL I need to run.

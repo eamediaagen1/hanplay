@@ -1,0 +1,258 @@
+Continue from the current project state and implement these changes carefully without breaking auth, premium logic, dashboard progression, admin, Chinese Themes, branding, deployment setup, or existing routes.
+
+GOAL
+Polish the product for launch by improving:
+- support/contact info
+- pricing
+- dashboard/layout/UI
+- navbar/footer
+- theme toggle placement
+- onboarding analytics form after email verification
+- large-screen sizing
+- landing page polish
+
+IMPORTANT
+- Keep everything working
+- Reuse existing components where possible
+- Make the product look more premium and organized
+- Apply all changes consistently across the app
+- Add SQL migration(s) for new stored analytics data
+
+==================================================
+PART 1 — SUPPORT EMAIL
+==================================================
+
+Update the support/contact email everywhere to:
+
+support@hanplay.online
+
+Audit and replace old email references in:
+- landing page
+- footer
+- contact section
+- support/help text
+- membership page if shown
+- admin/contact related UI if any
+- metadata or mailto links if present
+
+==================================================
+PART 2 — PRICING UPDATE
+==================================================
+
+Change pricing to:
+
+9.99
+
+Update all relevant places:
+- pricing page
+- landing page pricing mentions
+- upgrade cards
+- membership page
+- paywall text
+- CTA descriptions
+- anywhere else price appears
+
+Keep the Gumroad link unchanged unless already updated:
+https://hanplay.gumroad.com/l/hanplay-premium
+
+==================================================
+PART 3 — MOVE ACCOUNT + THEME CONTROLS
+==================================================
+
+Move account/settings/theme controls from the lower-left area to the top-right area of the app layout.
+
+Requirements:
+- top-right should feel cleaner and more modern
+- user/account area should be easier to access
+- theme toggle should live there in the app
+- improve the visual structure around it
+
+Also improve the general top navigation/header UI so it looks more polished.
+
+==================================================
+PART 4 — FIX LARGE SCREEN 16:9 SIZING
+==================================================
+
+Current issue:
+- on large 16:9 screens, the app UI feels too small
+
+Please improve large-screen responsiveness so the app feels better on:
+- laptops
+- desktop
+- 16:9 displays
+
+Focus on:
+- dashboard card sizing
+- spacing
+- heading sizes
+- content width
+- section balance
+- visual presence
+
+Do NOT break the mobile improvements.
+I want better scaling and better balance, not just oversized text.
+
+==================================================
+PART 5 — LANDING PAGE THEME TOGGLE
+==================================================
+
+Add a dark/light theme toggle to the landing page too.
+
+Requirements:
+- it should be visible and clean
+- consistent with the main app theme system
+- should work before login on the public landing page
+- keep it well integrated into the navbar/header
+
+==================================================
+PART 6 — BETTER FOOTER + SOCIAL LINKS
+==================================================
+
+Build a better footer for the landing page/public site.
+
+Include:
+- brand name: Hanplay
+- short support/contact info
+- useful links if appropriate
+- social links/icons for:
+  - Instagram
+  - TikTok
+  - Reddit
+  - X
+  - YouTube
+
+If actual social URLs are not yet available, structure the footer so I can easily replace placeholders later.
+
+Make it look polished and modern, not empty or generic.
+
+==================================================
+PART 7 — ABOUT US + CONTACT US IMPROVEMENTS
+==================================================
+
+Improve both sections on the landing page.
+
+A. About Us
+- make it larger and more substantial
+- clearer and more visually important
+- explain the mission/product more confidently
+- keep it readable and attractive
+
+B. Contact Us
+- change it into a form-style section
+- include fields like:
+  - name
+  - email
+  - message
+
+If real submission backend is not already implemented, create a polished form UI with a safe fallback or wire it if current architecture supports it cleanly.
+Do not overengineer, but make it feel real and useful.
+
+==================================================
+PART 8 — FIXED NAVBAR ON SCROLL
+==================================================
+
+Make the landing page navbar fixed/sticky when scrolling.
+
+Requirements:
+- navbar remains visible while scrolling
+- smooth/polished behavior
+- should still look good in both dark and light themes
+- no layout jump or overlap issues
+
+==================================================
+PART 9 — POST-VERIFICATION ANALYTICS FORM
+==================================================
+
+After email verification and before the user enters the dashboard for the first time, show a short onboarding/analytics form.
+
+Purpose:
+Collect simple user acquisition/segmentation data for future analysis.
+
+This form should appear after auth verification and before entering the dashboard, ideally only when the data has not been collected yet.
+
+Fields to collect:
+1. Where did you hear about Hanplay?
+   Use radio buttons with options:
+   - Reddit
+   - TikTok
+   - Google
+   - Friend
+   - ChatGPT
+   - Other
+
+2. Age
+   - input or select, whichever fits best
+
+3. Country
+   - input or select, whichever fits best
+
+Requirements:
+- store the data in the database
+- only ask once unless current system already supports editing later
+- after submission, allow the user into the dashboard
+- do not block existing users who already completed it
+- if user skips is not desired, require completion once
+- keep the form short and clean
+
+==================================================
+PART 10 — SQL MIGRATIONS FOR ANALYTICS DATA
+==================================================
+
+Add the necessary SQL migration(s) to store the onboarding analytics data.
+
+Suggested fields/table should support:
+- user_id
+- acquisition_source
+- age
+- country
+- submitted_at
+- created_at
+- updated_at
+
+You may use:
+- a dedicated onboarding/profile analytics table
+OR
+- extend existing profiles table if that is cleaner in the current schema
+
+Important:
+- preserve current data
+- do not duplicate existing equivalent fields
+- keep secure ownership/RLS in mind
+- use the current schema style
+
+==================================================
+PART 11 — GENERAL UI POLISH
+==================================================
+
+While doing the above, improve overall UI polish where relevant:
+- better alignment
+- cleaner spacing
+- stronger hierarchy
+- more premium feel
+- consistent sizing
+- especially dashboard and top navigation
+
+But do not redesign the whole app from scratch.
+
+==================================================
+PART 12 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. all places where support email was updated
+2. all places where pricing was updated to 9.99
+3. account/theme control layout changes
+4. large-screen sizing fixes
+5. landing page improvements
+6. footer/social links added
+7. about/contact changes
+8. sticky navbar implementation
+9. onboarding analytics form flow
+10. SQL migrations added
+11. files changed
+12. any placeholder social/contact values I should replace later
+
+IMPORTANT
+- Implement the changes, not just describe them
+- Keep it polished and launch-ready
+- Do not break existing flows

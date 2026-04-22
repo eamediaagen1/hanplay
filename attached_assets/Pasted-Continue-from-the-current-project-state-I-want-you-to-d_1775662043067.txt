@@ -1,0 +1,155 @@
+Continue from the current project state.
+
+I want you to do a full responsive/mobile UX pass on the app, with priority on the dashboard, flashcards, and quiz experience.
+
+GOAL
+Make the app fit properly on all device sizes:
+- desktop
+- laptop
+- tablet
+- phone
+
+Current issues:
+- dashboard boxes/cards and text look bad on smaller screens
+- spacing and sizing are not balanced
+- flashcard page is not comfortable on phone
+- quiz page requires too much scrolling to reach the Next button
+- overall layout does not feel truly mobile-friendly
+
+IMPORTANT
+- Do not break existing logic
+- Keep auth, premium logic, dashboard behavior, admin, and progression intact
+- This is mainly a responsive UX/layout fix
+- Focus on polish, usability, and consistent behavior across screen sizes
+
+==================================================
+PART 1 — DASHBOARD RESPONSIVE FIX
+==================================================
+
+Audit the dashboard layout on mobile/tablet and improve it.
+
+Fix:
+- oversized boxes/cards
+- bad text wrapping
+- poor spacing/padding
+- inconsistent card heights
+- awkward stacking on smaller screens
+- buttons that feel too wide or too cramped
+- typography scaling issues
+
+Requirements:
+- dashboard should look clean on phone
+- cards should stack naturally
+- text should remain readable
+- spacing should feel balanced
+- no broken alignment
+- no overflow/cutoff
+
+Priority sections to improve:
+- greeting header
+- continue bar
+- streak card
+- levels cards
+- quick action cards
+- upgrade/free-user banners if shown
+
+==================================================
+PART 2 — FLASHCARDS RESPONSIVE FIX
+==================================================
+
+Fix flashcards for mobile.
+
+Current issue:
+- on phone, the layout is not comfortable
+- users may need too much scrolling
+- controls are not well positioned
+
+Requirements:
+- flashcard content should fit comfortably on phone screens
+- reduce unnecessary vertical space
+- keep key controls visible
+- make buttons easier to tap
+- avoid awkward overflow
+- make front/back card layout responsive
+- text sizing should adapt well to smaller screens
+
+==================================================
+PART 3 — QUIZ RESPONSIVE FIX
+==================================================
+
+Fix the quiz page for phone devices.
+
+Current issue:
+- on phone, user has to scroll down too much to click “Next”
+- this hurts UX
+
+Requirements:
+- ensure quiz answers and Next/Submit actions are usable without excessive scrolling
+- reduce wasted vertical space
+- improve spacing/layout for question + answers + button
+- keep CTA visible more easily on mobile
+- if appropriate, use a sticky/fixed bottom action area for Next/Submit on mobile only
+- make sure this does not break desktop UX
+
+Important:
+The goal is that users on phone can answer and move forward easily.
+
+==================================================
+PART 4 — GLOBAL RESPONSIVE AUDIT
+==================================================
+
+Do a broader responsive pass across the app and fix obvious mobile issues.
+
+Check:
+- text overflow
+- card overflow
+- button sizing
+- icon sizing
+- grid breakpoints
+- page padding on small screens
+- modal/dialog responsiveness
+- navigation/sidebar behavior on mobile
+- spacing consistency
+- safe tap targets
+
+==================================================
+PART 5 — FIT ANY DEVICE
+==================================================
+
+I want the app to feel good on:
+- small phones
+- larger phones
+- tablets
+- laptops
+- wide desktop screens
+
+Please improve breakpoints and layout behavior so the app adapts gracefully.
+
+==================================================
+PART 6 — IMPLEMENTATION STYLE
+==================================================
+
+Use the current styling system and components already in the app.
+
+Requirements:
+- do not redesign everything
+- improve responsiveness with minimal clean changes
+- keep the current visual style
+- reuse existing classes/components where possible
+- prefer scalable responsive utilities over one-off hacks
+
+==================================================
+PART 7 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. which pages/components were improved
+2. what responsive issues were fixed
+3. how dashboard mobile layout changed
+4. how flashcard mobile layout changed
+5. how quiz Next-button/mobile flow changed
+6. files changed
+
+IMPORTANT:
+Do not only adjust one screen.
+Do a careful responsive/mobile usability pass across the main app, with special focus on dashboard, flashcards, and quiz.

@@ -1,0 +1,178 @@
+Continue from the current project state.
+
+There is a signup/onboarding flow bug that must be fixed carefully.
+
+CURRENT ISSUE
+- After signup, when the user enters name, email, and password, the redirect URL shows dashboard
+- but the page becomes white/blank
+- the onboarding form is not working correctly
+- the signup flow needs to be more user-friendly
+- if DB/schema changes are needed, add proper migration(s)
+
+GOAL
+Fix the signup → verification/onboarding → dashboard flow so it works correctly and feels smooth.
+
+IMPORTANT
+- Do not break auth, premium logic, dashboard, admin, or existing user data
+- Preserve current functionality while fixing the broken flow
+- Make the signup experience cleaner and more user-friendly
+
+==================================================
+PART 1 — FIND THE REAL ROOT CAUSE
+==================================================
+
+Please audit the full signup and post-signup flow.
+
+Inspect:
+- signup form submit logic
+- auth redirect behavior
+- email verification / callback flow
+- onboarding form routing/guard logic
+- dashboard route logic
+- profile creation timing
+- name field handling
+- required onboarding data checks
+- any route protection causing blank/white screen
+- any error boundary or failed async load hidden behind a blank page
+
+Do not guess.
+Find the exact reason the user lands on a white page after signup.
+
+==================================================
+PART 2 — FIX SIGNUP → ONBOARDING → DASHBOARD FLOW
+==================================================
+
+I want the intended flow to be:
+
+1. User signs up with:
+- name
+- email
+- password
+
+2. Account is created successfully
+
+3. If email verification is required:
+- handle callback properly
+- do not drop user on a blank dashboard
+
+4. If onboarding/analytics form has not been completed:
+- user should be sent to the onboarding form page/step
+- not directly into a broken dashboard state
+
+5. After onboarding is submitted:
+- user should then enter dashboard normally
+
+If the current redirect goes straight to dashboard before onboarding/profile is ready, fix that flow properly.
+
+==================================================
+PART 3 — FIX WHITE/BLANK PAGE
+==================================================
+
+The white page must be fixed.
+
+Please identify whether it is caused by:
+- missing profile row
+- onboarding record missing
+- route guard loop
+- async user fetch issue
+- null/undefined values
+- auth redirect mismatch
+- layout crash
+- required data not loaded yet
+
+Then fix it properly.
+
+I want:
+- no blank white screen
+- safe loading/fallback state if data is still being fetched
+- proper redirect to the correct next step
+
+==================================================
+PART 4 — IMPROVE SIGNUP UX / SCHEMA
+==================================================
+
+Make the signup flow more user-friendly.
+
+Improve:
+- form layout
+- spacing
+- labels
+- validation messages
+- input clarity
+- submit/loading states
+- success/error messages
+
+Expected fields:
+- name
+- email
+- password
+
+Make it feel polished and clean.
+
+If the current profile schema does not properly support the name field or onboarding state, fix it.
+
+==================================================
+PART 5 — DATABASE / MIGRATIONS
+==================================================
+
+If needed, add proper migration(s).
+
+Check whether the schema correctly supports:
+- profile name
+- onboarding completed flag OR onboarding data row
+- any acquisition/analytics fields recently added
+- profile creation on signup
+- safe relationship to auth.users
+
+If migrations are needed:
+- add them cleanly
+- preserve existing data
+- do not duplicate structures if a correct one already exists
+
+==================================================
+PART 6 — SAFE ROUTING LOGIC
+==================================================
+
+Implement a clean routing decision after signup/login.
+
+Desired logic:
+- if user is not authenticated → auth page
+- if authenticated but profile/onboarding is incomplete → onboarding form
+- if authenticated and onboarding is complete → dashboard
+
+This logic must be robust and must not cause:
+- white screens
+- broken redirects
+- loop redirects
+
+==================================================
+PART 7 — EXISTING USERS
+==================================================
+
+Make sure this fix works for:
+- new users
+- existing users
+- verified users
+- premium users
+- free users
+
+Do not break existing accounts.
+
+If existing users already completed onboarding, they should go straight to dashboard.
+
+==================================================
+PART 8 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. root cause of the white screen
+2. what was changed in signup flow
+3. what was changed in onboarding routing
+4. any migration(s) added
+5. files changed
+6. how the final signup → onboarding → dashboard flow now works
+
+IMPORTANT
+- Do not just patch the UI
+- Fix the full flow correctly
+- Make signup more user-friendly and robust

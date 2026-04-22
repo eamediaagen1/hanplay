@@ -6,10 +6,15 @@ import { apiFetch } from "@/lib/api";
 /**
  * /auth/callback
  *
- * Supabase redirects here after the user clicks the magic-link email.
+ * Supabase redirects here after:
+ *   - Magic link click (SIGNED_IN event)
+ *   - Email confirmation after signup (SIGNED_IN event)
+ *   - Password reset link click (PASSWORD_RECOVERY event)
+ *
  * The SDK automatically exchanges the URL hash tokens for a session.
- * We wait for the SIGNED_IN event, optionally migrate localStorage data,
- * then redirect to /dashboard.
+ * We inspect the event type and route accordingly:
+ *   - PASSWORD_RECOVERY → /reset-password (user sets new password)
+ *   - SIGNED_IN         → /dashboard (with optional data migration)
  */
 export default function AuthCallback() {
   const [, setLocation] = useLocation();
@@ -21,6 +26,14 @@ export default function AuthCallback() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        if (event === "PASSWORD_RECOVERY") {
+          // Redirect to the reset password page — session is active so the
+          // user can call updateUser({ password }) there.
+          subscription.unsubscribe();
+          setLocation("/reset-password");
+          return;
+        }
+
         if (event === "SIGNED_IN" && session) {
           // Migrate spaced-repetition data from localStorage (fire-and-forget)
           try {
@@ -48,7 +61,7 @@ export default function AuthCallback() {
       }
     );
 
-    // Fallback: if already signed in when this page loads
+    // Fallback: if already signed in when this page loads (e.g. hard refresh)
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         subscription.unsubscribe();

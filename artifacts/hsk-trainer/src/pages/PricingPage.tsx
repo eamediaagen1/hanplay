@@ -6,30 +6,29 @@ import { useBranding, pickLogo } from "@/hooks/use-branding";
 import { useTheme } from "@/hooks/use-theme";
 
 const BENEFITS = [
-  "Access to all HSK levels — HSK 1 through HSK 6",
+  "All 6 HSK levels — 5,000+ words and growing",
   "Full flashcard decks and phrase practice for every level",
-  "All quizzes and level exams",
-  "Spaced repetition progress tracking",
-  "Level progression system — pass exams to advance",
-  "Lifetime access — no subscription, pay once",
+  "Quizzes, level exams, and spaced repetition",
+  "Exam-based progression system",
+  "1 year of access · no auto-renewal · no surprise charges",
 ];
 
 const FAQS = [
   {
-    q: "Is HSK 1 really free?",
-    a: "Yes. HSK 1 (150 words) is completely free with no account required in demo mode, and free for all registered users.",
-  },
-  {
     q: "What do I get with Premium?",
-    a: "Full access to all 6 HSK levels — over 5,000 words, all quizzes, phrases, and the level progression system.",
+    a: "Full access to all 6 HSK levels — over 5,000 vocabulary words, all quizzes, phrase practice, and the level progression system. Everything unlocked from day one.",
   },
   {
     q: "Is this a subscription?",
-    a: "No. It's a one-time payment. You pay once and keep access forever.",
+    a: "$9.99 unlocks one full year of access. There's no auto-renewal or recurring charge — just repurchase when you're ready to continue.",
   },
   {
     q: "What if I already purchased?",
-    a: "Sign in and use the 'Already purchased?' button on your dashboard to sync your access.",
+    a: "Sign in and go to Membership. You can enter your license key or use the email sync option to restore access in seconds.",
+  },
+  {
+    q: "Do you offer refunds?",
+    a: "Yes. If Hanplay isn't right for you, reach out within 30 days of purchase and we'll issue a full refund — no questions asked.",
   },
 ];
 
@@ -75,10 +74,10 @@ export default function PricingPage() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl sm:text-5xl font-serif font-bold text-foreground leading-tight">
-            Simple Pricing
+            One plan. Everything unlocked.
           </h1>
           <p className="mt-3 text-lg text-muted-foreground">
-            One plan. One payment. Lifetime access.
+            All 6 HSK levels for $9.99/year. No subscriptions. No surprises.
           </p>
         </div>
 
@@ -97,11 +96,11 @@ export default function PricingPage() {
 
             {/* Price */}
             <div className="flex items-baseline gap-2 mb-1">
-              <span className="text-5xl font-bold text-foreground">$29</span>
-              <span className="text-lg text-muted-foreground font-medium">one-time</span>
+              <span className="text-5xl font-bold text-foreground">$9.99</span>
+              <span className="text-lg text-muted-foreground font-medium">/ year</span>
             </div>
             <p className="text-sm text-muted-foreground mb-8">
-              No subscription. No renewals. Yours forever.
+              1 full year of access. No auto-renewal. No surprise charges.
             </p>
 
             {/* Benefits */}
@@ -116,31 +115,31 @@ export default function PricingPage() {
 
             {/* CTA */}
             <a
-              href={buildGumroadUrl(getStoredReferralCode())}
+              href={buildGumroadUrl(null, getStoredReferralCode())}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl bg-primary text-primary-foreground font-bold text-base shadow-lg shadow-primary/25 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/30 transition-all duration-200"
             >
-              Get Full Access
+              Get full access — $9.99/year
             </a>
 
             <p className="text-center text-xs text-muted-foreground mt-3">
-              Secure checkout via Gumroad · Instant delivery
+              Secure checkout · Instant access · 30-day money-back guarantee
             </p>
           </div>
         </div>
 
-        {/* Free tier note */}
+        {/* Demo note */}
         <div className="mt-6 text-center">
           <p className="text-sm text-muted-foreground">
-            Want to try first?{" "}
+            Not sure yet?{" "}
             <button
               onClick={() => navigate("/demo")}
               className="text-primary font-semibold hover:underline"
             >
-              Try the free HSK 1 demo
-            </button>{" "}
-            — no account needed.
+              Try the demo first
+            </button>
+            {" "}— no account needed.
           </p>
         </div>
 
@@ -160,10 +159,13 @@ export default function PricingPage() {
           </div>
         </div>
 
-        {/* Trust */}
+        {/* Trust footer */}
         <p className="text-center text-xs text-muted-foreground mt-12">
-          Have questions? Reach out before purchasing.
-          Satisfaction matters — if Premium doesn't work for you, we'll make it right.
+          Have a question before buying?{" "}
+          <a href="mailto:contact@hanplay.online" className="text-primary underline underline-offset-2">
+            contact@hanplay.online
+          </a>
+          . We offer a 30-day full refund — no questions asked.
         </p>
       </div>
     </div>

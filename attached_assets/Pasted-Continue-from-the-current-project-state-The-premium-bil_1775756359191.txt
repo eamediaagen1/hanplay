@@ -1,0 +1,138 @@
+Continue from the current project state.
+
+The premium/billing system has already been implemented to this stage:
+
+Backend:
+- billing router is registered in routes/index.ts
+- POST /api/premium/sync and POST /api/premium/activate write to premium_access + profiles
+- expiry stacking uses the shared grantOrExtendPremium helper
+
+Frontend:
+- gumroad.ts has buildGumroadUrl(userId?, referralCode?) and passes ?member=USER_ID
+- use-subscription.ts exists and reads /api/billing/status
+- BillingSuccessPage polls billing status and falls back to restore flow
+- BillingRestorePage exists
+- MembershipPage shows expiry date, activation date, source, and free-user restore/sync panels
+- DashboardPage passes user?.id into buildGumroadUrl
+- PricingPage uses $9.99/year
+- premium_access SQL migration is ready
+
+NOW I want two things:
+
+1. Improve/update the copywriting across the billing/premium flow
+2. Identify exactly what Gumroad API/config values are still needed from me and where to set them
+
+IMPORTANT
+- Do not rebuild the billing system from scratch
+- Reuse what is already implemented
+- Do not break current auth, premium logic, membership page, pricing page, dashboard, or restore flow
+- Focus on polish + final setup requirements
+
+==================================================
+PART 1 — COPYWRITING UPDATE
+==================================================
+
+Please improve the copywriting in all premium/billing-related areas so it feels cleaner, more trustworthy, and more premium.
+
+Audit and update text in:
+- Pricing page
+- Membership page
+- Billing success page
+- Billing restore page
+- Upgrade buttons / upgrade banners
+- Expiring soon banner
+- Free-user license activation section
+- Any Gumroad purchase-related helper text
+
+Goals:
+- clearer wording
+- more polished UX
+- less technical/confusing phrasing
+- stronger trust and conversion
+- consistent Hanplay branding
+
+Tone:
+- simple
+- premium
+- clear
+- reassuring
+- not robotic
+- not overly salesy
+
+Examples of things to improve:
+- “Get Premium” wording
+- “Restore Premium” wording
+- “Enter license key” helper text
+- “We’re confirming your purchase…” state
+- renewal / expiring CTA wording
+- any outdated or awkward billing text
+
+Please make the copy feel launch-ready.
+
+==================================================
+PART 2 — GUMROAD API / CONFIG CHECK
+==================================================
+
+Now audit the current Gumroad integration and tell me exactly what is still needed from me.
+
+I want you to inspect the codebase and determine which Gumroad-related values/configs are still missing or required, such as:
+- Gumroad product ID
+- Gumroad product URL
+- Gumroad verify license URL
+- Gumroad webhook secret (if applicable)
+- any API tokens/keys if required by current implementation
+- any success/return URL that must be configured in Gumroad
+- any license settings that must be enabled in Gumroad
+- whether the product must have license keys enabled
+- whether member param is already enough for the flow
+- whether any webhook endpoint URL must be added manually in Gumroad
+
+For each missing/required item, tell me:
+1. exact name of the variable/config
+2. why it is needed
+3. where it is used in the code
+4. where I get it from in Gumroad
+5. example format/value
+
+==================================================
+PART 3 — CHECK ENV / SETUP READINESS
+==================================================
+
+Please verify whether the current implementation still needs any backend/frontend env vars added for Gumroad and billing.
+
+List only the missing or required values, not everything already working.
+
+Group them clearly:
+- Required for backend
+- Required for frontend
+- Required in Gumroad dashboard
+- Required in Supabase if relevant
+
+==================================================
+PART 4 — OPTIONAL SMALL UX IMPROVEMENTS
+==================================================
+
+If helpful and easy, also improve:
+- loading states in billing pages
+- empty/error messaging
+- restore success state
+- membership plan display polish
+
+But do not redesign the whole app.
+
+==================================================
+PART 5 — DELIVERABLES
+==================================================
+
+At the end, provide:
+1. copywriting areas updated
+2. files changed
+3. final wording strategy used
+4. exact Gumroad values/configs still needed from me
+5. any env vars I must add
+6. any Gumroad dashboard/manual setup steps I must do next
+
+IMPORTANT
+- Implement the copy updates directly
+- Then give me a precise checklist of missing Gumroad setup/config values
+- Do not just explain generically

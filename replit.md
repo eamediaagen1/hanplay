@@ -38,13 +38,14 @@ workspace/
 ## HSK Trainer — Feature Summary
 
 ### Access Model
-- **HSK 1**: Free, words served from bundled `hskData.ts` (frontend-only)
-- **HSK 2–6**: Premium, words served exclusively from `GET /api/lessons?level=N` (requires valid Supabase JWT + `is_premium = true` in DB)
+- **ALL levels locked** for free users — premium gates everything (changed from HSK 1 being free)
+- **HSK 1–6**: Premium only, words served from `GET /api/lessons?level=N` (requires valid Supabase JWT + `is_premium = true` in DB)
 
 ### Frontend (`artifacts/hsk-trainer`)
-- **Pages**: MarketingPage, PricingPage (`/pricing`), LandingPage (magic link+password auth with optional name on signup), AuthCallback, DashboardPage (`/dashboard` — unified learning hub), FlashcardPage, ReviewPage, QuizPage, PhrasesPage, StrokesPage, SettingsPage, ChineseThemesPage (auth+premium-gated at `/chinese-themes`), AdminPage / AdminLoginPage
+- **Pages**: MarketingPage (centered nav, About+Contact sections), PricingPage (`/pricing`), LandingPage (magic link+password auth with optional name on signup), AuthCallback, DashboardPage (`/dashboard` — unified learning hub), FlashcardPage, ReviewPage, QuizPage, PhrasesPage, StrokesPage, SettingsPage, MembershipPage (`/membership` — plan status, license activation, sync), AffiliatePage (`/affiliate` — referral code + link), MaintenancePage (`/maintenance` — standalone public), ChineseThemesPage (auth+premium-gated at `/chinese-themes`), AdminPage / AdminLoginPage
 - **Removed/redirected**: ProgressPage (redirects to `/dashboard`), LevelSelection (`/levels` redirects to `/dashboard`)
 - **Auth context**: `src/contexts/auth-context.tsx` — `AuthProvider` + `useAuth` hook
+- **Components**: `NotificationBell.tsx` — bell icon with click-outside dropdown, empty state; shows in MobileTopbar (AppShell) and sidebar
 - **Data hooks**: `use-profile.ts`, `use-saved-words.ts`, `use-study-prefs.ts`, `use-streak.ts`, `use-flashcard-position.ts`, `use-referral.ts`
   - `useStudyPrefs()` → `{ prefs: { showPinyin, autoPlay, lastLevel }, set }` — persisted to `hsk_study_prefs` in localStorage
   - `useStreak()` → `{ streak: { current_streak, longest_streak, last_active_date }, ping }` — calls `/api/streak/ping` on flashcard mount
@@ -217,3 +218,56 @@ Route: `/phrases/:level` (level-aware) — reads level from URL path param, disp
 ## Word ID Format
 
 Word IDs follow the pattern `hsk{level}-{category}{n}` (e.g. `hsk1-f1`, `hsk2-1`, `hsk3-ho1`). The ProgressPage parses the level from the id using `/^hsk(\d)/`.
+
+New words from the CSV import use sequential zero-padded IDs: `hsk{N}-{4-digit}` (e.g. `hsk2-0001`). Homophones (same character, different pronunciation) use tone-aware pinyin slugs (e.g. `hsk3-de2`, `hsk3-dei3`). All 119 legacy IDs from hskData.ts are preserved exactly.
+
+## Vocabulary Migration (Migration 016)
+
+### Status
+Vocabulary table schema defined — not yet created in Supabase (no `/pg/query` endpoint available). App runs on static fallback (`hskData.ts`, 151 HSK1 words) until table is created and seeded.
+
+### Files
+| File | Purpose |
+|------|---------|
+| `artifacts/api-server/migrations/016_vocabulary.sql` | Full DDL — run in Supabase SQL Editor |
+| `artifacts/api-server/scripts/transform-csv.cjs` | Transforms CSV → seed JSON |
+| `artifacts/api-server/scripts/vocabulary_seed.json` | 5,427-row seed dataset (pre-generated) |
+| `artifacts/api-server/src/lib/vocabularyService.ts` | Supabase-first + static fallback |
+
+### Database Schema (vocabulary table)
+- `id TEXT PRIMARY KEY` — stable, human-readable
+- `hsk_level SMALLINT` — 1–6
+- `hanzi TEXT` — Chinese characters (API maps to `word` for frontend compat)
+- `pinyin TEXT` — tone-marked pronunciation
+- `meaning TEXT` — full English translation
+- `meaning_short TEXT` — ≤30 char display label
+- `word_type TEXT` — primary grammar type (noun/verb/adjective/adverb/…)
+- `word_types TEXT[]` — all grammar types (polysemy: ["noun","verb"])
+- `topic_category TEXT` — semantic group (Greetings/Food/… — null for CSV words)
+- `search_vector TSVECTOR` — full-text search, GIN indexed
+- `image_url`, `image_alt` — optional media
+
+### Activation Steps
+1. Run `artifacts/api-server/migrations/016_vocabulary.sql` in Supabase SQL Editor
+2. Call `POST /api/admin/seed-vocabulary` to load all 5,427 words
+3. Optionally preview first: `POST /api/admin/seed-vocabulary?dry=1`
+
+### Admin Endpoints
+- `POST /api/admin/seed-vocabulary` — seed from `vocabulary_seed.json` (5,427 words)
+- `POST /api/admin/seed-vocabulary?legacy=1` — seed from `hskData.ts` (151 words)
+- `POST /api/admin/seed-vocabulary?dry=1` — preview counts only
+- `POST /api/admin/import-vocabulary` — body: `SeedRow[]` for incremental updates
+- `POST /api/admin/invalidate-vocabulary-cache` — clear in-memory cache
+
+### CSV Dataset Summary (hanplayvocab_clean.csv)
+| Level | Words | Notes |
+|-------|-------|-------|
+| HSK 1 | 300 | 119 matched to existing IDs; 32 legacy-only kept as inactive |
+| HSK 2 | 200 | All new |
+| HSK 3 | 500 | 12 homophones (得 de/děi, 只 zhǐ/zhī etc.) |
+| HSK 4 | 999 | |
+| HSK 5 | 1,599 | |
+| HSK 6 | 1,797 | |
+| **Total** | **5,427** | **Zero duplicate IDs** |
+
+Category column in CSV = grammar types only (Noun/Verb/Adjective…). No semantic topic column. `topic_category` field populated only for the 119 carried-over legacy words.
